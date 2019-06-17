@@ -1,0 +1,33 @@
+language: python
+matrix:
+  include:
+    - name: "Windows"
+      python: 3.6
+      os: windows
+      language: shell
+    - name: "Linux"
+      dist: xenial
+      python: 3.6
+      before_install:
+        - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+        - sudo apt-get update -q
+        - sudo apt-get install gfortran-9
+        - sudo ln -fs /usr/bin/gfortran-9 /usr/bin/gfortran && gfortran --version
+
+# commands to install dependencies: in this case use cmake to generate build environment
+install: 
+    - mkdir ./build
+    - cd ./build
+    - cmake -DCMAKE_BUILD_TYPE=Release -G "MinGW Makefiles" ../ || cmake -DCMAKE_BUILD_TYPE=Release ../
+
+# commands to run tests: compile FLINT and link text executable
+script:
+    - cmake --build ./
+
+# run tests
+after_success:
+    - ./TestFLINT
+    - cat ./results.txt
+    - mv ./results.txt ../media
+
+
