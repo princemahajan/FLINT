@@ -74,7 +74,7 @@ module StepSize
         real(WP), dimension(:), intent(in), optional :: Params !< Real parameter array to be passed to DEFunc
         
         real(WP) :: d0, d1, d2, dMax, h0, h1
-        real(WP), dimension(n) :: Y1, F1
+        real(WP), dimension(n) :: F1
         
         ! Algorithm starts here
         

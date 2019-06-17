@@ -1,4 +1,4 @@
-!############################################################################################
+!#################################################################################################################
 !
 ! Copyright 2019 Bharat Mahajan
 !
@@ -29,28 +29,32 @@
 !!                  + 13 stage with the last stage same as the first stage (FSAL)
 !!                  + 5th order error estimation with 3rd-order correction
 !!                  + 7th-order interpolant with 3 extra stages
-!!                  + For details, see Hairer's book "Solving ODE I" or his code at http://www.unige.ch/~hairer/prog/nonstiff/dop853.f.
+!!                  + For details, see Hairer's book "Solving ODE I" or his code at 
+!!                      http://www.unige.ch/~hairer/prog/nonstiff/dop853.f.
 !!              - Verner98R: Verner's 9th order method with Robust coefficients
 !!                  + 16 stages
 !!                  + Integration methods of order 9 with error pair of order 8
 !!                  + 8th-order interpolant with 5 extra stages
-!!                  + For details, see http://people.math.sfu.ca/~jverner/RKV98.IIa.Robust.000000351.081209.FLOAT6040OnWeb
+!!                  + For details, see 
+!!                      http://people.math.sfu.ca/~jverner/RKV98.IIa.Robust.000000351.081209.FLOAT6040OnWeb
 !!              - Verner65E: Verner's 6th order method with Efficient coefficients
 !!                  + 9 stages with the last stage same as the first stage (FSAL)
 !!                  + Integration methods of order 9 with error pair of order 8
 !!                  + 5th-order interpolant with 1 extra stage
-!!                  + For details, see http://people.math.sfu.ca/~jverner/RKV65.IIIXb.Efficient.00000144617.081204.RATOnWeb
+!!                  + For details, see 
+!!                      http://people.math.sfu.ca/~jverner/RKV65.IIIXb.Efficient.00000144617.081204.RATOnWeb
 !!              - DOP54: Dormand-Prince 5th order method
 !!                  + 7 stages with the last stage same as the first stage (FSAL)
 !!                  + Integration methods of order 5 with error pair of order 4
 !!                  + 4th-order interpolant with no extra stages
-!!                  + For coefficients, see  http://www.unige.ch/~hairer/prog/nonstiff/dopri5.f
+!!                  + For coefficients, see 
+!!                      http://www.unige.ch/~hairer/prog/nonstiff/dopri5.f
 !!    
 !! \author      Bharat Mahajan
 !! \version     0.9
 !! \date        02/04/2019    
 !
-!######################################################################################################################################
+!#################################################################################################################
 
     
 module ButcherTableaus

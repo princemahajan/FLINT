@@ -53,10 +53,11 @@
     real(WP) :: x0, xf
     real(WP), dimension(6) :: y0, yf
  
-    real(WP) :: stepsz, stepsz0, xfval, ipdx
+    real(WP) :: stepsz0, ipdx
     real(WP), dimension(:), allocatable :: Xint, Xarr
     real(WP), dimension(:,:), allocatable :: Yint, Yarr
     real(WP), allocatable, dimension(:,:) :: EventStates
+    logical, dimension(2) :: EvMask = [.TRUE.,.TRUE.]
     integer :: stiffstatus, stifftestval
     integer :: nsteps, naccpt, nrejct, fcalls, itr, nevents, ctr
     character(len=10) :: mname
@@ -113,7 +114,7 @@
         if (erkvar%status == FLINT_SUCCESS) then
             call erkvar%Integrate(x0, y0, xf, yf, StepSz=stepsz0,  &
                 IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
-                EventStates=EventStates, EventMask = [.TRUE.,.TRUE.],StiffTest=stiffstatus)
+                EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
 
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
@@ -168,7 +169,7 @@
             InterpOn=.TRUE., EventsOn=.TRUE.)
         if (erkvar%status == FLINT_SUCCESS) then
             call erkvar%Integrate(x0, y0, xf, yf, StepSz=stepsz0,  &
-                EventStates=EventStates, EventMask = [.TRUE.,.TRUE.],StiffTest=stiffstatus)
+                EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
             
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 

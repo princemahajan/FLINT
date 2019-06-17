@@ -7,9 +7,9 @@
  
  ## Copyright
  Copyright 2019 Bharat Mahajan <br><br>
-This work was performed at Odyssey Space Research LLC, Houston, TX under 
-contract no. 80JSC017D0001 with NASA-Johnson Space Center. FLINT source code 
-is licensed under the Apache License, Version 2.0 (the "License") <br>
+This work was performed at Odyssey Space Research LLC, Houston, TX as part of
+the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
+FLINT source code is licensed under the Apache License, Version 2.0 (the "License")
 found in the LICENSE file contained in this distribution. <br><br>
 The coefficients for DOP853 method were derived by Ernest Hairer. 
 His original codes are available at http://www.unige.ch/~hairer/software.html. 
@@ -46,12 +46,14 @@ User specifies the differential equations and events function in a separate
 class and their interfaces are provided. See the test program TestFLINT 
 and the DiffEq module on how to use FLINT.
 
-## Installation and Known Issues
+## Installation
 
-FLINT is mostly tested with ifort compiler from Intel Parallel Studio XE Composer for Windows 2016
-integrated with Microsoft Visual Studio Community version 2017. The CMakeLists file is tested to
-successfully generate Visual Studio projects as well as makefiles on Windows and Linux using cmake. 
-FLINT has no dependency on any other library.
+FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for 
+Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing
+is also done with gfortran on Windows and Linux plaforms. The CMakeLists file is provided
+to generate Visual Studio projects as well as makefiles on Windows and Linux using cmake.
+Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency
+on any other library.
 
  ## How to Use
 1. Create a differential equation system class by providing differential equation
@@ -124,7 +126,7 @@ at integrator's natural step-size must not be set to True.
     x0 = 0.0    
     y0 = [6400.0_wp,0.0_wp,0.0_WP, 0.0_WP,7.69202528825512_WP,7.69202528825512_WP]
     xf = 161131.68239305308_WP      
-    ! Call Tntgerate with final solution in yf, no initial step-size given, events-related
+    ! Call Intgerate with final solution in yf, no initial step-size given, events-related
     ! data (event-id, x value, y state) in EventData, and all events are detected
     if (erk%status == FLINT_SUCCESS) then    
         call erk%Integrate(x0, y0, xf, yf, StepSz=0.0, IntStepsOn=.FALSE.,&
@@ -139,20 +141,24 @@ must intgerate the equations again before calling Interpolate.
     real(WP), dimension(:), allocatable :: Xarr1, Xarr2
     real(WP), dimension(6,:) :: Yarr1, Yarr2
     Xarr1 = [(x0 + (xf-x0)/10*i, i=0,9)]    ! grid-1 with 10 points
-    Xarr1 = [(x0 + (xf-x0)/1000*i, i=0,999)]    ! grid-2 with 1000 points
+    Xarr2 = [(x0 + (xf-x0)/1000*i, i=0,999)]    ! grid-2 with 1000 points
     allocate(Yarr1(6,size(Xarr1)))    ! allocate solution storage
     allocate(Yarr2(6,size(Xarr2)))        
     if (erk%status == FLINT_SUCCESS) then
         ! interpolate and keep the internal storage for further calls
         call erk%Interpolate(Xarr1, Yarr1, .TRUE.)
         ! After this interpolation, delete the internal storage (default).
-        call erk%Interpolate(Xarr1, Yarr1, .FALSE.) 
+        call erk%Interpolate(Xarr2, Yarr2, .FALSE.) 
     end if    
     ! print the solutions
     print *, 'Solution at grid-1'    
     print *, Yarr1
     print *, 'Solution at grid-2'        
     print *, Yarr2
+    ! print the event data
+    print *, EventData(1,:)     ! Time at which events occured
+    print *, EventData(2:7,:)   ! corresponding position and velocity states
+    print *, Eventdata(8,:)     ! Event-ID number
 ```  
 For all the FLINT status codes and options supported by Init, Integrate, and Interpolate
 procedures along with the interfaces for user-supplied functions, see the FLINT_base 

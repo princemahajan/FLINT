@@ -37,8 +37,8 @@ submodule (ERK) ERKInterp
         logical, intent(in), optional :: SaveInterpCoeffs
 
         logical :: DeallocMem
-        integer :: n, ctr, k, X0loc, X0start
-        real(WP) :: h, hSign, theta, X0
+        integer :: n, ctr, X0loc, X0start
+        real(WP) :: h, hSign, X0
         
         ! if interpolation mode is not on then return with an error
         if (me%InterpOn .NEQV. .TRUE.) then
@@ -101,7 +101,7 @@ submodule (ERK) ERKInterp
             
             ! compute the interpolation polynomial  
             Yarr(:, ctr) = InterpY(size(me%InterpStates), Xarr(ctr),  X0, h, &
-                                    me%pstar, me%Bip(me%InterpStates,:,X0loc))
+                                    me%pstar, me%Bip(:,:,X0loc))
 
             ! prepare for the next point
             X0start = X0loc      

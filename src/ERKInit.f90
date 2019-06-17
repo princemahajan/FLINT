@@ -46,9 +46,6 @@
         real(WP), intent(in), optional :: EventStepSz        
 
         integer :: status
-        logical :: isSacalarTol 
-        real(DP) :: X        
-        real(DP), dimension(2) :: Params, Y, dYdX
         
         ! assign the method
         if (present(Method)) me%Method = Method

@@ -46,7 +46,7 @@ submodule (ERK) ERKIntegrate
         integer, intent(inout), optional :: StiffTest        
         real(WP), dimension(:), intent(in), optional :: params                
     
-        real(WP) :: h, hSign, hnew, hmax, X, X1, Err, Eventh, EventX0, EventX1, EventStepSz
+        real(WP) :: h, hSign, hnew, hmax, X, Err, Eventh, EventX0, EventX1, EventStepSz
         real(WP), dimension(me%pDiffEqSys%n) :: Y1, Y2, F0, Sc0, Yint12
 
         !integer, dimension(:), allocatable :: IpStages
@@ -166,6 +166,8 @@ submodule (ERK) ERKIntegrate
             if (.NOT. present(EventStates)) then
                 me%status = FLINT_ERROR_EVENTPARAMS
             end if
+            ! allocate EventData to 0 size to define it
+            allocate(EventData(0))
         end if
 
         ! Return if any error up to this point
@@ -375,15 +377,12 @@ submodule (ERK) ERKIntegrate
                                             BipComputed = .TRUE.
                                         end if
                                         ! Now find the exact event location using root-finding
-                                        call Root(EventX0, EventX1, val0, val1, DEFAULT_EVENTTOL, SingleEvent, EventXm, valm, rootiter, rooterror)
+                                        call Root(EventX0, EventX1, val0, val1, DEFAULT_EVENTTOL, &
+                                                    SingleEvent, EventXm, valm, rootiter, rooterror)
                                         if (rooterror == 0 .OR. rooterror == 2) then
                                             ! save the event states
                                             EventYm = InterpY(size(me%InterpStates), EventXm, X, h, me%pstar, Bip)
-                                            if (.NOT. allocated(EventData)) then
-                                                EventData = [EventXm, EventYm, real(EventId, WP)]
-                                            else
-                                                EventData = [EventData, EventXm, EventYm, real(EventId, WP)]
-                                            end if
+                                            EventData = [EventData, EventXm, EventYm, real(EventId, WP)]
                                         else
                                             ! root finding failed, save the event states at the point "a"
                                             status = FLINT_ERROR_EVENTROOT
@@ -826,21 +825,25 @@ submodule (ERK) ERKIntegrate
             
         cont3(:) = cont1(:) - h*k(InterpStates,13) - cont2(:)
             
-        cont4(:) = h*(me%d(1,1)*k(InterpStates,1) + me%d(6-4,1)*k(InterpStates,6) + me%d(7-4,1)*k(InterpStates,7) + me%d(8-4,1)*k(InterpStates,8) &
-                    + me%d(9-4,1)*k(InterpStates,9) + me%d(10-4,1)*k(InterpStates,10) + me%d(11-4,1)*k(InterpStates,11) + me%d(12-4,1)*k(InterpStates,12) &
-                    + me%d(13-4,1)*k(InterpStates,13) + me%d(14-4,1)*k(InterpStates,14) + me%d(15-4,1)*k(InterpStates,15) + me%d(16-4,1)*k(InterpStates,16))
+        cont4(:) = h*(me%d(1,1)*k(InterpStates,1) + me%d(6-4,1)*k(InterpStates,6) + me%d(7-4,1)*k(InterpStates,7) &
+                    + me%d(8-4,1)*k(InterpStates,8) + me%d(9-4,1)*k(InterpStates,9) + me%d(10-4,1)*k(InterpStates,10) &
+                    + me%d(11-4,1)*k(InterpStates,11) + me%d(12-4,1)*k(InterpStates,12) + me%d(13-4,1)*k(InterpStates,13) &
+                    + me%d(14-4,1)*k(InterpStates,14) + me%d(15-4,1)*k(InterpStates,15) + me%d(16-4,1)*k(InterpStates,16))
             
-        cont5(:) = h*(me%d(1,2)*k(InterpStates,1) + me%d(6-4,2)*k(InterpStates,6) + me%d(7-4,2)*k(InterpStates,7) + me%d(8-4,2)*k(InterpStates,8) &
-                    + me%d(9-4,2)*k(InterpStates,9) + me%d(10-4,2)*k(InterpStates,10) + me%d(11-4,2)*k(InterpStates,11) + me%d(12-4,2)*k(InterpStates,12) &
-                    + me%d(13-4,2)*k(InterpStates,13) + me%d(14-4,2)*k(InterpStates,14) + me%d(15-4,2)*k(InterpStates,15) + me%d(16-4,2)*k(InterpStates,16))
+        cont5(:) = h*(me%d(1,2)*k(InterpStates,1) + me%d(6-4,2)*k(InterpStates,6) + me%d(7-4,2)*k(InterpStates,7) &
+                    + me%d(8-4,2)*k(InterpStates,8) + me%d(9-4,2)*k(InterpStates,9) + me%d(10-4,2)*k(InterpStates,10) &
+                    + me%d(11-4,2)*k(InterpStates,11) + me%d(12-4,2)*k(InterpStates,12) + me%d(13-4,2)*k(InterpStates,13) &
+                    + me%d(14-4,2)*k(InterpStates,14) + me%d(15-4,2)*k(InterpStates,15) + me%d(16-4,2)*k(InterpStates,16))
             
-        cont6(:) = h*(me%d(1,3)*k(InterpStates,1) + me%d(6-4,3)*k(InterpStates,6) + me%d(7-4,3)*k(InterpStates,7) + me%d(8-4,3)*k(InterpStates,8) &
-                    + me%d(9-4,3)*k(InterpStates,9) + me%d(10-4,3)*k(InterpStates,10) + me%d(11-4,3)*k(InterpStates,11) + me%d(12-4,3)*k(InterpStates,12) &
-                    + me%d(13-4,3)*k(InterpStates,13) + me%d(14-4,3)*k(InterpStates,14) + me%d(15-4,3)*k(InterpStates,15) + me%d(16-4,3)*k(InterpStates,16))
+        cont6(:) = h*(me%d(1,3)*k(InterpStates,1) + me%d(6-4,3)*k(InterpStates,6) + me%d(7-4,3)*k(InterpStates,7) &
+                    + me%d(8-4,3)*k(InterpStates,8) + me%d(9-4,3)*k(InterpStates,9) + me%d(10-4,3)*k(InterpStates,10) &
+                    + me%d(11-4,3)*k(InterpStates,11) + me%d(12-4,3)*k(InterpStates,12) + me%d(13-4,3)*k(InterpStates,13) &
+                    + me%d(14-4,3)*k(InterpStates,14) + me%d(15-4,3)*k(InterpStates,15) + me%d(16-4,3)*k(InterpStates,16))
   
-        cont7(:) = h*(me%d(1,4)*k(InterpStates,1) + me%d(6-4,4)*k(InterpStates,6) + me%d(7-4,4)*k(InterpStates,7) + me%d(8-4,4)*k(InterpStates,8) &
-                    + me%d(9-4,4)*k(InterpStates,9) + me%d(10-4,4)*k(InterpStates,10) + me%d(11-4,4)*k(InterpStates,11) + me%d(12-4,4)*k(InterpStates,12) &
-                    + me%d(13-4,4)*k(InterpStates,13) + me%d(14-4,4)*k(InterpStates,14) + me%d(15-4,4)*k(InterpStates,15) + me%d(16-4,4)*k(InterpStates,16))
+        cont7(:) = h*(me%d(1,4)*k(InterpStates,1) + me%d(6-4,4)*k(InterpStates,6) + me%d(7-4,4)*k(InterpStates,7) &
+                    + me%d(8-4,4)*k(InterpStates,8) + me%d(9-4,4)*k(InterpStates,9) + me%d(10-4,4)*k(InterpStates,10) &
+                    + me%d(11-4,4)*k(InterpStates,11) + me%d(12-4,4)*k(InterpStates,12) + me%d(13-4,4)*k(InterpStates,13) &
+                    + me%d(14-4,4)*k(InterpStates,14) + me%d(15-4,4)*k(InterpStates,15) + me%d(16-4,4)*k(InterpStates,16))
             
         ! check Hairer's contd8 routine for verifying the following code
         IntpCoeff(:,0) = cont0(:)
