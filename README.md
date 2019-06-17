@@ -1,6 +1,6 @@
 # FLINT: Fortran Library for numerical INTegration 
 
-[![Build Status](https://travis-ci.com/princemahajan/FLINT.svg?token=Aqh2nPFat8LRMZyyd4Hz&branch=master)](https://travis-ci.com/princemahajan/FLINT) 
+[![Build Status](https://travis-ci.com/princemahajan/FLINT.svg?branch=master)](https://travis-ci.com/princemahajan/FLINT) 
  
  ## Author
  Bharat Mahajan
