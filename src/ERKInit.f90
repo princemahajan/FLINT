@@ -136,7 +136,7 @@
                 me%s = DOP853_s
                 me%sint = DOP853_sint
                 me%a(1:int((me%s-1)/2.0*me%s)) = DOP853_a
-                me%b(1:me%s) = DOP853_b
+                me%b(1:me%sint) = DOP853_b
                 me%c(2:me%s) = DOP853_c
                 me%e(1:me%sint) = DOP853_e
                 me%IsFSALMethod = DOP853_FSAL
@@ -151,7 +151,7 @@
                 me%s = Verner98R_s
                 me%sint = Verner98R_sint
                 me%a(1:int((me%s-1)/2.0*me%s)) = Verner98R_a
-                me%b(1:me%s) = Verner98R_b
+                me%b(1:me%sint) = Verner98R_b
                 me%c(2:me%s) = Verner98R_c
                 me%e(1:me%sint) = Verner98R_e
                 me%IsFSALMethod = Verner98R_FSAL                
@@ -166,7 +166,7 @@
                 me%s = Verner65E_s
                 me%sint = Verner65E_sint
                 me%a(1:int((me%s-1)/2.0*me%s)) = Verner65E_a
-                me%b(1:me%s) = Verner65E_b
+                me%b(1:me%sint) = Verner65E_b
                 me%c(2:me%s) = Verner65E_c
                 me%e(1:me%sint) = Verner65E_e
                 me%IsFSALMethod = Verner65E_FSAL                
@@ -181,7 +181,7 @@
                 me%s = DOP54_s
                 me%sint = DOP54_sint
                 me%a(1:int((me%s-1)/2.0*me%s)) = DOP54_a
-                me%b(1:me%s) = DOP54_b
+                me%b(1:me%sint) = DOP54_b
                 me%c(2:me%s) = DOP54_c
                 me%e(1:me%sint) = DOP54_e
                 me%IsFSALMethod = DOP54_FSAL                

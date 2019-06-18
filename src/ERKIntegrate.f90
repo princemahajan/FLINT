@@ -57,7 +57,7 @@ submodule (ERK) ERKIntegrate
         logical, dimension(me%pDiffEqSys%m) :: EventTerm
         logical, dimension(me%pDiffEqSys%m) :: EvMask
         real(WP), allocatable, dimension(:) :: EventData
-        
+        real(WP), dimension(me%pDiffEqSys%n) :: EventY1, EventYm        
         real(WP), dimension(me%pDiffEqSys%n, me%s) :: k                
         real(WP), dimension(5) :: StepSzParams        
 
@@ -66,7 +66,7 @@ submodule (ERK) ERKIntegrate
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
         
         logical :: IsProblemStiff, IntStepsNeeded, LastStepRejected, LAST_STEP
-        logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, EventTriggered, BipComputed
+        logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, BipComputed
         
         class(DiffEqSys), pointer :: pDiffEqSys
         integer(kind(ERK_DOP853)) :: method
@@ -77,7 +77,6 @@ submodule (ERK) ERKIntegrate
         IntStepsNeeded = .FALSE.
         LastStepRejected = .FALSE.
         LAST_STEP = .FALSE.
-        EventTriggered = .FALSE.
         status = FLINT_SUCCESS        
         
         ! Copy frequently needed scalars on the stack
@@ -329,11 +328,11 @@ submodule (ERK) ERKIntegrate
                         ! check for event triggers between X and X+h
              EventLoop: do
                             block
-                                real(WP), dimension(n) :: EventY1, EventYm
                                 logical :: EventTriggered
                                 real(WP) :: val0, val1, valm, EventXm
                                 integer :: rootiter, rooterror
-                                ! interpolate solution
+
+                                !! interpolate solution
                                 if (Eventh == h) then
                                     EventY1 = Y2
                                 else
