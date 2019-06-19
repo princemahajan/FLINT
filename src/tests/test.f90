@@ -35,8 +35,12 @@
 
     ! Simulation Parameters
     
-    ! Number of periodic orbits to run
-    real, parameter :: norb = 1
+    ! Number of periodic orbits to run and loops for benchmark
+    real, parameter :: norb = 4
+    integer, parameter :: nloops = 1000
+    
+    ! Turn on the events
+    logical, parameter :: EventsEnabled = .TRUE.
     
     ! scalar tolerance
     real(wp),parameter :: tol   = 1.0e-11_WP  
@@ -50,10 +54,10 @@
     type(ERK_class) erkvar
     type(CR3BPSys) :: CR3BPDEObject
     
-    real(WP) :: x0, xf
+    real(WP) :: x0, xf, xfval
     real(WP), dimension(6) :: y0, yf
  
-    real(WP) :: stepsz0, ipdx
+    real(WP) :: stepsz0, ipdx, stepsz
     real(WP), dimension(:), allocatable :: Xint, Xarr
     real(WP), dimension(:,:), allocatable :: Yint, Yarr
     real(WP), allocatable, dimension(:,:) :: EventStates
@@ -62,6 +66,8 @@
     integer :: nsteps, naccpt, nrejct, fcalls, itr, nevents, ctr
     character(len=10) :: mname
     integer :: method
+    
+    real(WP) :: t0, tf
  
     ! Arenstorf orbit: Earth-moon mass-ratio
     real(wp), parameter :: EMmu  = 0.012277471_WP
@@ -84,10 +90,10 @@
     
     ! create results file
     open(unit=17,file= fname, status = 'replace')
-    write(17, *) '--- FLINT Results ---'
+    write(17, *) '--- FLINT Results (',norb, ' orbits, ', nloops, ' loops)  ---'
     write(17, *) ' '
     write(17, *) 'A. Natural Step-size'
-    write(17, '(6A12)') 'Method', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
+    write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
     
     ! Solution at natural step size
     
@@ -108,20 +114,27 @@
             method = ERK_Verner98R
         end select            
           
-        stiffstatus = stifftestval
-        call erkvar%Init(CR3BPDEObject, 5000, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
-            InterpOn=.FALSE., EventsOn=.TRUE.)
+        call erkvar%Init(CR3BPDEObject, 10000, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
+            InterpOn=.FALSE., EventsOn=EventsEnabled)
         if (erkvar%status == FLINT_SUCCESS) then
-            call erkvar%Integrate(x0, y0, xf, yf, StepSz=stepsz0,  &
-                IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
-                EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+            
+            call CPU_TIME(t0)
+            do ctr = 1,nloops
+                stiffstatus = stifftestval
+                stepsz = stepsz0
+                xfval = xf
+                call erkvar%Integrate(x0, y0, xfval, yf, StepSz=stepsz,  &
+                    IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
+                    EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+            end do
+            call CPU_TIME(tf)
 
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
             if (erkvar%status == FLINT_SUCCESS) then 
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
-                write(17, '(A12,2E12.3,3I12.1)') mname, norm2(y0(1:3)-yf(1:3)), &
+                write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
                     maxval(JacobiC(Emmu, Yint))-minval(JacobiC(Emmu, Yint)), &
                     fcalls, naccpt, nrejct
             end if
@@ -133,19 +146,21 @@
         end if
     end do
 
-    write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
-    write(17, '(5A12)') 'EventID','X','Y1','Y2','Y3'             
+    if (EventsEnabled) then
+        write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
+        write(17, '(5A12)') 'EventID','X','Y1','Y2','Y3'             
                 
-    nevents = int(size(EventStates,2))
-    do ctr = 1,nevents
-    write(17, '(I12.1, 4E12.3)') int(EventStates(8,ctr)),EventStates(1,ctr),&
+        nevents = int(size(EventStates,2))
+        do ctr = 1,nevents
+        write(17, '(I12.1, 4E12.3)') int(EventStates(8,ctr)),EventStates(1,ctr),&
               EventStates(2,ctr),EventStates(3,ctr),EventStates(4,ctr)
-    end do
+        end do
+    end if
     
 
     ! Solution at interpolated grid
     write(17, *) 'B. Interpolated Grid'
-    write(17, '(6A12)') 'Method', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
+    write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
     
     do itr = 1,4
         
@@ -164,20 +179,27 @@
             method = ERK_Verner98R
         end select            
           
-        stiffstatus = stifftestval
         call erkvar%Init(CR3BPDEObject, 10000, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
-            InterpOn=.TRUE., EventsOn=.TRUE.)
+            InterpOn=.TRUE., EventsOn=EventsEnabled)
         if (erkvar%status == FLINT_SUCCESS) then
-            call erkvar%Integrate(x0, y0, xf, yf, StepSz=stepsz0,  &
-                EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+            
+            call CPU_TIME(t0)
+            do ctr = 1,nloops
+                stiffstatus = stifftestval
+                stepsz = stepsz0
+                xfval = xf
+                call erkvar%Integrate(x0, y0, xfval, yf, StepSz=stepsz,  &
+                    EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+                call erkvar%Interpolate(Xarr,Yarr,.TRUE.)            
+            end do
+            call CPU_TIME(tf)            
             
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
             if (erkvar%status == FLINT_SUCCESS) then
-                call erkvar%Interpolate(Xarr,Yarr,.TRUE.)
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
-                write(17, '(A12,2E12.3,3I12.1)') mname, norm2(y0(1:3)-yf(1:3)), &
+                write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
                     maxval(JacobiC(Emmu, Yarr))-minval(JacobiC(Emmu, Yarr)), &
                     fcalls, naccpt, nrejct
             end if
@@ -187,13 +209,15 @@
         end if
     end do
 
-    write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
-    write(17, '(5A12)') 'EventID','X','Y1','Y2','Y3'             
-    nevents = int(size(EventStates,2))
-    do ctr = 1,nevents
-    write(17, '(I12.1, 4E12.3)') int(EventStates(8,ctr)),EventStates(1,ctr),&
+    if (EventsEnabled) then
+        write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
+        write(17, '(5A12)') 'EventID','X','Y1','Y2','Y3'             
+        nevents = int(size(EventStates,2))
+        do ctr = 1,nevents
+        write(17, '(I12.1, 4E12.3)') int(EventStates(8,ctr)),EventStates(1,ctr),&
               EventStates(2,ctr),EventStates(3,ctr),EventStates(4,ctr)
-    end do
+        end do
+    end if
     
     
     contains
