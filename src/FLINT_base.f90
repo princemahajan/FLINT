@@ -19,7 +19,6 @@
 !!              the intefaces for the differential equation and event functions provided by the
 !!              user. FLINT error codes are defined here as well.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/25/2019    
 !
 !############################################################################################    

@@ -18,7 +18,6 @@
 !! \details     It provides the differential equations and event functions
 !!              for the test cases used for FLINT library testing.    
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/25/2019    
 !
 !############################################################################################    

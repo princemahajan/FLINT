@@ -17,7 +17,6 @@
 !> \brief       FLINTUtils Module
 !! \details     This module provides procedures for common utility functions.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        04/25/2019    
 !
 !############################################################################################

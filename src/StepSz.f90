@@ -17,7 +17,6 @@
 !> \brief       StepSize Module
 !! \details     This module provides procedures for step size computation.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/28/2019    
 !
 !############################################################################################
