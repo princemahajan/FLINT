@@ -4,7 +4,6 @@
 # _|    _____|___|_| \_|  _|   
                                                         
 
-# Version: 0.9
 # Author: Bharat Mahajan
 
 cmake_minimum_required(VERSION 3.12)

@@ -17,7 +17,6 @@
 !> \brief       ERK Integration Submodule
 !! \details     It provides the implementation for Integrate method of ERK_class.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        02/06/2019    
 !
 !############################################################################################

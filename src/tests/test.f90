@@ -17,7 +17,6 @@
 !> \brief       TestFLINT1 Main Program
 !! \details     Main program to run multiple test cases for FLINT.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/25/2019    
 !
 !############################################################################################    

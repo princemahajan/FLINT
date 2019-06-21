@@ -2,10 +2,10 @@
   
  A. Natural Step-size
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
-  DOP54        0.367E+01   0.103E-01   0.853E-10       44853        7426          59
-  DOP853       0.891E+00   0.578E-02   0.698E-10       15819        1071         263
-  Verner65E    0.242E+01   0.284E-02   0.109E-10       32429        4011          45
-  Verner98R    0.142E+01   0.209E-02   0.361E-11       15584         792         186
+  DOP54        0.369E+01   0.103E-01   0.853E-10       44853        7426          59
+  DOP853       0.844E+00   0.578E-02   0.698E-10       15819        1071         263
+  Verner65E    0.245E+01   0.284E-02   0.109E-10       32429        4011          45
+  Verner98R    0.147E+01   0.209E-02   0.361E-11       15584         792         186
  X-axis (Y1) and Y-axis (Y2) crossing events
      EventID           X          Y1          Y2          Y3
            2   0.399E+00   0.748E+00   0.871E-15   0.000E+00
@@ -34,10 +34,10 @@
            2   0.679E+02   0.751E+00   0.185E-12   0.000E+00
  B. Interpolated Grid
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
-  DOP54        0.636E+01   0.103E-01   0.890E-10       44853        7426          59
-  DOP853       0.202E+01   0.578E-02   0.106E-09       18960        1071         263
-  Verner65E    0.577E+01   0.284E-02   0.105E-08       36416        4011          45
-  Verner98R    0.338E+01   0.209E-02   0.120E-10       19424         792         186
+  DOP54        0.688E+01   0.103E-01   0.890E-10       44853        7426          59
+  DOP853       0.214E+01   0.578E-02   0.106E-09       18960        1071         263
+  Verner65E    0.606E+01   0.284E-02   0.105E-08       36416        4011          45
+  Verner98R    0.355E+01   0.209E-02   0.120E-10       19424         792         186
  X-axis (Y1) and Y-axis (Y2) crossing events
      EventID           X          Y1          Y2          Y3
            2   0.399E+00   0.748E+00   0.871E-15   0.000E+00

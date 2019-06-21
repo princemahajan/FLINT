@@ -18,7 +18,6 @@
 !! \details     A module for Explicit Runge-Kutta type numerical solvers with dense-output,
 !!              events detection, and stiffness detection.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/25/2019    
 !
 !############################################################################################

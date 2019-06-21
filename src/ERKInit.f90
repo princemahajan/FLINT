@@ -18,7 +18,6 @@
 !! \details     It provides implementation for the init, final, and some miscellaneous methods
 !!              of ERK module.
 !! \author      Bharat Mahajan
-!! \version     0.9
 !! \date        01/25/2019    
 !
 !############################################################################################
