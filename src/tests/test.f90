@@ -131,7 +131,7 @@
 
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
-            if (erkvar%status == FLINT_SUCCESS) then 
+            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM) then 
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
@@ -196,7 +196,7 @@
             
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
-            if (erkvar%status == FLINT_SUCCESS) then
+            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM) then 
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &

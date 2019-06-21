@@ -272,33 +272,8 @@ submodule (ERK) ERKIntegrate
                         end if
                     end if
                     
-                    ! return the solution at integrator's natural step size
-                    if (IntStepsNeeded) then
-                        Xint(AcceptedSteps + 1) = X + h
-                        Yint(:,AcceptedSteps + 1) = Y2
-                    end if
-
-                    ! Do we need interpolation coefficients?
-                    BipComputed = .FALSE.
-                    if (InterpOn) then
-                        ! Compute interpolation coefficients
-                        select case (method)
-                            case (ERK_DOP853)
-                            Bip = DOP853_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
-                            case (ERK_DOP54)
-                            Bip = DOP54_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)                                
-                            case default
-                            Bip = IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
-                        end select
-                        BipComputed = .TRUE.
-                        TotalFCalls = TotalFCalls + FCalls
-                        ! store the solution internally at the natural step size
-                        me%Xint(AcceptedSteps + 1) = X + h
-                        !me%Yint(:,AcceptedSteps + 1) = Y2
-                        me%Bip(:,:,AcceptedSteps) = Bip
-                    end if
-                    
                     ! Events checking start here, ignore event checking at IC
+                    BipComputed = .FALSE.
                     if (EventsOn .AND. AcceptedSteps > 1) then
                         ! generate X values at which event triggers are checked
                         if (EventStepSz == 0.0 .OR. EventStepSz >= abs(h)) then
@@ -388,8 +363,12 @@ submodule (ERK) ERKIntegrate
                                         end if
                                         ! Do we need to stop at this event?
                                         if (EventTerm(EventId) .EQV. .TRUE.) then
+                                            ! the last solution is the same as the event state
+                                            h = EventXm - X
+                                            Y2 = EventYm
                                             LAST_STEP = .TRUE.
                                             status = FLINT_EVENT_TERM
+                                            exit EventLoop
                                         end if
                                     end if
                                 end do
@@ -407,6 +386,33 @@ submodule (ERK) ERKIntegrate
                         end do EventLoop
                     end if
 
+                    ! return the solution at integrator's natural step size
+                    if (IntStepsNeeded) then
+                        Xint(AcceptedSteps + 1) = X + h
+                        Yint(:,AcceptedSteps + 1) = Y2
+                    end if
+
+                    ! Do we need to store interpolation coefficients?
+                    if (InterpOn) then
+                        if (.NOT. BipComputed) then
+                            ! Compute interpolation coefficients
+                            select case (method)
+                            case (ERK_DOP853)
+                            Bip = DOP853_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
+                            case (ERK_DOP54)
+                            Bip = DOP54_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)                                
+                            case default
+                            Bip = IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
+                            end select
+                            BipComputed = .TRUE.
+                            TotalFCalls = TotalFCalls + FCalls
+                        end if
+                        ! store the solution internally at the natural step size
+                        me%Xint(AcceptedSteps + 1) = X + h
+                        !me%Yint(:,AcceptedSteps + 1) = Y2
+                        me%Bip(:,:,AcceptedSteps) = Bip
+                    end if
+                    
                     ! get ready for the next iteration
                     X = X + h
                     Y1 = Y2
@@ -456,8 +462,8 @@ submodule (ERK) ERKIntegrate
 
             else
                     
-            ! We have either accomplished our job or finished prematurely?!
-                
+                ! We have either accomplished our job or finished prematurely?!
+
                 ! return the solution at the integrator's natural steps
                 if (IntStepsNeeded) then
                     block
@@ -519,19 +525,19 @@ submodule (ERK) ERKIntegrate
                     status = FLINT_ERROR 
                 end if
 
-                ! save the step size and final solution
+                ! save the stats
                 Xf = X
                 Yf = Y1
-                StepSz = h
+                StepSz = h                
                 me%Xf = Xf
                 me%hf = StepSz
                 me%Yf = Yf
                 me%AcceptedSteps = AcceptedSteps
                 me%RejectedSteps = RejectedSteps
-                me%FCalls = TotalFCalls
+                me%FCalls = TotalFCalls                
+                me%status = status
                 
                 ! exit the main integration loop
-                me%status = status
                 exit
                 
             end if

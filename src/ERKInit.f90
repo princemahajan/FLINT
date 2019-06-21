@@ -47,6 +47,9 @@
 
         integer :: status
         
+        ! reset the status
+        me%status = FLINT_SUCCESS
+        
         ! assign the method
         if (present(Method)) me%Method = Method
     
