@@ -323,6 +323,9 @@ submodule (ERK) ERKIntegrate
                                     val0 = EV0(EventId)
                                     val1 = EV1(EventId)
                                         
+                                    ! If the previous or the new value is NaN, ignore the event
+                                    if (IEEE_IS_NAN(val0) .OR. IEEE_IS_NAN(val1)) cycle 
+                                    
                                     EventTriggered = .FALSE.
                                     select case (EventDir(EventId))
                                     case (0)

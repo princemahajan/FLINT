@@ -193,7 +193,9 @@ module FLINT_base
             real(WP), intent(in) :: X               !< Current independent variable value
             real(WP), dimension(:), intent(in) :: Y !< Current solution value
             
-            !> Size is m. If value(i) == 0, then event with EventID i may trigger based on Direction(i).
+            !> Size is m. 
+            !! If Value(i) changes sign, then the event with EventID i may trigger based on Direction(i).
+            !! If Value(i) changes from/to NaN, then the event is not triggered.
             real(WP), dimension(:), intent(out) :: Value
 
             !> Size must be same as Value. 

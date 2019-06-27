@@ -27,7 +27,8 @@ module ERK
     use FLINT_base
     use ButcherTableaus
     use StepSize
-
+    use, intrinsic :: IEEE_ARITHMETIC
+    
     implicit none
 
     private

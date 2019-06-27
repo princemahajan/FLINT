@@ -10,7 +10,7 @@
 This work was performed at Odyssey Space Research LLC, Houston, TX as part of
 the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
 FLINT source code is licensed under the Apache License, Version 2.0 (the "License")
-found in the LICENSE file contained in this distribution. <br><br>
+found in LICENSE file contained in this distribution. <br><br>
 The coefficients for DOP853 method were derived by Ernest Hairer. 
 His original codes are available at http://www.unige.ch/~hairer/software.html. 
 The coefficients for Verner65E and Verner98R methods were derived by Jim Verner, and 
@@ -31,9 +31,9 @@ the interpolation method can be used any number of times to find the solution
 values at any user-specified grid within the initial and final points used during
 the integration. Interpolation is much faster than integration in FLINT, as the 
 coefficients are all precomputed during the integration. Multiple event detection is
-supported for each integrator along with event-masking, event-direction and 
-termination options. Additionally, a step-size for event detection is also 
-supported. In a nutshell, the features are:
+supported for each integrator along with event-masking (static and dynamic), 
+event-direction, and termination options. Additionally, a step-size for event detection 
+is also supported. In a nutshell, the features are:
     
 - Modern object-oriented, thread-safe, and optimized Fortran code
 - 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E
@@ -105,10 +105,13 @@ function, events function (if any), and parameters (if any).
 using Runge-Kutta intgerators.
 ```fortran
         use FLINT
+
         type(ERK_class) ::  erk
         type(TBSys)     :: diffeq
+        
         diffeq%n = 6        ! Number of 1st-order differential equations
         diffeq%m = 2        ! Number of events
+        
         ! Initialize the ERK object for 10000 max steps, DOP54 method with abs. tol. 1e-12, rel. tol. 1e-9
         ! and turn on interpolation and events detection    
         call erk%Init(diffeq, 10000, Method=ERK_DOP54, ATol=[1e-12], RTol=[1e-9],&
@@ -122,10 +125,12 @@ at integrator's natural step-size must not be set to True.
     real(WP) :: x0, xf    
     real(WP), dimension(6) :: y0, yf
     real(WP), allocatable, dimension(:,:) :: EventData ! allocated by Integrate
+    
     stiffstatus = 1 ! detect stiffness and terminate if equations are stiff    
     x0 = 0.0    
     y0 = [6400.0_wp,0.0_wp,0.0_WP, 0.0_WP,7.69202528825512_WP,7.69202528825512_WP]
     xf = 161131.68239305308_WP      
+    
     ! Call Intgerate with final solution in yf, no initial step-size given, events-related
     ! data (event-id, x value, y state) in EventData, and all events are detected
     if (erk%status == FLINT_SUCCESS) then    
@@ -140,16 +145,19 @@ must intgerate the equations again before calling Interpolate.
 ```fortran      
     real(WP), dimension(:), allocatable :: Xarr1, Xarr2
     real(WP), dimension(6,:) :: Yarr1, Yarr2
+    
     Xarr1 = [(x0 + (xf-x0)/10*i, i=0,9)]    ! grid-1 with 10 points
     Xarr2 = [(x0 + (xf-x0)/1000*i, i=0,999)]    ! grid-2 with 1000 points
     allocate(Yarr1(6,size(Xarr1)))    ! allocate solution storage
     allocate(Yarr2(6,size(Xarr2)))        
+    
     if (erk%status == FLINT_SUCCESS) then
         ! interpolate and keep the internal storage for further calls
         call erk%Interpolate(Xarr1, Yarr1, .TRUE.)
         ! After this interpolation, delete the internal storage (default).
         call erk%Interpolate(Xarr2, Yarr2, .FALSE.) 
     end if    
+    
     ! print the solutions
     print *, 'Solution at grid-1'    
     print *, Yarr1

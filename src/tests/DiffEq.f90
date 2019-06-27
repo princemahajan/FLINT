@@ -26,6 +26,7 @@
 module MyDiffEq
 
     use FLINT
+    use, intrinsic :: IEEE_ARITHMETIC
 
     implicit none
     
@@ -53,15 +54,13 @@ module MyDiffEq
     
         implicit none
         
-        intrinsic :: size
-        
+        intrinsic :: size  
         class(TBSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
         real(WP), intent(in), dimension(:) :: Y
         real(WP), intent(in), dimension(:), optional :: Params
         
         real(WP), dimension(size(Y)) :: TwoBodyDE
-        
         real(WP) :: MyParams
         
         if (present(Params)) then
@@ -156,12 +155,11 @@ module MyDiffEq
         real(WP), dimension(:), intent(out) :: Value
         integer, dimension(:), intent(out) :: Direction
         logical, dimension(:), intent(out) :: Terminal
-        
+
         Value = [Y(1),Y(2)]
         
-        !if ((EventID == 0 .OR. EventID == 1))   Value(1) = Y(1)
-        
-        !if (EventID == 0 .OR. EventID == 2)   Value(2) = Y(2)
+        ! only detect Y-crossings in the region X>0
+        if ((EventID == 0 .OR. EventID == 2) .AND. Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
         
         Direction = [-1,1]
         Terminal = [.FALSE.,.FALSE.]
