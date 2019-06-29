@@ -158,7 +158,7 @@ module MyDiffEq
 
         Value = [Y(1),Y(2)]
         
-        ! only detect Y-crossings in the region X>0
+        ! only detect Y-crossings in the region X<0
         if ((EventID == 0 .OR. EventID == 2) .AND. Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
         
         Direction = [-1,1]

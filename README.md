@@ -1,12 +1,14 @@
-# FLINT: Fortran Library for numerical INTegration 
+# FLINT: Fortran Library for numerical INTegration of differential equations
 
 [![Build Status](https://travis-ci.com/princemahajan/FLINT.svg?branch=master)](https://travis-ci.com/princemahajan/FLINT) 
- 
- ## Author
- Bharat Mahajan
- 
- ## Copyright
- Copyright 2019 Bharat Mahajan <br><br>
+
+## Author
+
+Bharat Mahajan
+
+## Copyright
+
+Copyright 2019 Bharat Mahajan <br><br>
 This work was performed at Odyssey Space Research LLC, Houston, TX as part of
 the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
 FLINT source code is licensed under the Apache License, Version 2.0 (the "License")
@@ -16,7 +18,8 @@ His original codes are available at http://www.unige.ch/~hairer/software.html.
 The coefficients for Verner65E and Verner98R methods were derived by Jim Verner, and 
 are available at http://people.math.sfu.ca/~jverner/.    
 
- ## Introduction
+## Introduction
+
 FLINT is a modern object-oriented Fortran library that provides four explicit Runge-Kutta (ERK)
 methods of order 5, 6, 8, and 9 along with dense-output and event-detection
 support for each of the methods. The code is written such that any other ERK
@@ -34,7 +37,7 @@ coefficients are all precomputed during the integration. Multiple event detectio
 supported for each integrator along with event-masking (static and dynamic), 
 event-direction, and termination options. Additionally, a step-size for event detection 
 is also supported. In a nutshell, the features are:
-    
+
 - Modern object-oriented, thread-safe, and optimized Fortran code
 - 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E
 - Any ERK method can be implemented by just including their coefficients
@@ -55,9 +58,11 @@ to generate Visual Studio projects as well as makefiles on Windows and Linux usi
 Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency
 on any other library.
 
- ## How to Use
+## How to Use
+
 1. Create a differential equation system class by providing differential equation
 function, events function (if any), and parameters (if any).
+
 ```fortran
     use FLINT
     implicit none
@@ -101,8 +106,10 @@ function, events function (if any), and parameters (if any).
         Terminal = [.FALSE., .FALSE.] ! continue integration after events
     end subroutine SampleEventTB      
 ```
+
 2. Initialize the differential equation and ERK class objects for 
 using Runge-Kutta intgerators.
+
 ```fortran
         use FLINT
 
@@ -117,9 +124,11 @@ using Runge-Kutta intgerators.
         call erk%Init(diffeq, 10000, Method=ERK_DOP54, ATol=[1e-12], RTol=[1e-9],&
         InterpOn=.TRUE.,EventsOn=.TRUE.)
 ```
+
 3. Call the Integrate subroutine for performing the integration if init was successful.
 Note if interpolation is enabled, then the IntStepsOn option for computing the states 
 at integrator's natural step-size must not be set to True.
+
 ```fortran
     integer :: stiffstatus    
     real(WP) :: x0, xf    
@@ -138,10 +147,12 @@ at integrator's natural step-size must not be set to True.
         EventStates=EventData, EventMask = [.TRUE.,.TRUE.],StiffTest=stiffstatus)
     end if    
 ```
+
 4. Call the Interpolate function for computing solution on the desired grid of x values.
 The last parameter must be specified as True if user wants FLINT to keep the internal storage
 for calling Interpolate again. Otherwise, the internal storage is deleted and the user
 must intgerate the equations again before calling Interpolate.
+
 ```fortran      
     real(WP), dimension(:), allocatable :: Xarr1, Xarr2
     real(WP), dimension(6,:) :: Yarr1, Yarr2
@@ -168,11 +179,13 @@ must intgerate the equations again before calling Interpolate.
     print *, EventData(2:7,:)   ! corresponding position and velocity states
     print *, Eventdata(8,:)     ! Event-ID number
 ```  
+
 For all the FLINT status codes and options supported by Init, Integrate, and Interpolate
 procedures along with the interfaces for user-supplied functions, see the FLINT_base 
 module in FLINT_base.f90 file. 
 
- ## Testing
+## Testing
+
 In all the tests, the orbit is propagated for 4 orbital periods and the integration is 
 repeated 5000 times. The tables give the total time for 5000 propagations and all 
 other testing parameters are given for each integration. The relative tolerance
@@ -265,9 +278,10 @@ The plots are generated using https://github.com/jacobwilliams/pyplot-fortran.
 For relative tol=1e-9 and abs tol=1e-12, the Arenstorf orbit propagated for 4 periods
 by JDOP853, JDDEABM and FLINT's Verner98R are shown below. Verner98R diverges much
 slower than DOP853 and DDEABM for this orbit and tolerance values.
-![JDOP853](media/JDOP853.png)
-![JDDEABM](media/Jacob_DDEABM.png)    
-![FLINT's Verner98R](media/FLINT_Verner98R.png)
+
+ ![JDOP853](media/JDOP853.png)
+ ![JDDEABM](media/Jacob_DDEABM.png)
+ ![FLINT's Verner98R](media/FLINT_Verner98R.png)
 
 The following figure shows the multiple event detection capability of FLINT, 
 in which the X-crossings in decreasing and Y-crossings in increasing direction
@@ -275,6 +289,7 @@ are detected and reported to the user.
 ![FINT's event-detection](media/FLINT_Events.png)
 
 
- ## References
+## References
+
 - Hairer, Ernst, Norsett, Syvert P., Wanner, Gerhard, Solving Ordinary Differential Equations I,
 Springer-Verlag Berlin Heidelberg, 2nd Ed., 1993.    
