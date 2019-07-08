@@ -106,7 +106,7 @@ Introduction</h1>
 <li>Modern object-oriented, thread-safe, and optimized Fortran code</li>
 <li>4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E</li>
 <li>Any ERK method can be implemented by just including their coefficients</li>
-<li>Dense output with delayed interpolation (integrate once, interplate as many times)</li>
+<li>Dense output with delayed interpolation (integrate once, interpolate as many times)</li>
 <li>Multiple event-detection with event masking and separate event step-size</li>
 <li>Stiffness detection</li>
 </ul>
@@ -114,103 +114,18 @@ Introduction</h1>
 <h1><a class="anchor" id="usagesec"></a>
 Usage</h1>
 <ol type="1">
-<li>Create a differential equation system class by providing differential equation function, events function (if any), and parameters (if any). <pre class="fragment">use FLINT
-implicit none
-
-type, extends(DiffEqSys) :: TBSys
-    real(WP) :: GM = 398600.436233_WP  ! parameter constant
-contains
-    procedure :: F =&gt; TwoBodyDE     ! Differential equations
-    procedure :: G =&gt; SampleEventTB ! events, use only if needed
-end type TBSys
-
-contains
-
-pure function TwoBodyDE(me, X, Y, Params)
-    implicit none
-    class(TBSys), intent(in) :: me !&lt; Differential Equation object
-    real(WP), intent(in) :: X
-    real(WP), intent(in), dimension(:) :: Y
-    real(WP), intent(in), dimension(:), optional :: Params
-    real(WP), dimension(size(Y)) :: TwoBodyDE
-
-    TwoBodyDE(1:3) = Y(4:6)
-    TwoBodyDE(4:6) = -me%GM/(norm2(Y(1:3))**3)*Y(1:3) ! Two-body orbit diffeq
-end function TwoBodyDE
-
-pure subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
-    implicit none
-    class(TBSys), intent(in) :: me !&lt; Differential Equation object            
-    integer, intent(in) :: EventID        
-    real(WP), intent(in) :: X
-    real(WP), dimension(:), intent(in) :: Y
-    real(WP), dimension(:), intent(out) :: Value
-    integer, dimension(size(Value)), intent(out) :: Direction
-    logical, dimension(size(Value)), intent(out) :: Terminal
-
-    Value(1) = Y(2) ! detect y-crossing
-    Value(2) = Y(1) ! detect x-crossing    
-
-    Direction(1) = 1  ! detect -ve to +ve transitions for y coordinate
-    Direction(2) = -1 ! detect +ve to -ve transitions for x coordinate
-    Terminal = [.FALSE., .FALSE.] ! continue integration after events
-end subroutine SampleEventTB      
-</pre></li>
-<li>Create and initialize the differential equation and ERK class objects for using Runge-Kutta intgerators <pre class="fragment">    use FLINT
-    type(ERK_class) ::  erk
-    type(TBSys)     :: diffeq
-    diffeq%n = 6        ! Number of 1st-order differential equations
-    diffeq%m = 2        ! Number of events
-
-      ! Initialize the ERK object for 10000 max steps, DOP54 method with abs. tol. 1e-12, rel. tol. 1e-9
-    ! and turn on interpolation and events detection    
-    call erk%Init(diffeq, 10000, Method=ERK_DOP54, ATol=[1e-12], RTol=[1e-9],&amp;
-    InterpOn=.TRUE.,EventsOn=.TRUE.)
-</pre></li>
-<li>Call the Integrate subroutine for performing the integration if init was successful. Note if interpolation is enabled, then the IntStepsOn option for computing the states at the integrator's natural step-size must not be set to True. <pre class="fragment">integer :: stiffstatus    
-real(WP) :: x0, xf    
-real(WP), dimension(6) :: y0, yf
-real(WP), allocatable, dimension(:,:) :: EventData ! allocated by Integrate
-
-stiffstatus = 1 ! detect stiffness and terminate if equations are stiff    
-x0 = 0.0    
-y0 = [6400.0_wp,0.0_wp,0.0_WP, 0.0_WP,7.69202528825512_WP,7.69202528825512_WP]
-xf = 161131.68239305308_WP      
-
-! Call Tntgerate with final solution in yf, no initial step-size given, events-related
-! data (event-id, x value, y state) in EventData, and all events are detected
-if (erk%status == FLINT_SUCCESS) then    
-    call erk%Integrate(x0, y0, xf, yf, StepSz=0.0, IntStepsOn=.FALSE.,&amp;
-    EventStates=EventData, EventMask = [.TRUE.,.TRUE.],StiffTest=stiffstatus)
-end if    
-</pre></li>
-<li>Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must intgerate the equations again before calling Interpolate. <pre class="fragment">real(WP), dimension(:), allocatable :: Xarr1, Xarr2
-real(WP), dimension(6,:) :: Yarr1, Yarr2
-
-Xarr1 = [(x0 + (xf-x0)/10*i, i=0,9)]    ! grid-1 with 10 points
-Xarr2 = [(x0 + (xf-x0)/1000*i, i=0,999)]    ! grid-2 with 1000 points
-allocate(Yarr1(6,size(Xarr1)))    ! allocate solution storage
-allocate(Yarr2(6,size(Xarr2)))        
-
-if (erk%status == FLINT_SUCCESS) then
-  ! interpolate and keep the internal storage for further calls
-  call erk%Interpolate(Xarr1, Yarr1, .TRUE.)
-  ! After this interpolation, delete the internal storage (default).
-  call erk%Interpolate(Xarr2, Yarr2, .FALSE.) 
-end if    
-
-! print the solutions
-print *, 'Solution at grid-1'    
-print *, Yarr1
-print *, 'Solution at grid-2'        
-print *, Yarr2
-! print the event data
-print *, EventData(1,:)     ! Time at which events occured
-print *, EventData(2:7,:)   ! corresponding position and velocity states
-print *, Eventdata(8,:)     ! Event-ID number
-</pre></li>
+<li>Create a differential equation system class by providing differential equation function, events function (if any), and parameters (if any).</li>
 </ol>
-<p>For all the FLINT status codes and options supported by Init, Integrate, and Interpolate procedures along with the interfaces for user-supplied functions, see the FLINT_base module in <a class="el" href="_f_l_i_n_t__base_8f90.html">FLINT_base.f90</a> file. </p>
+<div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code" href="namespaceflint.html">flint</a></div><div class="line"><span class="keywordtype">implicit none</span></div><div class="line"></div><div class="line"><span class="keyword">type</span>, <span class="keyword">extends</span>(diffeqsys) :: tbsys</div><div class="line"><span class="keywordtype">    real</span>(WP) :: GM = 398600.436233_wp  <span class="comment">! parameter constant</span></div><div class="line"><span class="keyword">contains</span></div><div class="line">    <span class="keywordtype">procedure</span> :: F =&gt; twobodyde     <span class="comment">! Differential equations</span></div><div class="line">    <span class="keywordtype">procedure</span> :: G =&gt; sampleeventtb <span class="comment">! events, use only if needed</span></div><div class="line"><span class="keyword">end type </span>tbsys</div><div class="line"></div><div class="line"><span class="keyword">contains</span></div><div class="line"></div><div class="line"><span class="keywordtype">pure</span> <span class="keyword">function </span>twobodyde(me, X, Y, Params)</div><div class="line">    <span class="keywordtype">implicit none</span></div><div class="line">    <span class="keywordtype">class</span>(TBSys), <span class="keywordtype">intent(in)</span> :: me</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">intent(in)</span> :: X</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">intent(in)</span>, <span class="keywordtype">dimension(:)</span> :: Y</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">intent(in)</span>, <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">optional</span> :: Params</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">dimension(size(Y))</span> :: TwoBodyDE</div><div class="line"></div><div class="line">    twobodyde(1:3) = y(4:6)</div><div class="line">    twobodyde(4:6) = -me%GM/(norm2(y(1:3))**3)*y(1:3) <span class="comment">! Two-body orbit diffeq</span></div><div class="line"><span class="keyword">end function </span>twobodyde</div><div class="line"></div><div class="line"><span class="keywordtype">pure</span> <span class="keyword">subroutine </span>sampleeventtb(me, EventID, X, Y, Value, Direction, Terminal)</div><div class="line">    <span class="keywordtype">implicit none</span></div><div class="line">    <span class="keywordtype">class</span>(TBSys), <span class="keywordtype">intent(in)</span> :: me</div><div class="line">    <span class="keywordtype">integer</span>, <span class="keywordtype">intent(in)</span> :: EventID        </div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">intent(in)</span> :: X</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">intent(in)</span> :: Y</div><div class="line"><span class="keywordtype">    real</span>(WP), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">intent(out)</span> :: Value</div><div class="line">    <span class="keywordtype">integer</span>, <span class="keywordtype">dimension(size(Value))</span>, <span class="keywordtype">intent(out)</span> :: Direction</div><div class="line">    <span class="keywordtype">logical</span>, <span class="keywordtype">dimension(size(Value))</span>, <span class="keywordtype">intent(out)</span> :: Terminal</div><div class="line"></div><div class="line">    value(1) = y(2) <span class="comment">! detect y-crossing</span></div><div class="line">    value(2) = y(1) <span class="comment">! detect x-crossing    </span></div><div class="line"></div><div class="line">    direction(1) = 1  <span class="comment">! detect -ve to +ve transitions for y coordinate</span></div><div class="line">    direction(2) = -1 <span class="comment">! detect +ve to -ve transitions for x coordinate</span></div><div class="line">    terminal = [.false., .false.] <span class="comment">! continue integration after events</span></div><div class="line"><span class="keyword">end subroutine </span>SampleEventTB      </div></div><!-- fragment --><ol type="1">
+<li>Create and initialize the differential equation and ERK class objects for using Runge-Kutta intgerators</li>
+</ol>
+<div class="fragment"><div class="line"><span class="keywordtype">use </span><a class="code" href="namespaceflint.html">flint</a></div><div class="line"><span class="keywordtype">type</span>(ERK_class) ::  erk</div><div class="line"><span class="keywordtype">type</span>(TBSys)     :: diffeq</div><div class="line">diffeq%n = 6        <span class="comment">! Number of 1st-order differential equations</span></div><div class="line">diffeq%m = 2        <span class="comment">! Number of events</span></div><div class="line"></div><div class="line"><span class="comment">! Initialize the ERK object for 10000 max steps, DOP54 method with abs. tol. 1e-12, rel. tol. 1e-9</span></div><div class="line"><span class="comment">! and turn on interpolation and events detection    </span></div><div class="line"><span class="keyword">call </span><a class="code" href="namespaceerk.html">erk</a>%Init(diffeq, 10000, method=erk_dop54, atol=[1e-12], rtol=[1e-9],&amp;</div><div class="line">interpon=.true.,eventson=.true.)</div></div><!-- fragment --><ol type="1">
+<li>Call the Integrate subroutine for performing the integration if init was successful. Note if interpolation is enabled, then the IntStepsOn option for computing the states at the integrator's natural step-size must not be set to True.</li>
+</ol>
+<div class="fragment"><div class="line"><span class="keywordtype">integer</span> :: stiffstatus    </div><div class="line"><span class="keywordtype">real</span>(WP) :: x0, xf    </div><div class="line"><span class="keywordtype">real</span>(WP), <span class="keywordtype">dimension(6)</span> :: y0, yf</div><div class="line"><span class="keywordtype">real</span>(WP), <span class="keywordtype">allocatable</span>, <span class="keywordtype">dimension(:,:)</span> :: EventData <span class="comment">! allocated by Integrate</span></div><div class="line"></div><div class="line">stiffstatus = 1 <span class="comment">! detect stiffness and terminate if equations are stiff    </span></div><div class="line">x0 = 0.0    </div><div class="line">y0 = [6400.0_wp,0.0_wp,0.0_wp, 0.0_wp,7.69202528825512_wp,7.69202528825512_wp]</div><div class="line">xf = 161131.68239305308_wp      </div><div class="line"></div><div class="line"><span class="comment">! Call Tntgerate with final solution in yf, no initial step-size given, events-related</span></div><div class="line"><span class="comment">! data (event-id, x value, y state) in EventData, and all events are detected</span></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespaceerk.html">erk</a>%status == flint_success) <span class="keywordflow">then</span>    </div><div class="line">    <span class="keyword">call </span><a class="code" href="namespaceerk.html">erk</a>%Integrate(x0, y0, xf, yf, stepsz=0.0, intstepson=.false.,&amp;</div><div class="line">    eventstates=eventdata, eventmask = [.true.,.true.],stifftest=stiffstatus)</div><div class="line"><span class="keywordflow">end if</span>    </div></div><!-- fragment --><ol type="1">
+<li>Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must intgerate the equations again before calling Interpolate.</li>
+</ol>
+<div class="fragment"><div class="line"><span class="keywordtype">real</span>(WP), <span class="keywordtype">dimension(:)</span>, <span class="keywordtype">allocatable</span> :: Xarr1, Xarr2</div><div class="line"><span class="keywordtype">real</span>(WP), <span class="keywordtype">dimension(6,:)</span> :: Yarr1, Yarr2</div><div class="line"></div><div class="line">xarr1 = [(x0 + (xf-x0)/10*i, i=0,9)]    <span class="comment">! grid-1 with 10 points</span></div><div class="line">xarr2 = [(x0 + (xf-x0)/1000*i, i=0,999)]    <span class="comment">! grid-2 with 1000 points</span></div><div class="line"><span class="keyword">allocate</span>(yarr1(6,<span class="keyword">size</span>(xarr1)))    <span class="comment">! allocate solution storage</span></div><div class="line"><span class="keyword">allocate</span>(yarr2(6,<span class="keyword">size</span>(xarr2)))        </div><div class="line"></div><div class="line"><span class="keywordflow">if</span> (<a class="code" href="namespaceerk.html">erk</a>%status == flint_success) <span class="keywordflow">then</span></div><div class="line">  <span class="comment">! interpolate and keep the internal storage for further calls</span></div><div class="line">  <span class="keyword">call </span><a class="code" href="namespaceerk.html">erk</a>%Interpolate(xarr1, yarr1, .true.)</div><div class="line">  <span class="comment">! After this interpolation, delete the internal storage (default).</span></div><div class="line">  <span class="keyword">call </span><a class="code" href="namespaceerk.html">erk</a>%Interpolate(xarr2, yarr2, .false.) </div><div class="line"><span class="keywordflow">end if</span>    </div><div class="line"></div><div class="line"><span class="comment">! print the solutions</span></div><div class="line">print *, <span class="stringliteral">&#39;Solution at grid-1&#39;</span>    </div><div class="line">print *, yarr1</div><div class="line">print *, <span class="stringliteral">&#39;Solution at grid-2&#39;</span>        </div><div class="line">print *, yarr2</div><div class="line"><span class="comment">! print the event data</span></div><div class="line">print *, eventdata(1,:)     <span class="comment">! Time at which events occured</span></div><div class="line">print *, eventdata(2:7,:)   <span class="comment">! corresponding position and velocity states</span></div><div class="line">print *, eventdata(8,:)     ! event-id number</div></div><!-- fragment --><p>For all the FLINT status codes and options supported by Init, Integrate, and Interpolate procedures along with the interfaces for user-supplied functions, see the FLINT_base module in <a class="el" href="_f_l_i_n_t__base_8f90.html">FLINT_base.f90</a> file. </p>
 <h1><a class="anchor" id="testsec"></a>
 Testing</h1>
 <p>In all the tests, the orbit is propagated for 4 orbital periods. The propagation is repeated 5000 times. The tables give the total time for 5000 propagations and all other testing parameters are the values for 1 propagation. The relative tolerance is taken as 1e-11 and absolute tolerance as 1e-14 in all the cases except when explicitly mentioned otherwise. Interpolation is used to capture 1000 points per orbit period, however delayed interpolation feature of FLINT is not used in these results.</p>
@@ -268,9 +183,7 @@ Testing</h1>
 <td class="markdownTableBodyNone">Rejected Steps  </td><td class="markdownTableBodyNone">15  </td><td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyNone">7  </td><td class="markdownTableBodyNone">8  </td><td class="markdownTableBodyNone">0  </td><td class="markdownTableBodyNone">NA   </td></tr>
 </table>
 </li>
-<li>Two-Body elliptic Earth orbit</li>
-</ul>
-<table class="markdownTable">
+<li>Two-Body elliptic Earth orbit <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Params\Integrator  </th><th class="markdownTableHeadNone">DOP54  </th><th class="markdownTableHeadNone">DOP853  </th><th class="markdownTableHeadNone">Verner65E  </th><th class="markdownTableHeadNone">Verner98R  </th><th class="markdownTableHeadNone">JDOP853  </th><th class="markdownTableHeadNone">JDDEABM   </th></tr>
 <tr class="markdownTableRowOdd">
@@ -286,7 +199,7 @@ Testing</h1>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">Rejected Steps  </td><td class="markdownTableBodyNone">19  </td><td class="markdownTableBodyNone">99  </td><td class="markdownTableBodyNone">10  </td><td class="markdownTableBodyNone">99  </td><td class="markdownTableBodyNone">99  </td><td class="markdownTableBodyNone">NA   </td></tr>
 </table>
-<ul>
+</li>
 <li>Two-Body elliptic Earth orbit with interpolation <table class="markdownTable">
 <tr class="markdownTableHead">
 <th class="markdownTableHeadNone">Params\Integrator  </th><th class="markdownTableHeadNone">DOP54  </th><th class="markdownTableHeadNone">DOP853  </th><th class="markdownTableHeadNone">Verner65E  </th><th class="markdownTableHeadNone">Verner98R  </th><th class="markdownTableHeadNone">JDOP853  </th><th class="markdownTableHeadNone">JDDEABM   </th></tr>
@@ -345,11 +258,10 @@ Testing</h1>
  <div class="image">
 <img src="Jacob_DDEABM.png" alt="Jacob_DDEABM.png"/>
 </div>
-<div class="image">
+ <div class="image">
 <img src="FLINT_Verner98R.png" alt="FLINT_Verner98R.png"/>
 </div>
-  <p></p>
-<p>The following figure shows the multiple event detection capability of FLINT, in which the X-crossings in decreasing and Y-crossings in increasing direction are detected and reported to the user. </p><div class="image">
+   <p>The following figure shows the multiple event detection capability of FLINT, in which the X-crossings in decreasing and Y-crossings in increasing direction are detected and reported to the user. </p><div class="image">
 <img src="FLINT_Events.png" alt="FLINT_Events.png"/>
 </div>
  <h1><a class="anchor" id="refsec"></a>
@@ -363,7 +275,7 @@ References</h1>
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="footer">Generated by
+    <li class="footer">Generated on Sat Jul 6 2019 00:49:37 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

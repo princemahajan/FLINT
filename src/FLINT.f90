@@ -37,7 +37,7 @@
 !!              - Modern object-oriented, thread-safe, and optimized Fortran code
 !!              - 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E
 !!              - Any ERK method can be implemented by just including their coefficients
-!!              - Dense output with delayed interpolation (integrate once, interplate as many times)
+!!              - Dense output with delayed interpolation (integrate once, interpolate as many times)
 !!              - Multiple event-detection with event masking and separate event step-size
 !!              - Stiffness detection
 !!
@@ -52,7 +52,8 @@
 !! \section     usagesec Usage
 !!              1. Create a differential equation system class by providing differential equation
 !!              function, events function (if any), and parameters (if any).
-!!
+!!              
+!!              \code{.f90}
 !!                  use FLINT
 !!                  implicit none
 !!    
@@ -94,25 +95,29 @@
 !!                      Direction(2) = -1 ! detect +ve to -ve transitions for x coordinate
 !!                      Terminal = [.FALSE., .FALSE.] ! continue integration after events
 !!                  end subroutine SampleEventTB      
+!!              \endcode
 !!
 !!              2. Create and initialize the differential equation and ERK class objects for 
 !!              using Runge-Kutta intgerators
 !!
+!!              \code{.f90}
 !!                      use FLINT
 !!                      type(ERK_class) ::  erk
 !!                      type(TBSys)     :: diffeq
 !!                      diffeq%n = 6        ! Number of 1st-order differential equations
 !!                      diffeq%m = 2        ! Number of events
 !!                      
-!!                        ! Initialize the ERK object for 10000 max steps, DOP54 method with abs. tol. 1e-12, rel. tol. 1e-9
+!!                      ! Initialize the ERK object for 10000 max steps, DOP54 method with abs. tol. 1e-12, rel. tol. 1e-9
 !!                      ! and turn on interpolation and events detection    
 !!                      call erk%Init(diffeq, 10000, Method=ERK_DOP54, ATol=[1e-12], RTol=[1e-9],&
 !!                      InterpOn=.TRUE.,EventsOn=.TRUE.)
+!!              \endcode
 !!
 !!              3. Call the Integrate subroutine for performing the integration if init was successful.
 !!              Note if interpolation is enabled, then the IntStepsOn option for computing the states 
 !!              at the integrator's natural step-size must not be set to True.
 !!
+!!              \code{.f90}
 !!                  integer :: stiffstatus    
 !!                  real(WP) :: x0, xf    
 !!                  real(WP), dimension(6) :: y0, yf
@@ -129,12 +134,14 @@
 !!                      call erk%Integrate(x0, y0, xf, yf, StepSz=0.0, IntStepsOn=.FALSE.,&
 !!                      EventStates=EventData, EventMask = [.TRUE.,.TRUE.],StiffTest=stiffstatus)
 !!                  end if    
+!!              \endcode
 !!
 !!              4. Call the Interpolate function for computing solution on the desired grid of x values.
 !!              The last parameter must be specified as True if user wants FLINT to keep the internal storage
 !!              for calling Interpolate again. Otherwise, the internal storage is deleted and the user
 !!              must intgerate the equations again before calling Interpolate.
-!!                    
+!!
+!!              \code{.f90}
 !!                  real(WP), dimension(:), allocatable :: Xarr1, Xarr2
 !!                  real(WP), dimension(6,:) :: Yarr1, Yarr2
 !!    
@@ -159,7 +166,8 @@
 !!                  print *, EventData(1,:)     ! Time at which events occured
 !!                  print *, EventData(2:7,:)   ! corresponding position and velocity states
 !!                  print *, Eventdata(8,:)     ! Event-ID number
-!!                
+!!              \endcode
+!!
 !!              For all the FLINT status codes and options supported by Init, Integrate, and Interpolate
 !!              procedures along with the interfaces for user-supplied functions, see the FLINT_base 
 !!              module in FLINT_base.f90 file. 
@@ -174,19 +182,19 @@
 !!              The initial conditions in Cartesian coodinates used are as follows:
 !!              - Two-Body circular Earth orbit  (Units: km, sec)
 !!                  + GM: 398600.436233     
-!!                  [6400.0,0.0,0.0, 0.0,5.58037857139,5.58037857139] 
+!!                  + Y0 = [6400.0,0.0,0.0, 0.0,5.58037857139,5.58037857139] 
 !!              - Two-Body elliptic Earth orbit  (Units: km, sec)
 !!                  + GM: 398600.436233     
-!!                  [6400.0,0.0,0.0,0.0,7.69202528825512,7.69202528825512]
+!!                  + Y0 = [6400.0,0.0,0.0,0.0,7.69202528825512,7.69202528825512]
 !!              - Arenstorf orbit in rotating frame  (Units: nondimensional)
 !!                  + mass-ratio: 0.012277471
 !!                  + time-period: 17.0652165601579625588917206249    
-!!                  [0.994, 0.0, 0.0_wp, -2.00158510637908252240537862224]
+!!                  + Y0 = [0.994, 0.0, 0.0, -2.00158510637908252240537862224]
 !!    
 !!              Note that JDOP853 and JDDEABM are modern fortran implementations of DOP853
 !!              and DDEABM by Jacob Williams, and are available at https://github.com/jacobwilliams.
 !!              The plots are generated using https://github.com/jacobwilliams/pyplot-fortran.    
-!! 
+!!
 !!              - Two-Body circular Earth orbit
 !!              Params\Integrator | DOP54   | DOP853 | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------ | --------- | --------- | -------  | --------------
@@ -207,7 +215,7 @@
 !!              Accepted Steps    |   1302  | 157    |   749     |    131    |  157     |   NA           
 !!              Rejected Steps    |     15  | 0      |   7       |    8      |  0       |   NA           
 !!
-!!              - Two-Body elliptic Earth orbit  
+!!              - Two-Body elliptic Earth orbit
 !!              Params\Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------  | --------- | --------- | -------  | --------------
 !!              Closing Error     | 2.7     | 2.7     |   2.7     |    2.7    |  2.7     |   2.7           
@@ -251,10 +259,10 @@
 !!              by JDOP853, JDDEABM and FLINT's Verner98R are shown below. Verner98R diverges much
 !!              slower than DOP853 and DDEABM for this orbit and tolerance values.
 !!              \image html "JDOP853.png"
-!!              \image html "Jacob_DDEABM.png"    
+!!              \image html "Jacob_DDEABM.png"
 !!              \image html "FLINT_Verner98R.png"
 !!              \image latex "JDOP853.png"
-!!              \image latex "Jacob_DDEABM.png"        
+!!              \image latex "Jacob_DDEABM.png"
 !!              \image latex "FLINT_Verner98R.png"
 !!
 !!              The following figure shows the multiple event detection capability of FLINT, 

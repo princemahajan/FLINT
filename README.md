@@ -1,4 +1,4 @@
-# FLINT
+# [FLINT:center]
 
 ## Fortran Library for numerical INTegration of differential equations
 
@@ -25,9 +25,9 @@ are available at http://people.math.sfu.ca/~jverner/.
 FLINT is a modern object-oriented Fortran library that provides four explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and event-detection support for each of the methods. The code is written such that any other ERK method can be  implemented by including its coefficients with minimum changes required in the code. The DOP853 integrator is the default method chosen, and its implementation is hand-optimized specific to its coefficients. For other integrators, a generic routine for step-integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in its internal memory. After that, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final points used during the integration. Interpolation is much faster than integration in FLINT, as the coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with event-masking (static and dynamic), event-direction, and termination options. Additionally, a step-size for event detection is also supported. In a nutshell, the features are:
 
 - Modern object-oriented, thread-safe, and optimized Fortran code
-- 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E
+- 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E (as of now)
 - Any ERK method can be implemented by just including their coefficients
-- Dense output with delayed interpolation (integrate once, interplate as many times)
+- Dense output with delayed interpolation (integrate once, interpolate as many times)
 - Multiple event-detection with event masking and separate event step-size
 - Stiffness detection
 
@@ -161,14 +161,14 @@ In all the tests, the orbit is propagated for 4 orbital periods and the integrat
 The initial conditions in Cartesian coodinates used are as follows:
 - Two-Body circular Earth orbit  (Units: km, sec)
     + GM: 398600.436233     
-    [6400.0,0.0,0.0, 0.0,5.58037857139,5.58037857139] 
+    + Y0 = [6400.0,0.0,0.0, 0.0,5.58037857139,5.58037857139] 
 - Two-Body elliptic Earth orbit  (Units: km, sec)
     + GM: 398600.436233     
-    [6400.0,0.0,0.0,0.0,7.69202528825512,7.69202528825512]
+    + Y0 = [6400.0,0.0,0.0,0.0,7.69202528825512,7.69202528825512]
 - Arenstorf orbit in rotating frame  (Units: nondimensional)
     + mass-ratio: 0.012277471
     + time-period: 17.0652165601579625588917206249    
-    [0.994, 0.0, 0.0_wp, -2.00158510637908252240537862224]
+    + Y0 = [0.994, 0.0, 0.0_wp, -2.00158510637908252240537862224]
 
 Note that JDOP853 and JDDEABM are modern fortran implementations of DOP853 and DDEABM by Jacob Williams, and are available at https://github.com/jacobwilliams. The plots are generated using https://github.com/jacobwilliams/pyplot-fortran.
 
