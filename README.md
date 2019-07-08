@@ -1,4 +1,4 @@
-# [FLINT:center]
+# FLINT
 
 ## Fortran Library for numerical INTegration of differential equations
 
