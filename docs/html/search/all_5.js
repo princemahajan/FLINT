@@ -26,5 +26,5 @@ var searchData=
   ['flintutils',['flintutils',['../namespaceflintutils.html',1,'']]],
   ['flintutils_2ef90',['FLINTUtils.f90',['../_f_l_i_n_t_utils_8f90.html',1,'']]],
   ['func',['func',['../interfaceflintutils_1_1func.html',1,'flintutils::func'],['../interfaceflintutils_1_1func.html#a07840f0a298271842730abef2fdfb04e',1,'flintutils::func::func()']]],
-  ['flint_3a_20fortran_20library_20for_20numerical_20integrators',['FLINT: Fortran Library for numerical INTegrators',['../index.html',1,'']]]
+  ['flint_3a_20fortran_20library_20for_20numerical_20integrators_20of_20differential_20equations',['FLINT: Fortran Library for numerical INTegrators of differential equations',['../index.html',1,'']]]
 ];

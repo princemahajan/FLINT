@@ -24,7 +24,7 @@ for the JavaScript code in this file
 var NAVTREE =
 [
   [ "FLINT", "index.html", [
-    [ "FLINT: Fortran Library for numerical INTegrators", "index.html", [
+    [ "FLINT: Fortran Library for numerical INTegrators of differential equations", "index.html", [
       [ "Introduction", "index.html#sec", null ],
       [ "Usage", "index.html#usagesec", null ],
       [ "Testing", "index.html#testsec", null ],

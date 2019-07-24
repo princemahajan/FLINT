@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['flint_3a_20fortran_20library_20for_20numerical_20integrators',['FLINT: Fortran Library for numerical INTegrators',['../index.html',1,'']]]
+  ['flint_3a_20fortran_20library_20for_20numerical_20integrators_20of_20differential_20equations',['FLINT: Fortran Library for numerical INTegrators of differential equations',['../index.html',1,'']]]
 ];

@@ -242,6 +242,8 @@ submodule (ERK) ERKIntegrate
                 ! Advance one step using the chosen method
                 if (method == ERK_DOP853) then
                     call DOP853_stepint(X, Y1, Y2)
+                elseif (method == ERK_DOP54) then
+                    call DOP54_stepint(X, Y1, Y2)
                 else
                     call stepint(X, Y1, Y2)
                 end if
@@ -575,12 +577,12 @@ submodule (ERK) ERKIntegrate
             ! It is a series sum: 1 + 2 + 3 + ...
             astart = int((i-1)/2.0*(i-2))
             ! In my testing, I am seeing matmul performing better than 
-            ! MKL's gemv. However, do concurrent is faster than both but 
+            ! MKL's gemv. However, do loop is faster than both but 
             ! but still slower than hard-coded computations
             ! call gemv(k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
-            ! aijkj = matmul(k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
+            !aijkj = matmul(k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
             aijkj = 0.0_WP
-            do concurrent (j = 1:(i-1))
+            do j = 1,(i-1)
                 aijkj = aijkj + k(:,j)*me%a(astart + j)
             end do
             
@@ -864,6 +866,84 @@ submodule (ERK) ERKIntegrate
 
     end function DOP853_IntpCoeff
  
+    !> It advances integrator by 1 step by computing stages
+    subroutine DOP54_stepint(X0, Y0, Y1)
+    
+        implicit none
+        
+        real(WP), intent(in) :: X0
+        real(WP), dimension(n), intent(in) :: Y0
+        real(WP), dimension(n), intent(out) :: Y1
+        
+        real(WP), dimension(n) :: Yint, aijkj, Sc
+        integer :: i
+        
+        ! first stage
+        k(:,1) = F0  
+        
+        ! 2nd stage
+        aijkj = k(:,1)*me%a(1)           
+        Yint = Y0 + h*aijkj
+        k(:,2) = pDiffEqSys%F(X0 + h*me%c(2), Yint, params)
+
+        ! 3rd stage
+        aijkj = k(:,1)*me%a(2) + k(:,2)*me%a(3)           
+        Yint = Y0 + h*aijkj        
+        k(:,3) = pDiffEqSys%F(X0 + h*me%c(3), Yint, params)
+        
+        ! 4th stage
+        aijkj = k(:,1)*me%a(4) + k(:,2)*me%a(5) + k(:,3)*me%a(6)    
+        Yint = Y0 + h*aijkj        
+        k(:,4) = pDiffEqSys%F(X0 + h*me%c(4), Yint, params)
+        
+        ! 5th stage
+        aijkj = k(:,1)*me%a(7) + k(:,2)*me%a(8) + k(:,3)*me%a(9) + k(:,4)*me%a(10)           
+        Yint = Y0 + h*aijkj
+        k(:,5) = pDiffEqSys%F(X0 + h*me%c(5), Yint, params)
+        
+        ! 6th stage
+        aijkj = k(:,1)*me%a(11) + k(:,2)*me%a(12) + k(:,3)*me%a(13) &
+                +  k(:,4)*me%a(14) + k(:,5)*me%a(15)
+        Yint12 = Y0 + h*aijkj                
+        k(:,6) = pDiffEqSys%F(X0 + h*me%c(6), Yint12, params)
+        
+        ! 7th stage
+        aijkj = k(:,1)*me%a(16) + k(:,2)*me%a(17) + k(:,3)*me%a(18) &
+                + k(:,4)*me%a(19) + k(:,5)*me%a(20) + k(:,6)*me%a(21)
+        Yint = Y0 + h*aijkj  
+        k(:,7) = pDiffEqSys%F(X0 + h, Yint, params)
+        
+        ! propagate the solution to the next step for error computation
+        ! For FSAL, Yint is the new solution
+
+        ! The scale factor for error computations
+        if (IsScalarTol .EQV. .FALSE.) then
+            Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
+        else
+            Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
+        end if 
+
+        ! Estimate the error. We assume that the error coeffcients are precomputed,
+        ! i.e., e_i = b_i - bhat_i
+        
+        Err = abs(h)*sqrt(sum(((k(:,1)*me%e(1) + k(:,3)*me%e(3) + k(:,4)*me%e(4) + k(:,5)*me%e(5) &
+                + k(:,6)*me%e(6) + k(:,7)*me%e(7))/Sc)**2)/n)
+
+        ! If this step is accepted then return the new solution
+        ! else just return the initial condition
+        if (Err <= 1.0_WP) then 
+            Y1 = Yint
+            ! In FSAL methods, the intgeration last stage is F0 for the next step
+            F0 = k(:,7)
+            ! Function calls made if the step is accepted
+            FCalls = sint - 1    
+        else
+            Y1 = Y0
+            ! Function calls made if the step is rejected
+            FCalls = sint - 2            
+        end if
+        
+    end subroutine DOP54_stepint
     
     
     function DOP54_IntpCoeff(X0, Y0, X1, Y1, InterpStates) result(IntpCoeff)

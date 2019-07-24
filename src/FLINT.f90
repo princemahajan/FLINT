@@ -1,5 +1,5 @@
 !###!#########################################################################################
-!> \mainpage    FLINT: Fortran Library for numerical INTegrators
+!> \mainpage    FLINT: Fortran Library for numerical INTegrators of differential equations
 !! \details     A fortran library for numerical integration with dense output
 !!              and multiple event-detection support. Currently, it provides four
 !!              Explicit Runge-Kutta methods: DOP54, DOP853, Verner65E, and Verner98R.
@@ -16,9 +16,9 @@
 !!              The coefficients for Verner65E and Verner98R methods were derived by Jim Verner, and 
 !!              are available at http://people.math.sfu.ca/~jverner/.    
 !! \section     sec Introduction 
-!!              FLINT is a modern object-oriented fortran library that provides four explicit Runge-Kutta (ERK)
-!!              methods of order 5, 6, 8, and 9 along with dense-output and event-detection
-!!              support for each of the methods. The code is written such that any other ERK
+!!              FLINT is a modern object-oriented fortran library that provides four adaptive step-size 
+!!              explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and 
+!!              event-detection support for each of the methods. The code is written such that any other ERK
 !!              method can be implemented by including its coefficients with minimum changes
 !!              required in the code. The DOP853 integrator is the default method chosen, and its
 !!              implementation is hand-optimized specific to its coefficients. For other integrators,
@@ -50,7 +50,7 @@
 !!              however it is not tested with it (yet). FLINT has no dependency on any other library.
 !!    
 !! \section     usagesec Usage
-!!              1. Create a differential equation system class by providing differential equation
+!!              + Create a differential equation system class by providing differential equation
 !!              function, events function (if any), and parameters (if any).
 !!              
 !!              \code{.f90}
@@ -97,7 +97,7 @@
 !!                  end subroutine SampleEventTB      
 !!              \endcode
 !!
-!!              2. Create and initialize the differential equation and ERK class objects for 
+!!              + Create and initialize the differential equation and ERK class objects for 
 !!              using Runge-Kutta intgerators
 !!
 !!              \code{.f90}
@@ -113,7 +113,7 @@
 !!                      InterpOn=.TRUE.,EventsOn=.TRUE.)
 !!              \endcode
 !!
-!!              3. Call the Integrate subroutine for performing the integration if init was successful.
+!!              + Call the Integrate subroutine for performing the integration if init was successful.
 !!              Note if interpolation is enabled, then the IntStepsOn option for computing the states 
 !!              at the integrator's natural step-size must not be set to True.
 !!
@@ -136,7 +136,7 @@
 !!                  end if    
 !!              \endcode
 !!
-!!              4. Call the Interpolate function for computing solution on the desired grid of x values.
+!!              + Call the Interpolate function for computing solution on the desired grid of x values.
 !!              The last parameter must be specified as True if user wants FLINT to keep the internal storage
 !!              for calling Interpolate again. Otherwise, the internal storage is deleted and the user
 !!              must intgerate the equations again before calling Interpolate.
@@ -196,7 +196,7 @@
 !!              The plots are generated using https://github.com/jacobwilliams/pyplot-fortran.    
 !!
 !!              - Two-Body circular Earth orbit
-!!              Params\Integrator | DOP54   | DOP853 | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853 | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------ | --------- | --------- | -------  | --------------
 !!              Closing Error     | 6.3e-6  | 4.3e-7 |   2.7e-6  |    1.1e-7 |  4.3e-7  |   3.1e-6           
 !!              IOM Error         | 3.1e-11 | 3.1e-11|   3.1e-11 |   3.1e-11 |  3.1e-11 |   3.9e-10               
@@ -206,7 +206,7 @@
 !!              Rejected Steps    |     15  | 0      |   7       |    8      |  0       |   NA           
 !!
 !!              - Two-Body circular Earth orbit with interpolation
-!!              Params\Integrator | DOP54   | DOP853 | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853 | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------ | --------- | --------- | -------  | --------------
 !!              Closing Error     | 6.3e-6  | 4.3e-7 |   2.7e-6  |    1.1e-7 |  4.3e-7  |   3.1e-6           
 !!              IOM Error         | 3.1e-11 | 3.1e-11|   3.1e-11 |   3.1e-11 |  3.1e-11 |   3.9e-10               
@@ -216,7 +216,7 @@
 !!              Rejected Steps    |     15  | 0      |   7       |    8      |  0       |   NA           
 !!
 !!              - Two-Body elliptic Earth orbit
-!!              Params\Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------  | --------- | --------- | -------  | --------------
 !!              Closing Error     | 2.7     | 2.7     |   2.7     |    2.7    |  2.7     |   2.7           
 !!              IOM Error         | 6.7e-10 | 6.7e-10 |   6.7e-10 |   6.7e-10 |  6.7e-10 |   2.3e-9               
@@ -226,7 +226,7 @@
 !!              Rejected Steps    |     19  | 99      |   10      |    99     |  99      |   NA         
 !!
 !!              - Two-Body elliptic Earth orbit with interpolation
-!!              Params\Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------  | --------- | --------- | -------  | --------------
 !!              Closing Error     | 2.7     | 2.7     |   2.7     |    2.7    |  2.7     |   2.7           
 !!              IOM Error         | 6.7e-10 | 6.7e-10 |   6.7e-10 |   6.7e-10 |  6.7e-10 |   2.3e-9               
@@ -236,7 +236,7 @@
 !!              Rejected Steps    |     19  | 99      |   10      |    99      |  99      |   NA         
 !!
 !!              - Arenstorf orbit
-!!              Params\Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------  | --------- | --------- | -------  | --------------
 !!              Closing Error     | 1.7     | 0.33    |   0.33    |    0.31   |  0.33    |   0.23           
 !!              IOM Error         | 7.2e-11 | 7.2e-11 |   7.2e-11 |   7.2e-11 |  7.2e-11 |   9.4e-11               
@@ -246,7 +246,7 @@
 !!              Rejected Steps    |     59  | 266     |   41      |    178    |  266     |   NA           
 !!
 !!              - Arenstorf orbit with interpolation
-!!              Params\Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
+!!              Params \ Integrator | DOP54   | DOP853  | Verner65E | Verner98R | JDOP853  | JDDEABM
 !!              ----------------- | ------- | ------  | --------- | --------- | -------  | --------------
 !!              Closing Error     | 1.7     | 0.33     |   0.33     |    0.31 |  0.33     |   0.23           
 !!              IOM Error         | 9.4e-11 | 7.1e-11 |   7.1e-11 |   7.1e-11 |  7.2e-11 |   9.4e-11               

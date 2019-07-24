@@ -136,6 +136,8 @@
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
                     maxval(JacobiC(Emmu, Yint))-minval(JacobiC(Emmu, Yint)), &
                     fcalls, naccpt, nrejct
+            else
+                write(17,*) mname//': Int failed: ', erkvar%status
             end if
             if (allocated(Xint)) deallocate(Xint)
             if (allocated(Yint)) deallocate(Yint)
@@ -156,7 +158,6 @@
         end do
     end if
     
-
     ! Solution at interpolated grid
     write(17, *) 'B. Interpolated Grid'
     write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
