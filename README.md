@@ -35,7 +35,16 @@ User specifies the differential equations and events function in a separate clas
 
 ### Installation
 
-FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing is also done with gfortran on Windows and Linux plaforms. The CMakeLists file is provided to generate Visual Studio projects as well as makefiles on Windows and Linux using cmake. Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library.
+FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing is also done with gfortran on Windows and Linux plaforms. Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists file is provided to generate Visual Studio projects or makefiles on Windows and Linux using cmake. Additionally, it also generates cmake config files to easily link FLINT using the find_package() command. The steps to link FLINT in cmake-based projects are:
+
++ In cmake GUI or command-line, set FLINT_INSTALL_LIB_DIR to the desired directory, where the compiled library, modules, and cmake config files will be installed.
++ In cmake GUI or command-line, set FLINT_INSTALL_BIN_DIR to the desired directory, where the compiled test executables of FLINT will be installed.
++ In your project CMAKELISTS.txt, insert
+    ```cmake
+        find_package(FLINT REQUIRED 0.9 CONFIG 
+            PATHS "<SAME_PATH_AS_IN_FLINT_INSTALL_LIB_DIR>/FLINT")
+        target_link_libraries(<YOUR_TARGET_NAME> FLINT::FLINT)
+    ```
 
 ### How to Use
 

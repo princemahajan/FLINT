@@ -1,0 +1,27 @@
+# ____| |    _ _|  \  |__ __| 
+# |     |      |    \ |   |   
+# __|   |      |  |\  |   |   
+# _|    _____|___|_| \_|  _|   
+                                                        
+
+# Author: Bharat Mahajan
+
+# - Config file for the FLINT package
+
+# It defines the following variables
+#  FLINT_LIBRARIES    - libraries to link against
+#  FLINT_EXECUTABLE   - the test executable
+
+get_filename_component(FLINT_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+
+# FLINT CMAKE config and target files are in binary dir
+@PACKAGE_INIT@
+
+# Our library dependencies (contains definitions for IMPORTED targets)
+if(NOT TARGET FLINT AND NOT FLINT_BINARY_DIR)
+  include("${FLINT_CMAKE_DIR}/FLINTTargets.cmake")
+endif()
+
+# These are IMPORTED targets created by FLINTTargets.cmake
+set(FLINT_LIBRARIES FLINT)
+set(FLINT_EXECUTABLE TestFLINT)
