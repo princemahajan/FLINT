@@ -66,22 +66,6 @@ target_link_libraries(${TestFLINTBIN} ${FLINTBIN})
 
 include(CompilerOptions)
 
-# Extract Fortran Compiler name
-#get_filename_component(Fortran_COMPILER_NAME ${CMAKE_Fortran_COMPILER} NAME)
-
-#if (${Fortran_COMPILER_NAME} STREQUAL "gfortran.exe" OR ${Fortran_COMPILER_NAME} STREQUAL "gfortran")
-    
-    # add gfortran specific options
-    
-#    target_compile_options(${FLINTBIN} PRIVATE "-std=f2008ts")
-#    target_compile_options(${FLINTBIN} PRIVATE "-ffree-line-length-0")
-#    target_compile_options(${TestFLINTBIN} PRIVATE "-std=f2008ts")
-#    target_compile_options(${TestFLINTBIN} PRIVATE "-ffree-line-length-0")    
-
-
-#elseif (${Fortran_COMPILER_NAME} STREQUAL "ifort.exe" OR ${Fortran_COMPILER_NAME} STREQUAL "ifort")
-
-
 # Thee options are for gfortran
 set(COption "-std=f2008ts")
 GetPlatformCompilerFlag("${COption}" FALSE Fortran)
@@ -180,10 +164,6 @@ install(TARGETS ${TestFLINTBIN}
 export(EXPORT FLINTTargets 
     NAMESPACE FLINT::
     FILE "${FLINT_INSTALL_LIB_DIR}/cmake/FLINTTargets.cmake")
-
-# Export the package for use from the build-tree
-# (this registers the build-tree with a global CMake-registry)
-export(PACKAGE FLINT)
 
 ##########################
 # Config and Version Files

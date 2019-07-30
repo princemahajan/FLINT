@@ -149,23 +149,25 @@ submodule (ERK) ERKIntegrate
             end if
         end if        
 
-        ! If Mask is not specified, then all events are enabled by default
-        if (present(EventMask)) then
-            EvMask = EventMask
-        else
-            EvMask = .TRUE.
-        end if
-        
-        ! If all the event masks are false then turn off events for this integration
-        if (.NOT. any(EvMask)) EventsOn = .FALSE.
-        
         ! Make sure optional event arguments are present if events are ON.        
         if (EventsOn) then
-            if (.NOT. present(EventStates)) then
-                me%status = FLINT_ERROR_EVENTPARAMS
+            ! If Mask is not specified, then all events are enabled by default
+            if (present(EventMask)) then
+                EvMask = EventMask
+            else
+                EvMask = .TRUE.
             end if
-            ! allocate EventData to 0 size to define it
-            allocate(EventData(0))
+            
+            if (.NOT. any(EvMask)) then
+                ! If all the event masks are false then turn off events for this integration                
+                EventsOn = .FALSE.
+            elseif (.NOT. present(EventStates)) then
+                ! If user has not provided the allocatable array for storage, retrun error
+                me%status = FLINT_ERROR_EVENTPARAMS
+            else
+                ! Allocate EventData to 0 size to define it
+                allocate(EventData(0))
+            end if
         end if
 
         ! Return if any error up to this point

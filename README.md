@@ -39,10 +39,10 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
 
 + In cmake GUI or command-line, set FLINT_INSTALL_LIB_DIR to the desired directory, where the compiled library, modules, and cmake config files will be installed.
 + In cmake GUI or command-line, set FLINT_INSTALL_BIN_DIR to the desired directory, where the compiled test executables of FLINT will be installed.
-+ In your project CMAKELISTS.txt, insert
++ In your project CMakeLists.txt, insert
     ```cmake
         find_package(FLINT REQUIRED 0.9 CONFIG 
-            PATHS "<SAME_PATH_AS_IN_FLINT_INSTALL_LIB_DIR>/FLINT")
+            PATHS "<SAME_PATH_AS_IN_FLINT_INSTALL_LIB_DIR>")
         target_link_libraries(<YOUR_TARGET_NAME> FLINT::FLINT)
     ```
 
