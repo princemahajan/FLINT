@@ -282,7 +282,8 @@ module FLINT_base
         !> Interface for the main Integrate method. It must be called after initialization and
         !! can be called multiple times with different IC and options without calling the init
         !! routine first every time.
-        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)
+        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
+                                                    EventRootFindingOn, StiffTest, params)
 
             import :: FLINT_class, WP, WORK_MAXSIZE
         

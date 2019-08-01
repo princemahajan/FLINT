@@ -26,7 +26,8 @@ submodule (ERK) ERKIntegrate
     contains    
 
     !> Integration main subroutine
-    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)
+    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
+                                    EventRootFindingOn, StiffTest, params)
     
         implicit none
         
