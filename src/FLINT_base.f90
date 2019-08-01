@@ -282,7 +282,7 @@ module FLINT_base
         !> Interface for the main Integrate method. It must be called after initialization and
         !! can be called multiple times with different IC and options without calling the init
         !! routine first every time.
-        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, StiffTest, params)
+        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)
 
             import :: FLINT_class, WP, WORK_MAXSIZE
         
@@ -322,6 +322,11 @@ module FLINT_base
             !! EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the ID
             !! of the event to which Xevent and Yevent corresponds.
             real(WP), allocatable, dimension(:,:), intent(out), optional :: EventStates
+            
+            !> If .FALSE., then no root-finding is used to compute the exact event location.
+            !! Rather, the integrator's natural step at which the sign-change is detected,
+            !! is returned. By default, root-finding is enabled.
+            logical, intent(in), optional :: EventRootFindingOn
 
             !> FLINT will use Hairer's DOP853 alogorithm to test for stiffness
             !! of the differential equations if StffTest == 1 or StffTest == 2. 

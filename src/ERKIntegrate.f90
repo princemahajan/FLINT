@@ -26,7 +26,7 @@ submodule (ERK) ERKIntegrate
     contains    
 
     !> Integration main subroutine
-    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, StiffTest, params)
+    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)
     
         implicit none
         
@@ -42,6 +42,7 @@ submodule (ERK) ERKIntegrate
         real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint
         logical, dimension(me%pDiffEqSys%m), intent(in), optional :: EventMask
         real(WP), allocatable, dimension(:,:), intent(out), optional :: EventStates
+        logical, intent(in), optional :: EventRootFindingOn        
         integer, intent(inout), optional :: StiffTest        
         real(WP), dimension(:), intent(in), optional :: params                
     
@@ -65,7 +66,7 @@ submodule (ERK) ERKIntegrate
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
         
         logical :: IsProblemStiff, IntStepsNeeded, LastStepRejected, LAST_STEP
-        logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, BipComputed
+        logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, RootFindingOn, BipComputed
         
         class(DiffEqSys), pointer :: pDiffEqSys
         integer(kind(ERK_DOP853)) :: method
@@ -157,7 +158,7 @@ submodule (ERK) ERKIntegrate
             else
                 EvMask = .TRUE.
             end if
-            
+
             if (.NOT. any(EvMask)) then
                 ! If all the event masks are false then turn off events for this integration                
                 EventsOn = .FALSE.
@@ -168,6 +169,14 @@ submodule (ERK) ERKIntegrate
                 ! Allocate EventData to 0 size to define it
                 allocate(EventData(0))
             end if
+            
+            ! Root-finding by default is enabled
+            if (present(EventRootFindingOn)) then
+                RootFindingOn = EventRootFindingOn
+            else
+                RootFindingOn = .TRUE.
+            end if
+            
         end if
 
         ! Return if any error up to this point
@@ -343,30 +352,38 @@ submodule (ERK) ERKIntegrate
 
                                     if (EventTriggered) then
                                         ! Current event has indeed triggered
-                                        ! compute interpolation coefficients if not already computed
-                                        if (.NOT. BipComputed) then
-                                            select case (method)
-                                            case (ERK_DOP853)
-                                            Bip = DOP853_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
-                                            case (ERK_DOP54)
-                                            Bip = DOP54_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)                                
-                                            case default
-                                            Bip = IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
-                                            end select    
-                                            TotalFCalls = TotalFCalls + FCalls
-                                            BipComputed = .TRUE.
-                                        end if
-                                        ! Now find the exact event location using root-finding
-                                        call Root(EventX0, EventX1, val0, val1, DEFAULT_EVENTTOL, &
+                                        if (RootFindingOn) then
+                                            ! compute interpolation coefficients if not already computed
+                                            if (.NOT. BipComputed) then
+                                                select case (method)
+                                                case (ERK_DOP853)
+                                                Bip = DOP853_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
+                                                case (ERK_DOP54)
+                                                Bip = DOP54_IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)                                
+                                                case default
+                                                Bip = IntpCoeff(X, Y1, X+h, Y2, me%InterpStates)
+                                                end select    
+                                                TotalFCalls = TotalFCalls + FCalls
+                                                BipComputed = .TRUE.
+                                            end if
+                                            ! Now find the exact event location using root-finding
+                                            call Root(EventX0, EventX1, val0, val1, DEFAULT_EVENTTOL, &
                                                     SingleEvent, EventXm, valm, rootiter, rooterror)
-                                        if (rooterror == 0 .OR. rooterror == 2) then
-                                            ! save the event states
-                                            EventYm = InterpY(size(me%InterpStates), EventXm, X, h, me%pstar, Bip)
-                                            EventData = [EventData, EventXm, EventYm, real(EventId, WP)]
+                                            if (rooterror == 0 .OR. rooterror == 2) then
+                                                ! save the event states
+                                                EventYm = InterpY(size(me%InterpStates), EventXm, X, h, me%pstar, Bip)
+                                                EventData = [EventData, EventXm, EventYm, real(EventId, WP)]
+                                            else
+                                                ! root finding failed, save the event states at the point "a"
+                                                status = FLINT_ERROR_EVENTROOT
+                                            end if
                                         else
-                                            ! root finding failed, save the event states at the point "a"
-                                            status = FLINT_ERROR_EVENTROOT
+                                            ! just return the state at which sign-change is detected
+                                            EventXm = EventX1
+                                            EventYm = val1
+                                            EventData = [EventData, EventXm, EventYm, real(EventId, WP)]
                                         end if
+                                        
                                         ! Do we need to stop at this event?
                                         if (EventTerm(EventId) .EQV. .TRUE.) then
                                             ! the last solution is the same as the event state

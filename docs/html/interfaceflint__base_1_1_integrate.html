@@ -110,16 +110,16 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_integrate.htm
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae288ded40b8ee87422ab53c50a99b2d7"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_integrate.html#ae288ded40b8ee87422ab53c50a99b2d7">integrate</a> (me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, StiffTest, params)</td></tr>
-<tr class="separator:ae288ded40b8ee87422ab53c50a99b2d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0f325ee508f1decfce7f0d89df2f73b"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_integrate.html#ae0f325ee508f1decfce7f0d89df2f73b">integrate</a> (me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)</td></tr>
+<tr class="separator:ae0f325ee508f1decfce7f0d89df2f73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for the main <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method. It must be called after initialization and can be called multiple times with different IC and options without calling the init routine first every time. </p>
 
 <p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00285">285</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 </div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
-<a id="ae288ded40b8ee87422ab53c50a99b2d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae288ded40b8ee87422ab53c50a99b2d7">&#9670;&nbsp;</a></span>integrate()</h2>
+<a id="ae0f325ee508f1decfce7f0d89df2f73b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0f325ee508f1decfce7f0d89df2f73b">&#9670;&nbsp;</a></span>integrate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -193,6 +193,12 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">logical, intent(in), optional&#160;</td>
+          <td class="paramname"><em>EventRootFindingOn</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">integer, intent(inout), optional&#160;</td>
           <td class="paramname"><em>StiffTest</em>, </td>
         </tr>
@@ -222,6 +228,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">yint</td><td>If IntStepsOn=true, user must provide this parameter. FLINT will allocate the memory and return the solution at integrator's natural steps in Yint. The first column is the initial condition Y0 and the final column is Yf. FLINT will not explicitly deallocate this memory.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">eventmask</td><td>If EventMask(i)=false, then the event with Eventid 'i' will not be checked. If all the events are masked, then event checking will be turned off.</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">eventstates</td><td>Solutions at the event locations for each of the unmasked event. If events are enabled, then user must specify this parameter. FLINT will internally allocate the storage and it will not explicitly deallocate this memory. EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the ID of the event to which Xevent and Yevent corresponds.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventrootfindingon</td><td>If .FALSE., then no root-finding is used to compute the exact event location. Rather, the integrator's natural step at which the sign-change is detected, is returned. By default, root-finding is enabled.</td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">stifftest</td><td>FLINT will use Hairer's DOP853 alogorithm to test for stiffness of the differential equations if StffTest == 1 or StffTest == 2. Test is disabled by default or if Stifftest == 0.<ul>
 <li>StiffTest == 1: If DiffEq are detected to be stiff then -1 is returned in StiffTest and the integration halts at the current step with appropriate status code.</li>
 <li>StiffTest == 2: If DiffEq are detected to be stiff then -1 is returned in StiffTest but the integration continues.</li>
@@ -247,7 +254,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li><li class="navelem"><a class="el" href="interfaceflint__base_1_1_integrate.html">Integrate</a></li>
-    <li class="footer">Generated on Tue Jul 23 2019 21:17:41 for FLINT by
+    <li class="footer">Generated on Thu Aug 1 2019 13:44:10 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>
