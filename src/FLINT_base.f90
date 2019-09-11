@@ -158,7 +158,7 @@ module FLINT_base
         !> Interface of the user-supplied Differential Equation function. It must
         !! return a vector of double precision values with dimension same as that of
         !! the input vector Y.
-        pure function DEFunc(me, X, Y, params)
+        function DEFunc(me, X, Y, params)
 
             import :: WP, DiffEqSys       
             implicit none
@@ -178,7 +178,7 @@ module FLINT_base
         
         
         !> Interface for a user-supplied procedure for computing events
-        pure subroutine EventFunc(me, EventID, X, Y, Value, Direction, Terminal)
+        subroutine EventFunc(me, EventID, X, Y, Value, Direction, Terminal)
             
             import :: WP, DiffEqSys
             implicit none

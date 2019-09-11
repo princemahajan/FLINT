@@ -41,7 +41,7 @@ module FLINTUtils
     
     !> Interface of the function whose root needs to be computed
     abstract interface
-        pure function func(x) result(y)
+        function func(x) result(y)
             import :: WP
             implicit none
             real(WP), intent(in) :: x !< independent variable
@@ -54,7 +54,7 @@ module FLINTUtils
     !> \brief Subroutine for computing the root using Brent algorithm.
     !! \details For details on the algorithm, see Numerical receipes in C book
     !! at https://www2.units.it/ipl/students_area/imm2/files/Numerical_Recipes.pdf
-    pure subroutine Root(a, b, ya, yb, tol, f, x, fx, niter, error)
+    subroutine Root(a, b, ya, yb, tol, f, x, fx, niter, error)
     
         implicit none
         

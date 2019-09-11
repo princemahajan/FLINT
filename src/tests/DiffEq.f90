@@ -50,7 +50,7 @@ module MyDiffEq
     
     contains
     
-    pure function TwoBodyDE(me, X, Y, Params)
+    function TwoBodyDE(me, X, Y, Params)
     
         implicit none
         
@@ -81,7 +81,7 @@ module MyDiffEq
     end function TwoBodyDE
         
         
-    pure function CR3BPDE(me, X, Y, Params)
+    function CR3BPDE(me, X, Y, Params)
     
         implicit none
         
@@ -123,7 +123,7 @@ module MyDiffEq
     
 
     
-    pure subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
             
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object            
@@ -145,7 +145,7 @@ module MyDiffEq
         
     end subroutine SampleEventTB      
     
-    pure subroutine SampleEventCR3BP(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventCR3BP(me, EventID, X, Y, Value, Direction, Terminal)
             
         implicit none
         class(CR3BPSys), intent(in) :: me !< Differential Equation object            

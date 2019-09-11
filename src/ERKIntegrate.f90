@@ -1079,7 +1079,7 @@ submodule (ERK) ERKIntegrate
     
     
     !> This procedure is passed to Root function for finding its zeros.
-    pure function SingleEvent(xx) result(gg)
+    function SingleEvent(xx) result(gg)
         implicit none
         real(WP), intent(in) :: xx !< independent variable
         real(WP) :: gg

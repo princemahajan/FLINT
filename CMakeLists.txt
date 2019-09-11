@@ -17,7 +17,7 @@ enable_language(Fortran)
 # set major and minor version
 set(FLINT_MAJOR_VERSION 0)
 set(FLINT_MINOR_VERSION 9)
-set(FLINT_VERSION  ${FOOBAR_MAJOR_VERSION}.${FOOBAR_MINOR_VERSION})
+set(FLINT_VERSION  ${FLINT_MAJOR_VERSION}.${FLINT_MINOR_VERSION})
 
 # CMake module directory
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -156,7 +156,7 @@ install(TARGETS ${FLINTBIN}
   COMPONENT dev)
 
 install(TARGETS ${TestFLINTBIN}
-  # IMPORTANT: Add the bar executable to the "export-set"
+  # IMPORTANT: Add the TestFLINT executable to the "export-set"
   EXPORT FLINTTargets
   RUNTIME DESTINATION "${FLINT_INSTALL_BIN_DIR}" COMPONENT bin)
 
