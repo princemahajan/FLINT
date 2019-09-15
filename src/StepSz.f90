@@ -51,7 +51,7 @@ module StepSize
     !> \brief Subroutine for computing the starting step size using Hairer's algorithm.
     !! \details For details on the algorithm, see Hairer's book "Solving ODE I" or his code dop853.f
     !! at http://www.unige.ch/~hairer/prog/nonstiff/dop853.f.
-    pure subroutine StepSz0Hairer(h, p, n, X0, Y0, F0, Sc, hSign, hMax, FCalls, pDiffEqSys, Params)
+    subroutine StepSz0Hairer(h, p, n, X0, Y0, F0, Sc, hSign, hMax, FCalls, pDiffEqSys, Params)
     
         implicit none
         
