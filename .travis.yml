@@ -30,7 +30,7 @@ after_success:
     - cat ./results.txt
     - mv ./results.txt ../media
     - cd ../media
-    - julia -e 'using Pkg; Pkg.add(\"Coverage\"); Pkg.add(\"DifferentialEquations\");Pkg.add(\"LinearAlgebra\");Pkg.add(\"Printf\")'
+    - julia -e 'using Pkg; Pkg.add("Coverage"); Pkg.add("DifferentialEquations");Pkg.add("LinearAlgebra");Pkg.add("Printf")'
     # run Julia script twice to let it compile things
-    - julia -e 'JuliaDiffEq_CR3BP.jl'
-    - julia -e 'JuliaDiffEq_CR3BP.jl'
+    - julia ./JuliaDiffEq_CR3BP.jl
+    - julia ./JuliaDiffEq_CR3BP.jl
