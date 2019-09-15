@@ -1,13 +1,13 @@
-language: python
+language: julia
+julia:
+  - 1.1
 matrix:
   include:
     - name: "Windows"
-      python: 3.6
       os: windows
       language: shell
     - name: "Linux"
       dist: xenial
-      python: 3.6
       before_install:
         - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
         - sudo apt-get update -q
@@ -29,5 +29,8 @@ after_success:
     - ./TestFLINT
     - cat ./results.txt
     - mv ./results.txt ../media
-
-
+    - cd ../media
+    - julia -e 'using Pkg; Pkg.add(\"Coverage\"); Pkg.add(\"DifferentialEquations\");Pkg.add(\"LinearAlgebra\");Pkg.add(\"Printf\")'
+    # run Julia script twice to let it compile things
+    - julia -e 'JuliaDiffEq_CR3BP.jl'
+    - julia -e 'JuliaDiffEq_CR3BP.jl'

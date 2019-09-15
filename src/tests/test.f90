@@ -39,7 +39,7 @@
     integer, parameter :: nloops = 1000
     
     ! Turn on the events
-    logical, parameter :: EventsEnabled = .TRUE.
+    logical, parameter :: EventsEnabled = .FALSE.
     
     ! scalar tolerance
     real(wp),parameter :: tol   = 1.0e-11_WP  
@@ -53,8 +53,8 @@
     type(ERK_class) erkvar
     type(CR3BPSys) :: CR3BPDEObject
     
-    real(WP) :: x0, xf, xfval
-    real(WP), dimension(6) :: y0, yf
+    real(WP) :: x0, xf, xfval, rnum
+    real(WP), dimension(6) :: y0, yf, y0r
  
     real(WP) :: stepsz0, ipdx, stepsz
     real(WP), dimension(:), allocatable :: Xint, Xarr
@@ -117,12 +117,15 @@
             InterpOn=.FALSE., EventsOn=EventsEnabled)
         if (erkvar%status == FLINT_SUCCESS) then
             
+            y0r = y0
             call CPU_TIME(t0)
             do ctr = 1,nloops
                 stiffstatus = stifftestval
                 stepsz = stepsz0
                 xfval = xf
-                call erkvar%Integrate(x0, y0, xfval, yf, StepSz=stepsz,  &
+                call RANDOM_NUMBER(rnum) ! randomize initial condition
+                y0r(1) = y0r(1) + rnum*0.000000000001*y0r(1)
+                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz,  &
                     IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
                     EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
             end do
@@ -188,7 +191,9 @@
                 stiffstatus = stifftestval
                 stepsz = stepsz0
                 xfval = xf
-                call erkvar%Integrate(x0, y0, xfval, yf, StepSz=stepsz,  &
+                call RANDOM_NUMBER(rnum) ! randomize initial condition
+                y0r(1) = y0r(1) + rnum*0.000000000001*y0r(1)                
+                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz,  &
                     EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
                 call erkvar%Interpolate(Xarr,Yarr,.TRUE.)            
             end do
