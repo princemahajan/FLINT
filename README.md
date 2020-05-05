@@ -63,7 +63,7 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
 
     contains
 
-    pure function TwoBodyDE(me, X, Y, Params)
+    function TwoBodyDE(me, X, Y, Params)
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
@@ -75,7 +75,7 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
         TwoBodyDE(4:6) = -me%GM/(norm2(Y(1:3))**3)*Y(1:3) ! Two-body orbit diffeq
     end function TwoBodyDE
 
-    pure subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object            
         integer, intent(in) :: EventID        
@@ -165,7 +165,7 @@ For all the FLINT status codes and options supported by Init, Integrate, and Int
 
 ### Testing
 
-The latest test results in addiiton to performance comparison with Julia DiffEq package are given in media folder. The results of Julia script for the same test case, can be seen in Travis-CI build results.
+The latest test results in addition to performance comparison with Julia DiffEq package can be seen in Travis-CI build [results](https://travis-ci.com/princemahajan/FLINT).
 
 The following test results were generated using the FLINT code from the first commit. In all of the following tests, the orbit is propagated for 4 orbital periods and the integration is repeated 5000 times. The tables give the total time for 5000 propagations and all other testing parameters are given for each integration. The relative tolerance is taken as 1e-11 and absolute tolerance as 1e-14 in all the cases except when explicitly mentioned otherwise. Interpolation is used to capture 1000 points per orbit period. Note that the delayed interpolation feature of FLINT is not used in these results.    
 

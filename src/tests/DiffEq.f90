@@ -123,11 +123,10 @@ module MyDiffEq
     
 
     
-    subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventTB(me, X, Y, Value, Direction, Terminal)
             
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object            
-        integer, intent(in) :: EventID        
         real(WP), intent(in) :: X
         real(WP), dimension(:), intent(in) :: Y
         real(WP), dimension(:), intent(out) :: Value
@@ -136,20 +135,19 @@ module MyDiffEq
         
         Value = [1,1]
         
-        if (EventID == 0 .OR. EventID == 1)   Value(1) = norm2(Y(1:3)) - 20000.0
+        Value(1) = norm2(Y(1:3)) - 20000.0
         
-        if (EventID == 0 .OR. EventID == 2)   Value(2) = 1 !Y(3)
+        Value(2) = 1 !Y(3)
         
         Direction = [0,0]
         Terminal = [.FALSE., .FALSE.]
         
     end subroutine SampleEventTB      
     
-    subroutine SampleEventCR3BP(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventCR3BP(me, X, Y, Value, Direction, Terminal)
             
         implicit none
         class(CR3BPSys), intent(in) :: me !< Differential Equation object            
-        integer, intent(in) :: EventID        
         real(WP), intent(in) :: X
         real(WP), dimension(:), intent(in) :: Y
         real(WP), dimension(:), intent(out) :: Value
@@ -159,7 +157,7 @@ module MyDiffEq
         Value = [Y(1),Y(2)]
         
         ! only detect Y-crossings in the region X<0
-        if ((EventID == 0 .OR. EventID == 2) .AND. Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
+        if (Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
         
         Direction = [-1,1]
         Terminal = [.FALSE.,.FALSE.]

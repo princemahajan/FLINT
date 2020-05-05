@@ -178,24 +178,19 @@ module FLINT_base
         
         
         !> Interface for a user-supplied procedure for computing events
-        subroutine EventFunc(me, EventID, X, Y, Value, Direction, Terminal)
+        subroutine EventFunc(me, X, Y, Value, Direction, Terminal)
             
             import :: WP, DiffEqSys
             implicit none
             
             class(DiffEqSys), intent(in) :: me  !< Object of class type DiffEqSys            
             
-            !> Value is either 0 or between 1 and m. If 0, the event function must compute
-            !! values for all the events. If its value is between 1 and m, then it needs 
-            !! only compute only one event with index EventID. Rest of the event are ignored.
-            integer, intent(in) :: EventID      
-            
             real(WP), intent(in) :: X               !< Current independent variable value
             real(WP), dimension(:), intent(in) :: Y !< Current solution value
             
             !> Size is m. 
-            !! If Value(i) changes sign, then the event with EventID i may trigger based on Direction(i).
-            !! If Value(i) changes from/to NaN, then the event is not triggered.
+            !! If Value(i) changes sign, then the event "i" may trigger based on Direction(i).
+            !! If Value(i) changes from/to NaN, then the sign change is ignored.
             real(WP), dimension(:), intent(out) :: Value
 
             !> Size must be same as Value. 
@@ -313,15 +308,16 @@ module FLINT_base
             !! not explicitly deallocate this memory.
             real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint
 
-            !> If EventMask(i)=false, then the event with Eventid 'i' will not be checked.
-            !! If all the events are masked, then event checking will be turned off.
+            !> If EventMask(i)=false, then the event "i" will not be checked for sign change.
+            !! If all the events are masked, then the event checking will be turned off.
             logical, dimension(me%pDiffEqSys%m), intent(in), optional :: EventMask
             
             !> Solutions at the event locations for each of the unmasked event. If events
             !! are enabled, then user must specify this parameter. FLINT will internally
             !! allocate the storage and it will not explicitly deallocate this memory.
-            !! EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the ID
-            !! of the event to which Xevent and Yevent corresponds.
+            !! EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the
+            !! index of the triggered event (between 1 and m) to which Xevent and Yevent
+            !! corresponds.
             real(WP), allocatable, dimension(:,:), intent(out), optional :: EventStates
             
             !> If .FALSE., then no root-finding is used to compute the exact event location.
@@ -373,6 +369,9 @@ module FLINT_base
             logical, intent(in), optional :: SaveInterpCoeffs
            
         end subroutine Interpolate
+        
+        
+        
 
         !> Query method to get the current state information of FLINT. Should be called 
         !! after each Integration to get the statistics.

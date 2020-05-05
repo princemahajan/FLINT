@@ -41,7 +41,7 @@ function (GetPlatformCompilerFlag Flags IsRequired LANG)
 # check each option one by one and return the first one that works
 foreach(flag ${Flags})
 
-    message(STATUS "Checking option: " ${flag})
+    message(STATUS "GetPlatformCompilerFlag: checking option: " ${flag})
 
     # unset the variable in cache from the previous runs
     unset(FLAG_WORKS CACHE)
@@ -67,6 +67,7 @@ foreach(flag ${Flags})
         break()
     else()
         set(FLAG_FOUND FALSE)
+        message("GetPlatformCompilerFlag: Unknown flag: " ${flag})
         unset(_Flag PARENT_SCOPE)
     endif()
     

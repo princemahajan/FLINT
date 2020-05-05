@@ -48,6 +48,7 @@ module StepSize
 
     contains
     
+    
     !> \brief Subroutine for computing the starting step size using Hairer's algorithm.
     !! \details For details on the algorithm, see Hairer's book "Solving ODE I" or his code dop853.f
     !! at http://www.unige.ch/~hairer/prog/nonstiff/dop853.f.

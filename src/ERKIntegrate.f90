@@ -293,7 +293,7 @@ submodule (ERK) ERKIntegrate
                             Eventh = h
                         else
                             Eventh = sign(EventStepSz, h)
-                            ! we need interpolation coefficinets to check signs at the intermediate points
+                            ! we need interpolation coefficients to check signs at the intermediate points
                             if (.NOT. BipComputed) then
                                 select case (method)
                                     case (ERK_DOP853)
@@ -310,8 +310,9 @@ submodule (ERK) ERKIntegrate
                             
                         EventX0 = X
                         EventX1 = X + Eventh
-                        ! The event value at the first point where event is checked
-                        if (AcceptedSteps == 2) call pDiffEqSys%G(0, X, Y1, EV0, EventDir, EventTerm)
+
+                        ! The event value at the first integrated state right after the initial condition
+                        if (AcceptedSteps == 2) call pDiffEqSys%G(X, Y1, EV0, EventDir, EventTerm)
 
                         ! check for event triggers between X and X+h
              EventLoop: do
@@ -326,9 +327,18 @@ submodule (ERK) ERKIntegrate
                                 else
                                     EventY1 = InterpY(size(me%InterpStates), EventX1, X, h, me%pstar, Bip)
                                 end if
+                                
                                 ! evaluate all event functions
-                                call pDiffEqSys%G(0, EventX1, EventY1, EV1, EventDir, EventTerm)
+                                ! TBD: We are supposed to evaluate only unmasked events and not all by default!
+                                ! but we dont want to make multiple calls either so figure out a way!
+                                call pDiffEqSys%G(EventX1, EventY1, EV1, EventDir, EventTerm)
                                     
+                                ! TBD: For event mode where event function is called afetr every successful step
+                                ! without regards to event triggering, then we dont need to check for evenets
+
+                                !TBD: User must be able to alter the solution states from inside the event function!
+                                ! Also the "params"!
+
                                 ! check each event for trigger
                                 do  EventId = 1,m
                                     ! if event is masked, no event check
@@ -1092,7 +1102,7 @@ submodule (ERK) ERKIntegrate
         ! interpolate solution
         ff = InterpY(size(me%InterpStates), xx, X, h, me%pstar, Bip)
         ! evaluate the single event function
-        call pDiffEqSys%G(EventId, xx, ff, eval, edir, eterm)
+        call pDiffEqSys%G(xx, ff, eval, edir, eterm)
         ! return the event value
         gg = eval(EventId)
     end function SingleEvent    
