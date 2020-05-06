@@ -155,14 +155,24 @@ module MyDiffEq
         logical, dimension(:), intent(out) :: Terminal
 
         Value = [Y(1),Y(2)]
-        
+
+        ! Detect discontinuous events
+        if (X > 0 .AND. X < 1) then
+            Value(1) = 1        
+        else
+            Value(1) = -1
+        end if
+
         ! only detect Y-crossings in the region X<0
         if (Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
+
         
-        Direction = [-1,1]
+
+        Direction = [0,1]
         Terminal = [.FALSE.,.FALSE.]
         
     end subroutine SampleEventCR3BP          
+    
     
     function TBIOM(mu, X)
         real(wp), intent(in) :: mu

@@ -240,6 +240,10 @@ submodule (ERK) ERKIntegrate
             !me%Yint(:,1) = Y0
         end if
         
+        ! Evaluate the event function at the initial condition to check for
+        ! events between X0 and first integrated state
+        if (EventsOn) call pDiffEqSys%G(X0, Y0, EV0, EventDir, EventTerm)
+
         ! Initialize the number of steps taken and other counters
         X = X0
         Y1 = Y0
@@ -298,8 +302,9 @@ submodule (ERK) ERKIntegrate
                     end if
                     
                     ! Events checking start here, ignore event checking at IC
+
                     BipComputed = .FALSE.
-                    if (EventsOn .AND. AcceptedSteps > 1) then
+                    if (EventsOn) then
                         ! generate X values at which event triggers are checked
                         if (EventStepSz == 0.0 .OR. EventStepSz >= abs(h)) then
                             Eventh = h
@@ -322,9 +327,6 @@ submodule (ERK) ERKIntegrate
                             
                         EventX0 = X
                         EventX1 = X + Eventh
-
-                        ! The event value at the first integrated state right after the initial condition
-                        if (AcceptedSteps == 2) call pDiffEqSys%G(X, Y1, EV0, EventDir, EventTerm)
 
                         ! check for event triggers between X and X+h
              EventLoop: do

@@ -39,7 +39,7 @@
     integer, parameter :: nloops = 1
     
     ! Turn on the events
-    logical, parameter :: EventsEnabled = .FALSE.
+    logical, parameter :: EventsEnabled = .TRUE.
     
     ! scalar tolerance
     real(wp),parameter :: tol   = 1.0e-11_WP  
@@ -89,7 +89,7 @@
     Xarr = [(x0+ipdx*itr,itr=0,(nIp-1))]
     allocate(Yarr(6,size(Xarr)))
     
-    stepsz0 = 1.0E-3_WP    ! let FLINT compute the initial step-size    
+    stepsz0 = 0.0E-3_WP    ! let FLINT compute the initial step-size    
     stifftestval = 1  ! check for stiffness and stop integration if stiff
     
     ! create results file
