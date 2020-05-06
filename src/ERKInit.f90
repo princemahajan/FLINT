@@ -234,13 +234,13 @@
     
     subroutine IntpMemAllocate()
 
-        allocate(me%Xint(me%MaxSteps), stat=status)
+        allocate(me%Xint(me%MaxSteps+1), stat=status)
         if (status /= 0) me%status = FLINT_ERROR_MEMALLOC
         
         !allocate(me%Yint(DE%n, me%MaxSteps), stat=status)
         !if (status /= 0) me%status = FLINT_ERROR_MEMALLOC
         
-        allocate(me%Bip(size(me%InterpStates), 0:me%pstar, me%MaxSteps), stat=status)
+        allocate(me%Bip(size(me%InterpStates), 0:me%pstar, me%MaxSteps+1), stat=status)
         if (status /= 0) me%status = FLINT_ERROR_MEMALLOC
     
     end subroutine

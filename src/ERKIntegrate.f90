@@ -26,8 +26,8 @@ submodule (ERK) ERKIntegrate
     contains    
 
     !> Integration main subroutine
-    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
-                                    EventRootFindingOn, StiffTest, params)
+    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, &
+                                EventMask, EventStates, EventRootFindingOn, StiffTest, params)
     
         implicit none
         
@@ -38,6 +38,8 @@ submodule (ERK) ERKIntegrate
         real(WP), intent(inout) :: Xf            
         real(WP), dimension(me%pDiffEqSys%n), intent(out) :: Yf
         real(WP), intent(inout) :: StepSz
+        logical, intent(in), optional :: UseConstStepSz            
+
         logical, intent(in), optional :: IntStepsOn
         real(WP), allocatable, dimension(:), intent(out), optional :: Xint            
         real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint
@@ -66,7 +68,7 @@ submodule (ERK) ERKIntegrate
         integer :: TotalSteps, MaxSteps, s, sint, p, pstar, q, EventId
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
         
-        logical :: IsProblemStiff, IntStepsNeeded, LastStepRejected, LAST_STEP
+        logical :: IsProblemStiff, IntStepsNeeded, LastStepRejected, LAST_STEP, ConstStepSz
         logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, RootFindingOn, BipComputed
         
         class(DiffEqSys), pointer :: pDiffEqSys
@@ -100,6 +102,18 @@ submodule (ERK) ERKIntegrate
         sint = me%sint
         StiffTestSteps = STIFFTEST_STEPS
         
+        ! Sign of the step: negative for backward integration
+        hSign = sign(1.0_WP, (Xf-X0))
+
+        ! If UseConstStepSz option is present, then use it. Adaptive step size 
+        ! algorithm is used by default. If constant step size is selected then
+        ! StepSz must have a positive value
+        ConstStepSz = .FALSE.
+        if (present(UseConstStepSz)) then
+            ConstStepSz = UseConstStepSz
+            if (ConstStepSz .AND. ((hSign*StepSz) <= 0)) status = FLINT_ERROR_CONSTSTEPSZ
+        end if
+
         ! If Interpolation is OFF and solution at integrator steps is needed,
         ! then allocate the storage for steps that will be returned to the user. 
         ! If Interpolation is ON, then no need as we already allocated the internal
@@ -113,9 +127,9 @@ submodule (ERK) ERKIntegrate
         end if
 
         if (IntStepsNeeded) then
-            allocate(Xint(MaxSteps), stat=stat)
+            allocate(Xint(MaxSteps+1), stat=stat)
             if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
-            allocate(Yint(pDiffEqSys%n,MaxSteps), stat=stat)
+            allocate(Yint(pDiffEqSys%n,MaxSteps+1), stat=stat)
             if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
         end if
         
@@ -141,11 +155,11 @@ submodule (ERK) ERKIntegrate
             ! If size of Xint is less than the max size, then it means user is calling
             ! Intgerate again without doing Init first, then reallocate the memory
             if (allocated(me%Xint)) then
-                if (size(me%Xint) < MaxSteps) then 
+                if (size(me%Xint) < MaxSteps+1) then 
                     deallocate(me%Xint, stat = status)
                     deallocate(me%Bip, stat = status)
-                    allocate(me%Xint(me%MaxSteps), stat=status)
-                    allocate(me%Bip(size(me%InterpStates), 0:me%pstar, me%MaxSteps), stat=status)
+                    allocate(me%Xint(me%MaxSteps+1), stat=status)
+                    allocate(me%Bip(size(me%InterpStates), 0:me%pstar, me%MaxSteps+1), stat=status)
                     if (status /= 0) me%status = FLINT_ERROR_MEMALLOC
                 end if
             end if
@@ -205,9 +219,6 @@ submodule (ERK) ERKIntegrate
             Sc0 = me%ATol(1) + me%RTol(1)*abs(Y0)
         end if        
         
-        ! Determine the sign of the step: negative for backward integration
-        hSign = sign(1.0_WP, (Xf-X0))
-
         ! Select the max step size if not provided by the user
         if (hmax == 0.0_WP) hmax = abs(Xf - X0)
 
@@ -243,9 +254,9 @@ submodule (ERK) ERKIntegrate
         do
 
             if (status == FLINT_SUCCESS .AND. (.NOT. LAST_STEP)    &
-                    .AND. (TotalSteps <= MaxSteps)) then
+                    .AND. (TotalSteps < MaxSteps)) then
 
-                ! Adjust the step size if (X+h) is bigger than Xf
+                ! If (X+1.01*h) > Xf then make it the last step
                 if (hSign*(X + 1.01_WP*h - Xf) > 0.0) then
                     h = Xf - X 
                     LAST_STEP = .TRUE.
@@ -265,6 +276,7 @@ submodule (ERK) ERKIntegrate
                 TotalFCalls = TotalFCalls + FCalls                
                 
                 ! check error to see if the step needs to be accepted or rejected
+                ! For constant step size, Err must be set to 0 by stepint function
                 if (Err <= 1.0_WP) then
 
                     ! step is accepted
@@ -452,20 +464,21 @@ submodule (ERK) ERKIntegrate
                     Y1 = Y2
 
                     ! compute the new step size now
-                    hnew = StepSzHairer(h, .FALSE., q, Err, StepSzParams)
+                    if (.NOT. ConstStepSz) then
+                        hnew = StepSzHairer(h, .FALSE., q, Err, StepSzParams)
+                        ! make sure hnew is not greater than hmax
+                        if (abs(hnew) > hmax) hnew = hsign*hmax
+                        ! if the last step was rejected, then dont increase step size
+                        if (LastStepRejected .EQV. .TRUE.) hnew = hSign*min(abs(hnew),abs(h))
+                        ! Update the Lund stabilization parameter hbyhoptOld
+                        ! this should be after computing the new step size
+                        StepSzParams(5) = max(Err, hbyhoptOLD)
+                        ! reset
+                        LastStepRejected = .FALSE.
+                    else
+                        hnew = h
+                    end if
 
-                    ! make sure hnew is not greater than hmax
-                    if (abs(hnew) > hmax) hnew = hsign*hmax
-                    
-                    ! if the last step was rejected, then dont increase step size
-                    if (LastStepRejected .EQV. .TRUE.) hnew = hSign*min(abs(hnew),abs(h))
-
-                    ! Update the Lund stabilization parameter hbyhoptOld
-                    ! this should be after computing the new step size
-                    StepSzParams(5) = max(Err, hbyhoptOLD)
-                    
-                    ! reset
-                    LastStepRejected = .FALSE.
                 else
 
                     ! step is rejected, now what
@@ -490,7 +503,7 @@ submodule (ERK) ERKIntegrate
                 
                 ! Take another step only if step size is not too small
                 ! Reference: Hairer's DOP853 code
-                if (abs(h)*0.01_WP <= abs(X)*EPS) then
+                if ((.NOT. ConstStepSz) .AND. abs(h)*0.01_WP <= abs(X)*EPS) then
                     status = FLINT_ERROR_STEPSZ_TOOSMALL
                 end if
 
@@ -540,12 +553,12 @@ submodule (ERK) ERKIntegrate
                 if (EventsOn .AND. allocated(EventData)) then                
                     EventStates = reshape(EventData, [n+2, int(size(EventData)/(n+2))])
                 end if
-                
+
                 if (X == Xf .AND. status == FLINT_SUCCESS) then
                     ! we finished like we should
                 elseif (EventsOn .AND. status == FLINT_EVENT_TERM) then
                     ! One of the terminal event has triggered, do nothing
-                else if (TotalSteps > MaxSteps .AND. status == FLINT_SUCCESS) then
+                else if (TotalSteps >= MaxSteps .AND. status == FLINT_SUCCESS) then
                     ! maximum steps reached
                     status = FLINT_ERROR_MAXSTEPS
                 else if (status == FLINT_ERROR_STEPSZ_TOOSMALL) then
@@ -635,16 +648,17 @@ submodule (ERK) ERKIntegrate
             Yint = Y0 + h*matmul(k(:,1:sint), me%b(1:sint))
         end if
 
-        ! The scale factor for error computations
-        if (IsScalarTol .EQV. .FALSE.) then
-            Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
-        else
-            Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
-        end if 
+        if (.NOT. ConstStepSz) then
+            ! The scale factor for error computations
+            if (IsScalarTol .EQV. .FALSE.) then
+                Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
+            else
+                Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
+            end if 
 
-        ! Estimate the error. We assume that the error coeffcients are precomputed,
-        ! i.e., e_i = b_i - bhat_i
-        block
+            ! Estimate the error. We assume that the error coeffcients are precomputed,
+            ! i.e., e_i = b_i - bhat_i
+            block
             real(WP), dimension(n) :: temp
             integer :: j
             temp = 0.0_WP
@@ -652,7 +666,10 @@ submodule (ERK) ERKIntegrate
                 temp = temp + k(:,j)*me%e(j)
             end do
             Err = abs(h)*sqrt(sum((temp/Sc)**2)/n)
-        end block
+            end block
+        else
+            Err = 0.0
+        end if
         
         ! If this step is accepted then return the new solution
         ! else just return the initial condition
@@ -773,26 +790,30 @@ submodule (ERK) ERKIntegrate
         ! propagate the solution to the next step for error computation
         ! For FSAL, Yint is the new solution
 
-        ! The scale factor for error computations
-        if (IsScalarTol .EQV. .FALSE.) then
-            Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
-        else
-            Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
-        end if 
+        if (.NOT. ConstStepSz) then        
+            ! The scale factor for error computations
+            if (IsScalarTol .EQV. .FALSE.) then
+                Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
+            else
+                Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
+            end if 
 
-        ! Estimate the error. We assume that the error coeffcients are precomputed,
-        ! i.e., e_i = b_i - bhat_i
+            ! Estimate the error. We assume that the error coeffcients are precomputed,
+            ! i.e., e_i = b_i - bhat_i
         
-        Err = sum(((k(:,1)*me%e(1) + k(:,6)*me%e(6) + k(:,7)*me%e(7) + k(:,8)*me%e(8) &
+            Err = sum(((k(:,1)*me%e(1) + k(:,6)*me%e(6) + k(:,7)*me%e(7) + k(:,8)*me%e(8) &
                 + k(:,9)*me%e(9) + k(:,10)*me%e(10) + k(:,11)*me%e(11) + k(:,12)*me%e(12))/Sc)**2)
 
-        ! For DOP853, we need to apply a 3rd-order correction
-        Err3 = sum(((aijkj-DOP853_bhh(1)*k(:,1)-DOP853_bhh(2)*k(:,9) &
+            ! For DOP853, we need to apply a 3rd-order correction
+            Err3 = sum(((aijkj-DOP853_bhh(1)*k(:,1)-DOP853_bhh(2)*k(:,9) &
                                  - DOP853_bhh(3)*k(:,12))/Sc)**2)
 
-        DenomErr = Err + 0.01_WP*Err3
-        if (DenomErr == 0.0_WP) DenomErr = 1.0_WP
-        Err = abs(h)*Err*sqrt(1.0/(n*DenomErr))
+            DenomErr = Err + 0.01_WP*Err3
+            if (DenomErr == 0.0_WP) DenomErr = 1.0_WP
+            Err = abs(h)*Err*sqrt(1.0/(n*DenomErr))
+        else
+            Err = 0.0
+        end if
         
         ! If this step is accepted then return the new solution
         ! else just return the initial condition
@@ -946,19 +967,22 @@ submodule (ERK) ERKIntegrate
         ! propagate the solution to the next step for error computation
         ! For FSAL, Yint is the new solution
 
-        ! The scale factor for error computations
-        if (IsScalarTol .EQV. .FALSE.) then
-            Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
+        if (.NOT. ConstStepSz) then
+            ! The scale factor for error computations
+            if (IsScalarTol .EQV. .FALSE.) then
+                Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
+            else
+                Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
+            end if 
+
+            ! Estimate the error. We assume that the error coeffcients are precomputed,
+            ! i.e., e_i = b_i - bhat_i
+            Err = abs(h)*sqrt(sum(((k(:,1)*me%e(1) + k(:,3)*me%e(3) + k(:,4)*me%e(4) &
+                                + k(:,5)*me%e(5) + k(:,6)*me%e(6) + k(:,7)*me%e(7))/Sc)**2)/n)
         else
-            Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
-        end if 
-
-        ! Estimate the error. We assume that the error coeffcients are precomputed,
-        ! i.e., e_i = b_i - bhat_i
+            Err = 0.0
+        end if
         
-        Err = abs(h)*sqrt(sum(((k(:,1)*me%e(1) + k(:,3)*me%e(3) + k(:,4)*me%e(4) + k(:,5)*me%e(5) &
-                + k(:,6)*me%e(6) + k(:,7)*me%e(7))/Sc)**2)/n)
-
         ! If this step is accepted then return the new solution
         ! else just return the initial condition
         if (Err <= 1.0_WP) then 
@@ -1117,6 +1141,7 @@ submodule (ERK) ERKIntegrate
         real(WP) :: StiffN, StiffD, hLamb
 
         IsProblemStiff = .FALSE.
+        hLamb = 0.0
         
         if (mod(AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
             StiffN = norm2(F0 - k(:,sint-1))

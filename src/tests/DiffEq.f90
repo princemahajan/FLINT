@@ -175,7 +175,7 @@ module MyDiffEq
     
     function JacobiC(mu, X)
         real(wp), intent(in) :: mu
-        real(wp), dimension(:,:), intent(in) :: X
+        real(wp), dimension(:,:), intent(in), pointer :: X
         real(wp), dimension(size(X,2)) :: JacobiC
         real(wp), dimension(size(X,2)) :: Omega
         real(WP), dimension(size(X,2)) :: r1, r2

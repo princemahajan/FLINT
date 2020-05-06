@@ -56,6 +56,7 @@ module FLINT_base
         enumerator :: FLINT_ERROR_INIT_REQD         = 13  !< FLINT Init is required
         enumerator :: FLINT_ERROR_EVENTPARAMS       = 14  !< Required event parameters are not specified
         enumerator :: FLINT_ERROR_EVENTROOT         = 15  !< Event root find is failed
+        enumerator :: FLINT_ERROR_CONSTSTEPSZ       = 16  !< Wrong value of StepSz for constant step size option
     end enum
 
     !> FLINT_class
@@ -277,7 +278,7 @@ module FLINT_base
         !> Interface for the main Integrate method. It must be called after initialization and
         !! can be called multiple times with different IC and options without calling the init
         !! routine first every time.
-        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
+        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
                                                     EventRootFindingOn, StiffTest, params)
 
             import :: FLINT_class, WP, WORK_MAXSIZE
@@ -293,7 +294,13 @@ module FLINT_base
             !! compute the initial step-size internally. After the completion of the integration,
             !! the last accepted step-size will be returned back.
             real(WP), intent(inout) :: StepSz
-            
+
+            !> If true, then FLINT will not use adaptive step size algorithm, rather it will use 
+            !! the initial step size value given in StepSz as the integrator's natural step. If
+            !! this option is set to True, then StepSz must have a positive number otherwise 
+            !! FLINT will return an error. By default, this option is set to False.
+            logical, intent(in), optional :: UseConstStepSz            
+
             !> If true, then FLINT will return the solution at the integrator's natural step size.
             logical, intent(in), optional :: IntStepsOn
             

@@ -36,7 +36,7 @@
     
     ! Number of periodic orbits to run and loops for benchmark
     real, parameter :: norb = 4
-    integer, parameter :: nloops = 1000
+    integer, parameter :: nloops = 1
     
     ! Turn on the events
     logical, parameter :: EventsEnabled = .FALSE.
@@ -44,12 +44,17 @@
     ! scalar tolerance
     real(wp),parameter :: tol   = 1.0e-11_WP  
     
+    ! max no. of steps
+    integer, parameter :: MAX_STEPS = 100000
+    logical, parameter :: CONST_STEPSZ = .FALSE.
+    
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0*norb)
     
     ! results file
     character(len=20) :: fname = 'results.txt'
-    
+    character(len=20) :: sfname = 'states.txt'
+        
     type(ERK_class) erkvar
     type(CR3BPSys) :: CR3BPDEObject
     
@@ -57,8 +62,8 @@
     real(WP), dimension(6) :: y0, yf, y0r
  
     real(WP) :: stepsz0, ipdx, stepsz
-    real(WP), dimension(:), allocatable :: Xint, Xarr
-    real(WP), dimension(:,:), allocatable :: Yint, Yarr
+    real(WP), dimension(:), allocatable, target :: Xint, Xarr
+    real(WP), dimension(:,:), allocatable, target :: Yint, Yarr
     real(WP), allocatable, dimension(:,:) :: EventStates
     logical, dimension(2) :: EvMask = [.TRUE.,.TRUE.]
     integer :: stiffstatus, stifftestval
@@ -84,16 +89,22 @@
     Xarr = [(x0+ipdx*itr,itr=0,(nIp-1))]
     allocate(Yarr(6,size(Xarr)))
     
-    stepsz0 = 0.0_WP    ! let FLINT compute the initial step-size    
+    stepsz0 = 1.0E-3_WP    ! let FLINT compute the initial step-size    
     stifftestval = 1  ! check for stiffness and stop integration if stiff
     
     ! create results file
     open(unit=17,file= fname, status = 'replace')
-    write(17, *) '--- FLINT Results (',norb, ' orbits, ', nloops, ' loops)  ---'
+    write(17, *) '--- FLINT Stat Results (',norb, ' orbits, ', nloops, ' loops)  ---'
     write(17, *) ' '
     write(17, *) 'A. Natural Step-size'
     write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
-    
+
+    open(unit=18,file= sfname, status = 'replace')
+    write(18, *) '--- FLINT States ---'
+    write(18, '(7A12)') 'X','Y1','Y2','Y3','Y4','Y5','Y6'             
+    write(18, *) ' '
+    write(18, *) 'A. Natural Step-size'
+
     ! Solution at natural step size
     
     do itr = 1,4
@@ -113,10 +124,10 @@
             method = ERK_Verner98R
         end select            
           
-        call erkvar%Init(CR3BPDEObject, 10000, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
+        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
             InterpOn=.FALSE., EventsOn=EventsEnabled)
         if (erkvar%status == FLINT_SUCCESS) then
-            
+
             y0r = y0
             call CPU_TIME(t0)
             do ctr = 1,nloops
@@ -125,7 +136,7 @@
                 xfval = xf
                 call RANDOM_NUMBER(rnum) ! randomize initial condition
                 y0r(1) = y0r(1) + rnum*0.000000000001*y0r(1)
-                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz,  &
+                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz, UseConstStepSz=CONST_STEPSZ, &
                     IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
                     EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
             end do
@@ -133,15 +144,24 @@
 
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
-            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM) then 
+            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM &
+                        .OR. erkvar%status == FLINT_ERROR_MAXSTEPS) then 
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
-                    maxval(JacobiC(Emmu, Yint))-minval(JacobiC(Emmu, Yint)), &
+                    JacobiC(Emmu, Yint(:,1:1))-JacobiC(Emmu, Yint(:,ubound(Yint,2):ubound(Yint,2))), &
                     fcalls, naccpt, nrejct
             else
-                write(17,*) mname//': Int failed: ', erkvar%status
+                write(17,*) mname//': Integrate failed: ', erkvar%status
             end if
+
+            ! write states
+            if (itr == 3) then
+                do ctr = 1, size(Xint)
+                    write(18, '(7E18.9)') Xint(ctr), Yint(1:6,ctr)
+                end do    
+            end if
+        
             if (allocated(Xint)) deallocate(Xint)
             if (allocated(Yint)) deallocate(Yint)
             if (allocated(EventStates) .AND. itr < 4) deallocate(EventStates)
@@ -149,6 +169,7 @@
             write(17,*) mname//': Init failed: ', erkvar%status            
         end if
     end do
+
 
     if (EventsEnabled) then
         write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
@@ -164,7 +185,12 @@
     ! Solution at interpolated grid
     write(17, *) 'B. Interpolated Grid'
     write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
+
+    write(18, *) ' '
+    write(18, *) 'B. Interpolated Grid'
+    write(18, *) ' '
     
+
     do itr = 1,4
         
         select case (itr)
@@ -182,7 +208,7 @@
             method = ERK_Verner98R
         end select            
           
-        call erkvar%Init(CR3BPDEObject, 10000, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
+        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
             InterpOn=.TRUE., EventsOn=EventsEnabled)
         if (erkvar%status == FLINT_SUCCESS) then
             
@@ -193,7 +219,7 @@
                 xfval = xf
                 call RANDOM_NUMBER(rnum) ! randomize initial condition
                 y0r(1) = y0r(1) + rnum*0.000000000001*y0r(1)                
-                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz,  &
+                call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz, UseConstStepSz=CONST_STEPSZ, &
                     EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
                 call erkvar%Interpolate(Xarr,Yarr,.TRUE.)            
             end do
@@ -201,18 +227,30 @@
             
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
 
-            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM) then 
+            if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM &
+                        .OR. erkvar%status == FLINT_ERROR_MAXSTEPS) then 
                 call erkvar%Info(stiffstatus, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
-                    maxval(JacobiC(Emmu, Yarr))-minval(JacobiC(Emmu, Yarr)), &
+                    JacobiC(Emmu, Yarr(:,1:1))-JacobiC(Emmu, Yarr(:,ubound(Yarr,2):ubound(Yarr,2))), &
                     fcalls, naccpt, nrejct
             end if
+
+
+            ! write states
+            if (itr == 3) then
+                do ctr = 1, size(Xarr)
+                    write(18, '(7E18.9)') Xarr(ctr), Yarr(1:6,ctr)
+                end do    
+            end if
+
+
             if (allocated(EventStates) .AND. itr < 4) deallocate(EventStates)
         else
             write(17,*) mname//': Init failed: ', erkvar%status            
         end if
     end do
+
 
     if (EventsEnabled) then
         write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
