@@ -33,6 +33,15 @@ FLINT is a modern object-oriented fortran library that provides four adaptive st
 + Ability to restart the integration or change solution on the detection of events
 + Stiffness detection
 
+
+### Speed Comparison with Julia
+
+For performance comparison, the latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia test code along with results are provided in the media folder on the FLINT's GitHub repository https://github.com/princemahajan/FLINT.
+
+![Julia Results](media/julia_screenshot.PNG)
+
+
+
 ### Installation
 
 FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing is also done with MinGW-W64 gfortran (gcc 8.1.0). Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists file is provided to generate Visual Studio projects or makefiles on Windows and Linux using cmake. Additionally, it generates cmake config files to easily link FLINT using the find_package() command. The steps to link FLINT in cmake-based projects are:
@@ -45,13 +54,6 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
             PATHS "<SAME_PATH_AS_IN_FLINT_INSTALL_LIB_DIR>")
         target_link_libraries(<YOUR_TARGET_NAME> FLINT::FLINT)
     ```
-
-### Speed Comparison with Julia
-
-For performance comparison, the latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia test code along with results are provided in the media folder on the FLINT's GitHub repository https://github.com/princemahajan/FLINT.
-
-![Julia Results](media/julia_screenshot.PNG)
-
 
 
 ### How to Use
