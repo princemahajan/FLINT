@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 !> \brief       StepSize Module
 !! \details     This module provides procedures for step size computation.
 !! \author      Bharat Mahajan
-!! \date        01/28/2019    
+!! \date        Created: 01/28/2019    
 !
 !############################################################################################
     

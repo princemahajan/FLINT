@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -110,16 +110,16 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_integrate.htm
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ae0f325ee508f1decfce7f0d89df2f73b"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_integrate.html#ae0f325ee508f1decfce7f0d89df2f73b">integrate</a> (me, X0, Y0, Xf, Yf, StepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, EventRootFindingOn, StiffTest, params)</td></tr>
-<tr class="separator:ae0f325ee508f1decfce7f0d89df2f73b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c3de9e475fa7782b2e26f53e80b3bf2"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_integrate.html#a0c3de9e475fa7782b2e26f53e80b3bf2">integrate</a> (me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, StiffTest, params)</td></tr>
+<tr class="separator:a0c3de9e475fa7782b2e26f53e80b3bf2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for the main <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method. It must be called after initialization and can be called multiple times with different IC and options without calling the init routine first every time. </p>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00285">285</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00397">397</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 </div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
-<a id="ae0f325ee508f1decfce7f0d89df2f73b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae0f325ee508f1decfce7f0d89df2f73b">&#9670;&nbsp;</a></span>integrate()</h2>
+<a id="a0c3de9e475fa7782b2e26f53e80b3bf2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c3de9e475fa7782b2e26f53e80b3bf2">&#9670;&nbsp;</a></span>integrate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -164,6 +164,12 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">logical, intent(in), optional&#160;</td>
+          <td class="paramname"><em>UseConstStepSz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical, intent(in), optional&#160;</td>
           <td class="paramname"><em>IntStepsOn</em>, </td>
         </tr>
         <tr>
@@ -193,12 +199,6 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">logical, intent(in), optional&#160;</td>
-          <td class="paramname"><em>EventRootFindingOn</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
           <td class="paramtype">integer, intent(inout), optional&#160;</td>
           <td class="paramname"><em>StiffTest</em>, </td>
         </tr>
@@ -222,13 +222,13 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">y0</td><td>Initial conditions</td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">xf</td><td>Final value of the independent variable</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">yf</td><td>Final Solution</td></tr>
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">stepsz</td><td>User can specify the initial step-size to use. If it is 0, then FLINT will compute the initial step-size internally. After the completion of the integration, the last accepted step-size will be returned back.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">stepsz</td><td>User can specify the initial step-size to use. If it is 0, then FLINT will compute the initial step-size internally. After the completion of the integration, the last accepted step size will be returned back. Note that user must provide the correct sign of the desired step size.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">useconststepsz</td><td>If true, then FLINT will not use adaptive step size algorithm, rather it will use the initial step size value given in StepSz as the integrator's natural step. StepSz must take into account the sign of the step otherwise FLINT will return an error. By default, this option is set to False.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">intstepson</td><td>If true, then FLINT will return the solution at the integrator's natural step size.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">xint</td><td>If IntStepsOn=true, user must provide this parameter. FLINT will allocate the memory and return the integrator's natural steps in Xint. FLINT will not explicitly deallocate this memory.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">yint</td><td>If IntStepsOn=true, user must provide this parameter. FLINT will allocate the memory and return the solution at integrator's natural steps in Yint. The first column is the initial condition Y0 and the final column is Yf. FLINT will not explicitly deallocate this memory.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">eventmask</td><td>If EventMask(i)=false, then the event with Eventid 'i' will not be checked. If all the events are masked, then event checking will be turned off.</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">eventstates</td><td>Solutions at the event locations for each of the unmasked event. If events are enabled, then user must specify this parameter. FLINT will internally allocate the storage and it will not explicitly deallocate this memory. EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the ID of the event to which Xevent and Yevent corresponds.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">eventrootfindingon</td><td>If .FALSE., then no root-finding is used to compute the exact event location. Rather, the integrator's natural step at which the sign-change is detected, is returned. By default, root-finding is enabled.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">xint</td><td>If IntStepsOn=true, user must provide this parameter. FLINT will allocate the memory and return the integrator's natural steps taken in Xint array. FLINT will not explicitly deallocate this memory.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">yint</td><td>If IntStepsOn=true, user must provide this parameter. FLINT will allocate the memory and return the solution at the integrator's natural steps in Yint. The first column is the initial condition Y0 and the final column is Yf. FLINT will not explicitly deallocate this memory. In case of an event action changing the solution at the location of the event, the new solution will be returned in Yint.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventmask</td><td>If EventMask(i)=false, then the event "i" will not be detected. If all the events are masked, then the event detection will be turned off.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">eventstates</td><td>Solutions at the event locations for each of the unmasked event. If events are enabled, then user must specify this parameter. FLINT will internally allocate the storage and it will not explicitly deallocate this memory. EventStates(1:(n+2),i) = [Xevent, Yevent, EventID], where EventID is the index of the triggered event (between 1 and m) to which Xevent and Yevent corresponds. In case of an event action changing the solution at the location of the event, EventStates will still return the orginal state.</td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">stifftest</td><td>FLINT will use Hairer's DOP853 alogorithm to test for stiffness of the differential equations if StffTest == 1 or StffTest == 2. Test is disabled by default or if Stifftest == 0.<ul>
 <li>StiffTest == 1: If DiffEq are detected to be stiff then -1 is returned in StiffTest and the integration halts at the current step with appropriate status code.</li>
 <li>StiffTest == 2: If DiffEq are detected to be stiff then -1 is returned in StiffTest but the integration continues.</li>
@@ -239,9 +239,9 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00286">286</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00399">399</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
-<p class="reference">References <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00036">flint_base::work_maxsize</a>, and <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
+<p class="reference">References <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
 
 </div>
 </div>
@@ -254,7 +254,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li><li class="navelem"><a class="el" href="interfaceflint__base_1_1_integrate.html">Integrate</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:10 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

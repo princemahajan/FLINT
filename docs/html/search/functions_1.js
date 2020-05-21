@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['cr3bpde',['cr3bpde',['../namespacemydiffeq.html#af1c67e0857a1a330acb71335f213fdbb',1,'mydiffeq']]]
+  ['cr3bpde',['cr3bpde',['../namespacemydiffeq.html#ac20bd5de267bb963046956428350887c',1,'mydiffeq']]]
 ];

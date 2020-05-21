@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['x0',['x0',['../structflint__base_1_1flint__class.html#aab25635650fd7dc9aacf176d0b6d9522',1,'flint_base::flint_class']]],
-  ['xf',['xf',['../structflint__base_1_1flint__class.html#ab4e64e385d1ca63d3bd1cecdd6e2030c',1,'flint_base::flint_class']]],
-  ['xint',['xint',['../structflint__base_1_1flint__class.html#ac569a8c9071b15a83df0bc421e926477',1,'flint_base::flint_class']]]
+  ['width',['width',['../namespaceplots.html#ae85c65b5b40e864b078670baad42a994',1,'plots']]],
+  ['word',['word',['../namespaceflintutils.html#a3119be2c8cbb8fec73fb088803b84399',1,'flintutils']]],
+  ['wp',['wp',['../namespaceflintutils.html#a3944cada4fec024ed8013142804c8fe5',1,'flintutils']]]
 ];

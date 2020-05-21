@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_info.html',''
 </div><!--header-->
 <div class="contents">
 
-<p>Query method to get the current state information of FLINT. Should be called after each Integration to get the statistics.  
+<p>Query method to get the current state information of FLINT. Can be called after each Integration to get the integration stats.  
  <a href="interfaceflint__base_1_1_info.html#details">More...</a></p>
 <div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Collaboration diagram for flint_base::Info:</div>
@@ -104,22 +104,22 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_info.html',''
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="interfaceflint__base_1_1_info__coll__graph.png" border="0" usemap="#flint__base_1_1_info_coll__map" alt="Collaboration graph"/></div>
 <map name="flint__base_1_1_info_coll__map" id="flint__base_1_1_info_coll__map">
-<area shape="rect"  title="Query method to get the current state information of FLINT. Should be called after each Integration t..." alt="" coords="5,5,111,83"/>
+<area shape="rect"  title="Query method to get the current state information of FLINT. Can be called after each Integration to g..." alt="" coords="5,5,111,83"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a0ab94aafba0b9ec9f7ca6ae54b89af8c"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_info.html#a0ab94aafba0b9ec9f7ca6ae54b89af8c">info</a> (me, LastStatus, nSteps, nAccept, nReject, nFCalls, InterpReady, h0, X0, Y0, hf, Xf, Yf)</td></tr>
-<tr class="separator:a0ab94aafba0b9ec9f7ca6ae54b89af8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e9ebc5f729f023622e96334f216ded8"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_info.html#a4e9ebc5f729f023622e96334f216ded8">info</a> (me, LastStatus, StatusMsg, nSteps, nAccept, nReject, nFCalls, InterpReady, h0, X0, Y0, hf, Xf, Yf)</td></tr>
+<tr class="separator:a4e9ebc5f729f023622e96334f216ded8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Query method to get the current state information of FLINT. Should be called after each Integration to get the statistics. </p>
+<div class="textblock"><p>Query method to get the current state information of FLINT. Can be called after each Integration to get the integration stats. </p>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00378">378</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00500">500</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 </div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
-<a id="a0ab94aafba0b9ec9f7ca6ae54b89af8c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0ab94aafba0b9ec9f7ca6ae54b89af8c">&#9670;&nbsp;</a></span>info()</h2>
+<a id="a4e9ebc5f729f023622e96334f216ded8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e9ebc5f729f023622e96334f216ded8">&#9670;&nbsp;</a></span>info()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -135,6 +135,12 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">integer(kind(<a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024a9b44c116005cb500aaa77de9e695d4ff">flint_success</a>)), intent(out)&#160;</td>
           <td class="paramname"><em>LastStatus</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character(len=:), intent(out), optional, allocatable&#160;</td>
+          <td class="paramname"><em>StatusMsg</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -212,7 +218,8 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">me</td><td>Object of class type FLINT</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">laststatus</td><td>The status code of the last operation</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">laststatus</td><td>The status code of the last operation completed</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">statusmsg</td><td>Status message corresponding to the status code in LastStatus</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">nsteps</td><td>Total number of steps taken</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">naccept</td><td>Number of Accepted steps</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">nreject</td><td>Number of rejected steps</td></tr>
@@ -228,7 +235,7 @@ Public Member Functions</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00380">380</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00502">502</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
 <p class="reference">References <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
 
@@ -243,7 +250,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li><li class="navelem"><a class="el" href="interfaceflint__base_1_1_info.html">Info</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:09 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

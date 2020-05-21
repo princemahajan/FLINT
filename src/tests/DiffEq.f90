@@ -123,53 +123,95 @@ module MyDiffEq
     
 
     
-    subroutine SampleEventTB(me, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventTB(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
             
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object            
         real(WP), intent(in) :: X
-        real(WP), dimension(:), intent(in) :: Y
+        real(WP), dimension(:), intent(inout) :: Y
+        integer, dimension(:), intent(in) :: EvalEvents
         real(WP), dimension(:), intent(out) :: Value
         integer, dimension(:), intent(out) :: Direction
-        logical, dimension(:), intent(out) :: Terminal
+        integer, intent(in), optional :: LocEvent
+        integer(kind(FLINT_EVENTACTION_CONTINUE)), intent(out), optional :: LocEventAction
+    
+        if (EvalEvents(1)==1) Value(1) = norm2(Y(1:3)) - 20000.0
         
-        Value = [1,1]
-        
-        Value(1) = norm2(Y(1:3)) - 20000.0
-        
-        Value(2) = 1 !Y(3)
+        if (EvalEvents(2)==1) Value(2) = 1 !Y(3)
         
         Direction = [0,0]
-        Terminal = [.FALSE., .FALSE.]
+        
+        if (present(LocEvent)) LocEventAction = FLINT_EVENTACTION_CONTINUE
         
     end subroutine SampleEventTB      
     
-    subroutine SampleEventCR3BP(me, X, Y, Value, Direction, Terminal)
+
+    subroutine SampleEventCR3BP(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
             
         implicit none
         class(CR3BPSys), intent(in) :: me !< Differential Equation object            
         real(WP), intent(in) :: X
-        real(WP), dimension(:), intent(in) :: Y
+        real(WP), dimension(:), intent(inout) :: Y
+        integer, dimension(:), intent(in) :: EvalEvents
         real(WP), dimension(:), intent(out) :: Value
         integer, dimension(:), intent(out) :: Direction
-        logical, dimension(:), intent(out) :: Terminal
+        integer, intent(in), optional :: LocEvent
+        integer(kind(FLINT_EVENTACTION_CONTINUE)), intent(out), optional :: LocEventAction
 
-        Value = [Y(1),Y(2)]
 
-        ! Detect discontinuous events
-        if (X > 0 .AND. X < 1) then
-            Value(1) = 1        
-        else
-            Value(1) = -1
+        ! Event-1: detect a narrow square pulse or a discontinuous 
+        ! event in both directions.
+        ! This will need a small event step size to detect!
+        ! We will also mask this event after the first detection to
+        ! reduce unnecessary event checking after the first detection.
+        if (EvalEvents(1) == 1) then
+            if (X > 0.5 .AND. X < 0.5005) then
+                Value(1) = 1        
+            else
+                Value(1) = -1
+            end if
+            Direction(1) = 0
         end if
 
-        ! only detect Y-crossings in the region X<0
-        if (Y(1) > 0.0)   Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
+        ! Event-2: only detect y2-crossings in the region y1>0
+        if (EvalEvents(2) == 1) then
+            if (Y(1) < 0.0) then
+                Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
+            else
+                Value(2) = Y(2)
+            end if 
+            Direction(2) = 1 ! detect in the increasing direction
+        end if
 
+        ! Event-3: Detect y2 crossings in region y1<0
+        if (EvalEvents(3)==1) then
+            if (Y(1) > 0.0) then
+                Value(3) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
+            else
+                Value(3) = Y(2)
+            end if 
+            Direction(3) = 1 ! detect in the increasing direction
+        end if
         
+        ! Set actions for each event if located
+        if (present(LocEvent) .AND. present(LocEventAction)) then
 
-        Direction = [0,1]
-        Terminal = [.FALSE.,.FALSE.]
+            if (LocEvent == 1) then
+                LocEventAction = IOR(FLINT_EVENTACTION_CONTINUE, &
+                                    FLINT_EVENTACTION_MASK)
+            else if (LocEvent == 2) then
+                ! Mask the event-2 after first trigger            
+                LocEventAction = IOR(FLINT_EVENTACTION_CONTINUE, &
+                                        FLINT_EVENTACTION_MASK)
+            else if (LocEvent == 3) then
+                ! Event-3 has been triggered
+                ! now change the solution back to the initial condition
+                ! and mask this event
+                Y = [0.994_WP, 0.0_WP, 0.0_WP, 0.0_WP, -2.00158510637908252240537862224_WP, 0.0_WP]
+                LocEventAction = IOR(FLINT_EVENTACTION_CHANGESOLY,&
+                                        FLINT_EVENTACTION_MASK)
+            end if
+        end if
         
     end subroutine SampleEventCR3BP          
     
@@ -185,7 +227,7 @@ module MyDiffEq
     
     function JacobiC(mu, X)
         real(wp), intent(in) :: mu
-        real(wp), dimension(:,:), intent(in), pointer :: X
+        real(wp), dimension(:,:), intent(in) :: X
         real(wp), dimension(size(X,2)) :: JacobiC
         real(wp), dimension(size(X,2)) :: Omega
         real(WP), dimension(size(X,2)) :: r1, r2

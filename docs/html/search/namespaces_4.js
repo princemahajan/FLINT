@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['stepsize',['stepsize',['../namespacestepsize.html',1,'']]]
+  ['plots',['plots',['../namespaceplots.html',1,'']]]
 ];

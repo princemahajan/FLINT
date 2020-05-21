@@ -1,3 +1,3 @@
 <map id="flint_base::EventFunc" name="flint_base::EventFunc">
-<area shape="rect" id="node1" title="Interface for a user&#45;supplied procedure for computing events." alt="" coords="5,5,152,83"/>
+<area shape="rect" id="node1" title="Interface for a user&#45;supplied procedure for computing events values during the integration...." alt="" coords="5,5,152,83"/>
 </map>

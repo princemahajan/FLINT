@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -15,19 +15,23 @@
 ! limitations under the License.
 !
 !> \brief       ERK Init submodule
-!! \details     It provides implementation for the init, final, and some miscellaneous methods
-!!              of ERK module.
+!! \details     It provides implementation for the init, final, and info methods
+!!              of the ERK module.
 !! \author      Bharat Mahajan
-!! \date        01/25/2019    
+!! \date        Created: 01/25/2019    
 !
 !############################################################################################
     
+    
     submodule (ERK) ERKInit
+
 
     contains
     
+
     module subroutine erk_init(me, DE, MaxSteps, Method, ATol, RTol,  &
-        InterpOn, InterpStates, MinStepSize, MaxStepSize, StepSzParams, EventsOn, EventStepSz)
+        InterpOn, InterpStates, MinStepSize, MaxStepSize, StepSzParams, &
+        EventsOn, EventStepSz, EventOptions, EventTol)
     
         implicit none
         
@@ -42,7 +46,11 @@
         real(WP), intent(in), optional :: MinStepSize, MaxStepSize
         real(WP), dimension(5), intent(in), optional :: StepSzParams
         logical, intent(in), optional :: EventsOn
-        real(WP), intent(in), optional :: EventStepSz        
+        real(WP), dimension(:), intent(in), optional :: EventStepSz
+        integer(kind(FLINT_EVENTOPTION_ROOTFINDING)), &
+                    dimension(:), intent(in), optional :: EventOptions
+        real(WP), dimension(:), intent(in), optional :: EventTol    
+
 
         integer :: status
         
@@ -87,19 +95,20 @@
             me%MinStepSize = EPS
         end if
             
-        ! Maximum-step size: if 0 then it will be set equal to Xf - X0
+        ! Maximum-step size: A "0" value means that it will be set 
+        ! equal to (Xf - X0)
         if (present(MaxStepSize)) then
             me%MaxStepSize = abs(MaxStepSize)
         else
             me%MaxStepSize = 0.0_WP
         end if        
 
-        ! method-specific tuning parameters
+        ! Method-specific step-size computation tuning parameters
+        ! Ask yourself before specifying: do you know what you are doing?
         if (present(StepSzParams)) then
             me%StepSzParams = StepSzParams
         else
             select case (me%method)
-        
             case (ERK_DOP853,ERK_DOP54,ERK_VERNER98R, ERK_VERNER65E)
                 me%StepSzParams = [SF, SFMIN, SFMAX, BETA, hbyhoptOLD]
             case default
@@ -108,8 +117,7 @@
             
         end if
         
-        ! If interpolation is ON?    
-        ! deallocate first if already allocated
+        ! Deallocate first before any allocation of interpolation space
         call IntpMemDeallocate()        
         if (present(InterpOn)) then
             if (InterpOn) then
@@ -118,19 +126,66 @@
                 me%InterpOn = .FALSE.
             end if
         end if
-        
-        !> Use Events option if specified
+
+        ! Event related parameters start from here
+
+        ! By default, event detection will be disabled
         if (present(EventsOn)) me%EventsOn = EventsOn
         
-        !> Event step size is always positive
-        if (me%EventsOn .EQV. .TRUE.) then
+        if (me%EventsOn) then
             ! For events, we need to interpolate all the states
             me%InterpStates = [integer :: (doI,doI=1,me%pDiffEqSys%n)]
 
-            ! make sure event step sz is always positive
-            if (present(EventStepSz)) me%EventStepSz = abs(EventStepSz)
+            ! user-specified event step size
+            if (present(EventStepSz)) then
+                if (size(EventStepSz) /= me%pDiffEqSys%m) then
+                    me%status = FLINT_ERROR_DIMENSION
+                    return
+                else
+                    ! make sure event step sz is always positive
+                    me%EventStepSz = abs(EventStepSz)
+                end if
+            else
+                ! By default, events will be checked at the integrator's steps
+                me%EventStepSz = [integer :: (0,doI=1,me%pDiffEqSys%m)]
+            end if
+
+            ! user-specified event options
+            if (present(EventOptions)) then
+                if (size(EventOptions) /= me%pDiffEqSys%m) then
+                    me%status = FLINT_ERROR_DIMENSION
+                    return
+                else if (any(EventOptions < FLINT_EVENTOPTION_ROOTFINDING) &
+                    .OR. any(EventOptions > FLINT_EVENTOPTION_STEPEND)) then
+                    me%status = FLINT_ERROR_EVENTPARAMS
+                    return
+                else
+                    me%EventOptions = EventOptions
+                end if
+            else
+                ! By default, events will be located using root-finding
+                me%EventOptions = &
+                         [integer :: (FLINT_EVENTOPTION_ROOTFINDING,doI=1,me%pDiffEqSys%m)]
+            end if
+
+           ! event tolerance option
+            if (present(EventTol)) then
+                if (size(EventTol) == me%pDiffEqSys%m) then
+                    me%ETol = abs(EventTol)
+                else
+                    me%status = FLINT_ERROR_DIMENSION
+                    return
+                end if
+            else
+                me%ETol = [real(WP) :: (DEFAULT_EVENTTOL,doI=1,me%pDiffEqSys%m)]
+            end if  
+    
         end if
         
+
+
+
+
         ! choose method-specific parameters
         select case (me%method)
         
@@ -201,13 +256,13 @@
         !> \remark Things to do if Interpolation is needed: 
         !! + Choose number of ERK stages
         !! + Allocate memeory for internal state: allocate now using max number of
-        !! steps allowed to take. This is to avoid heap allocation on every call
-        !! to Intgerate.
+        !! steps allowed to take. This is to avoid heap allocation during Intgerate.
+
         if (me%InterpOn) then
             ! check if dense output states are specified, else use all
-            ! If events are enabled, we save the coefficients for dense output for all states by default
-            me%status = FLINT_SUCCESS
-            if (present(InterpStates)) then
+            ! If events are enabled, we save the coefficients for dense output 
+            ! for all states by default
+            if (present(InterpStates) .AND. (.Not. EventsOn)) then
                 ! check for valid components
                 if (size(InterpStates) < 1 .OR. size(InterpStates) > me%pDiffEqSys%n &
                     .OR. any(InterpStates < 1) .OR. any(InterpStates > me%pDiffEqSys%n)) then
@@ -257,13 +312,14 @@
     
     
     
-    module subroutine erk_info(me, LastStatus, nSteps, nAccept, nReject, nFCalls, &
+    module subroutine erk_info(me, LastStatus, StatusMsg, nSteps, nAccept, nReject, nFCalls, &
                                 InterpReady, h0, X0, Y0, hf, Xf, Yf)
 
             !import :: FLINT_class, WP
         
             class(ERK_class), intent(inout) :: me
             integer(kind(FLINT_SUCCESS)), intent(out) :: LastStatus
+            character(len=:), allocatable, intent(out), optional :: StatusMsg
             integer, intent(out), optional :: nSteps
             integer, intent(out), optional :: nAccept
             integer, intent(out), optional :: nReject
@@ -281,7 +337,12 @@
             LastStatus = me%status
             
             ! optional information starts here
-            
+
+            ! status error message string
+            if (present(StatusMsg)) then
+                StatusMsg = FLINT_ErrorStrings(LastStatus)
+            end if
+           
             if (present(nSteps)) nSteps = me%TotalSteps
             
             if (present(nAccept)) nAccept = me%AcceptedSteps
@@ -316,7 +377,6 @@
         if (allocated(me%Rtol)) deallocate(me%RTol)
         if (allocated(me%InterpStates)) deallocate(me%InterpStates)
         if (allocated(me%Xint)) deallocate(me%Xint)
-        !if (allocated(me%Yint)) deallocate(me%Yint)                  
         if (allocated(me%Bip)) deallocate(me%Bip)                  
         if (allocated(me%Y0)) deallocate(me%Y0)                  
         if (allocated(me%Yf)) deallocate(me%Yf)                  

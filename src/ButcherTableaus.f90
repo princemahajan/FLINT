@@ -1,6 +1,6 @@
 !#################################################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -51,14 +51,14 @@
 !!                      http://www.unige.ch/~hairer/prog/nonstiff/dopri5.f
 !!    
 !! \author      Bharat Mahajan
-!! \date        02/04/2019    
+!! \date        Created: 02/04/2019    
 !
 !#################################################################################################################
 
     
 module ButcherTableaus
 
-use FLINT_base, only: WP, WORK_MAXSIZE
+use FLINT_base, only: WP
 
 
 !> Maximum number of stages for storage allocation

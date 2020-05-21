@@ -26,7 +26,9 @@ var NAVTREE =
   [ "FLINT", "index.html", [
     [ "FLINT: Fortran Library for numerical INTegrators of differential equations", "index.html", [
       [ "Introduction", "index.html#sec", null ],
-      [ "Usage", "index.html#usagesec", null ],
+      [ "Speed Comparison with Julia", "index.html#compsec", null ],
+      [ "Installation", "index.html#Installation", null ],
+      [ "How to Use", "index.html#usagesec", null ],
       [ "Testing", "index.html#testsec", null ],
       [ "References", "index.html#refsec", null ]
     ] ],
@@ -62,7 +64,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_butcher_tableaus_8f90.html",
-"test_8f90.html"
+"structflint__base_1_1flint__class.html#a7b699d0c455f9ece069fa52fe51c6393"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

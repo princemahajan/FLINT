@@ -24,6 +24,15 @@ var _f_l_i_n_t__base_8f90 =
     [ "flint_error_init_reqd", "_f_l_i_n_t__base_8f90.html#a5bcea50aa5364b5509b6bbfc0f334024ae4872a1f53b5885dbcbba8a1beca2d66", null ],
     [ "flint_error_eventparams", "_f_l_i_n_t__base_8f90.html#a5bcea50aa5364b5509b6bbfc0f334024abe20f4b53b58b0af4ecf914ca79230d0", null ],
     [ "flint_error_eventroot", "_f_l_i_n_t__base_8f90.html#a5bcea50aa5364b5509b6bbfc0f334024ae9cbbdcbc71f77f015531dd5cfb2c71d", null ],
-    [ "int_maxsteps", "_f_l_i_n_t__base_8f90.html#a15135f078159b83af29d07495cb6d1ef", null ],
-    [ "work_maxsize", "_f_l_i_n_t__base_8f90.html#a86f65fc7e8005161a2ae24c107ddb0b1", null ]
+    [ "flint_error_conststepsz", "_f_l_i_n_t__base_8f90.html#a5bcea50aa5364b5509b6bbfc0f334024a6a90ce0cda23a45544dcde65bda87585", null ],
+    [ "flint_eventaction_continue", "_f_l_i_n_t__base_8f90.html#aa8dc75eb18c9f4a851acac5fa36b3edda30a2216fe949c3ce68d01d9c2716873d", null ],
+    [ "flint_eventaction_terminate", "_f_l_i_n_t__base_8f90.html#aa8dc75eb18c9f4a851acac5fa36b3eddaf59b010da6274e872e79387f78162a90", null ],
+    [ "flint_eventaction_changesoly", "_f_l_i_n_t__base_8f90.html#aa8dc75eb18c9f4a851acac5fa36b3edda31d57bfaf894bf11afcbcc698e2fe788", null ],
+    [ "flint_eventaction_restartint", "_f_l_i_n_t__base_8f90.html#aa8dc75eb18c9f4a851acac5fa36b3edda749abaae294fc2b106e0beb87342aaa9", null ],
+    [ "flint_eventaction_mask", "_f_l_i_n_t__base_8f90.html#aa8dc75eb18c9f4a851acac5fa36b3edda0acee5945f124b2b4bf9d6f918dcc3fe", null ],
+    [ "flint_eventoption_rootfinding", "_f_l_i_n_t__base_8f90.html#a9be5f832926ac9ec540f214470ebcce9a187d5426891cfb22bb19d4096fea30f8", null ],
+    [ "flint_eventoption_stepbegin", "_f_l_i_n_t__base_8f90.html#a9be5f832926ac9ec540f214470ebcce9ad3045977973a6229113963e6f37e4410", null ],
+    [ "flint_eventoption_stepend", "_f_l_i_n_t__base_8f90.html#a9be5f832926ac9ec540f214470ebcce9aaef8ca241ebfe80d10f0bb66a1aaf8e6", null ],
+    [ "flint_errorstrings", "_f_l_i_n_t__base_8f90.html#a28267823b60e942cf203e62644a7ff6b", null ],
+    [ "int_maxsteps", "_f_l_i_n_t__base_8f90.html#a15135f078159b83af29d07495cb6d1ef", null ]
 ];

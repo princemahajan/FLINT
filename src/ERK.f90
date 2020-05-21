@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -16,9 +16,9 @@
 !
 !> \brief       Explicit Runge-Kutta Module
 !! \details     A module for Explicit Runge-Kutta type numerical solvers with dense-output,
-!!              events detection, and stiffness detection.
+!!              vector events detection, and stiffness detection.
 !! \author      Bharat Mahajan
-!! \date        01/25/2019    
+!! \date        Created: 01/25/2019    
 !
 !############################################################################################
 
@@ -36,7 +36,11 @@ module ERK
     real(WP), parameter :: DEFAULT_ABSTOL = 1.0e-9_WP !< default absolute tolerance
     real(WP), parameter :: DEFAULT_RELTOL = 1.0e-6_WP !< default relative tolerance
 
-    real(WP), parameter :: DEFAULT_EVENTTOL = 1.0e-9_WP !< this value is used to detect events
+    !> Maximum number of events that can be detected during event-checking inside the 
+    !! integrator's step using the event step size
+    integer, parameter :: MAXNUMSTEPSZEVENTS = 4
+    
+    real(WP), parameter :: DEFAULT_EVENTTOL = 1.0e-6_WP !< this value is used to detect events
     
     !> Stiffness test default number of steps. See Hairer's DOP853 code.
     integer, parameter :: STIFFTEST_STEPS = 1000
@@ -105,7 +109,7 @@ module ERK
     
     module subroutine erk_init(me, DE, MaxSteps, Method, ATol, RTol, InterpOn, &
         InterpStates, MinStepSize, MaxStepSize, StepSzParams, &
-        EventsOn, EventStepSz)
+        EventsOn, EventStepSz, EventOptions, EventTol)
     
         implicit none
         
@@ -120,13 +124,16 @@ module ERK
         real(WP), intent(in), optional :: MinStepSize, MaxStepSize        
         real(WP), dimension(5), intent(in), optional :: StepSzParams
         logical, intent(in), optional :: EventsOn
-        real(WP), intent(in), optional :: EventStepSz
-            
+        real(WP), dimension(:), intent(in), optional :: EventStepSz
+        integer(kind(FLINT_EVENTOPTION_ROOTFINDING)), dimension(:), &
+                                intent(in), optional :: EventOptions
+        real(WP), dimension(:), intent(in), optional :: EventTol    
+
     end subroutine erk_init
 
     
-    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, EventMask, EventStates, &
-                                            EventRootFindingOn, StiffTest, params)
+    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, &
+                                EventMask, EventStates, StiffTest, params)
     
         implicit none
         
@@ -143,7 +150,6 @@ module ERK
         real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint
         logical, dimension(me%pDiffEqSys%m), intent(in), optional :: EventMask
         real(WP), allocatable, dimension(:,:), intent(out), optional :: EventStates
-        logical, intent(in), optional :: EventRootFindingOn
         integer, intent(inout), optional :: StiffTest        
         real(WP), dimension(:), intent(in), optional :: params        
         
@@ -165,11 +171,12 @@ module ERK
     end subroutine erk_interp
     
     
-    module subroutine erk_info(me, LastStatus, nSteps, nAccept, nReject, nFCalls, &
+    module subroutine erk_info(me, LastStatus, StatusMsg, nSteps, nAccept, nReject, nFCalls, &
                                 InterpReady, h0, X0, Y0, hf, Xf, Yf)
 
             class(ERK_class), intent(inout) :: me
             integer(kind(FLINT_SUCCESS)), intent(out) :: LastStatus
+            character(len=:), allocatable, intent(out), optional :: StatusMsg
             integer, intent(out), optional :: nSteps
             integer, intent(out), optional :: nAccept
             integer, intent(out), optional :: nReject
@@ -193,12 +200,16 @@ module ERK
         real(WP), dimension(np) :: Yip
     end function InterpY
 
+
     module subroutine erk_destroy(me)
     
         type(ERK_class) :: me
         
     end subroutine erk_destroy    
     
+
+
+
     end interface
 
     

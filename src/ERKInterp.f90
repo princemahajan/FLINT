@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 !> \brief       ERK Interpolation Module
 !! \details     Provides implementation for the dense output features.
 !! \author      Bharat Mahajan (bharat.mahajan@nasa.gov).
-!! \date        02/04/2019    
+!! \date        Created: 02/04/2019    
 !
 !############################################################################################
     
@@ -40,7 +40,7 @@ submodule (ERK) ERKInterp
         real(WP) :: h, hSign, X0
         
         ! if interpolation mode is not on then return with an error
-        if (me%InterpOn .NEQV. .TRUE.) then
+        if (.NOT. me%InterpOn) then
             me%status = FLINT_ERROR_INTP_OFF
             return
         end if

@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -110,16 +110,16 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_init.html',''
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a55a78d198ab79f585c72c32d03be69fd"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_init.html#a55a78d198ab79f585c72c32d03be69fd">init</a> (me, DE, MaxSteps, Method, ATOl, RTol, InterpOn, InterpStates, MinStepSize, MaxStepSize, StepSzParams, EventsOn, EventStepSz)</td></tr>
-<tr class="separator:a55a78d198ab79f585c72c32d03be69fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b6b20abfc070cb1c0a1417459297914"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_init.html#a0b6b20abfc070cb1c0a1417459297914">init</a> (me, DE, MaxSteps, Method, ATOl, RTol, InterpOn, InterpStates, MinStepSize, MaxStepSize, StepSzParams, EventsOn, EventStepSz, EventOptions, EventTol)</td></tr>
+<tr class="separator:a0b6b20abfc070cb1c0a1417459297914"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Interface for the Initializaition method. It must be called before Integration. </p>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00219">219</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00316">316</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 </div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
-<a id="a55a78d198ab79f585c72c32d03be69fd"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55a78d198ab79f585c72c32d03be69fd">&#9670;&nbsp;</a></span>init()</h2>
+<a id="a0b6b20abfc070cb1c0a1417459297914"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0b6b20abfc070cb1c0a1417459297914">&#9670;&nbsp;</a></span>init()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -199,8 +199,20 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(wp), intent(in), optional&#160;</td>
-          <td class="paramname"><em>EventStepSz</em>&#160;</td>
+          <td class="paramtype">real(wp), dimension(:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>EventStepSz</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(kind(<a class="el" href="namespaceflint__base.html#a9be5f832926ac9ec540f214470ebcce9a187d5426891cfb22bb19d4096fea30f8">flint_eventoption_rootfinding</a>)), dimension(:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>EventOptions</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real(wp), dimension(:), intent(in), optional&#160;</td>
+          <td class="paramname"><em>EventTol</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -214,7 +226,7 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[in,out]</td><td class="paramname">me</td><td>Object</td></tr>
     <tr><td class="paramdir"></td><td class="paramname">de</td><td>Differential Equation system object</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">maxsteps</td><td>Must specify max no. of steps The implementation can use this number to decide how and how much to allocate internal storage for storing integrator natural steps as well as the interpolation coefficients for delayed interpolation.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">method</td><td>Type of Intergrator to use. Possible values are:<ul>
+    <tr><td class="paramdir">[in]</td><td class="paramname">method</td><td>Type of Intergrator to use. Implemented methods are:<ul>
 <li>ERK_DOP853 (default)</li>
 <li>ERK_DOP54</li>
 <li>ERK_VERNER98R</li>
@@ -224,9 +236,9 @@ Public Member Functions</h2></td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">atol</td><td>Absolute tolerance, size must be either 1 or n</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">rtol</td><td>Relative tolerance, size must be either 1 or n</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">interpon</td><td>If true, then the interpolation coefficients along with integrator natural steps are computed and stored internally. User can use <a class="el" href="interfaceflint__base_1_1_interpolate.html" title="Method for delayed interpolation. It must be called after at least one invocation of the Init and Int...">Interpolate</a> method to compute solutions at any value of the indepedent variable without doing the actual integrating again. Note that if InterpOn is true, then IntStepsOn option of <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> must be either omitted or set to false.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">interpstates</td><td>Specify the interpolation states for which the interpolation coefficients will be computed and stored, e.g. [1,4,6,n].</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">minstepsize</td><td>User can specify minimum and maximum step-sizes allowed.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">maxstepsize</td><td>User can specify minimum and maximum step-sizes allowed.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">interpstates</td><td>Specify the interpolation states for which the interpolation coefficients will be computed and stored, e.g. [1,3,4,6,n].</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">minstepsize</td><td>User can specify minimum and maximum step sizes allowed. Note that these are positive quantities. Sign will be handled bu FLINT.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">maxstepsize</td><td>User can specify minimum and maximum step sizes allowed. Note that these are positive quantities. Sign will be handled bu FLINT.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">stepszparams</td><td>Step-size computation specific parameters. User can specify these for a soecific step-size computation method, otherwise defaults are used. For Hairer's DOP853 code:<ul>
 <li>StepSzParams(1): Safety-factor</li>
 <li>StepSzParams(2): Minimum safety-factor</li>
@@ -236,12 +248,14 @@ Public Member Functions</h2></td></tr>
 </ul>
 </td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">eventson</td><td>Set true for events detection</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">eventstepsz</td><td>If events detection is enabled, then user can specify the maximum step-size at which events are detected. If there are even number of sign changes between X and X+EventStepSz, that event will not be detected. If EventStepSz is greater than the current natural step-size of the integrator, then EventStepSz is ignored. If it is not specified, then events are always checked at the natural steps. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventstepsz</td><td>If events detection is enabled, then user can specify the maximum interval after which events must be checked. If there are even number of sign changes between X and X+EventStepSz, that event cannot be detected. If EventStepSz is not specified, then events are always checked at the integrator's natural steps. Note that these are positive quantities and FLINT will take care of the appropriate sign based on the direction of integration.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventoptions</td><td>Event Options that control the event information returned by FLINT Default is FLINT_EVENTOPTION_ROOTFINDING.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">eventtol</td><td>Event tolerance values used for root-finding if enabled, size must be m </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00221">221</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00318">318</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
 <p class="reference">References <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
 
@@ -256,7 +270,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li><li class="navelem"><a class="el" href="interfaceflint__base_1_1_init.html">Init</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:09 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

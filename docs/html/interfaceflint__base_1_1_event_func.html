@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -95,7 +95,7 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_event_func.ht
 </div><!--header-->
 <div class="contents">
 
-<p>Interface for a user-supplied procedure for computing events.  
+<p>Interface for a user-supplied procedure for computing events values during the integration. It is also called after an event is detected in order for the user to specify the event actions to be taken by the event handler. Note that if multiple events are triggered at the same location then only the event with the lowest index will be reported.  
  <a href="interfaceflint__base_1_1_event_func.html#details">More...</a></p>
 <div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-0-trigger" src="closed.png" alt="+"/> Collaboration diagram for flint_base::EventFunc:</div>
@@ -104,37 +104,31 @@ $(document).ready(function(){initNavTree('interfaceflint__base_1_1_event_func.ht
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="interfaceflint__base_1_1_event_func__coll__graph.png" border="0" usemap="#flint__base_1_1_event_func_coll__map" alt="Collaboration graph"/></div>
 <map name="flint__base_1_1_event_func_coll__map" id="flint__base_1_1_event_func_coll__map">
-<area shape="rect"  title="Interface for a user&#45;supplied procedure for computing events." alt="" coords="5,5,152,83"/>
+<area shape="rect"  title="Interface for a user&#45;supplied procedure for computing events values during the integration...." alt="" coords="5,5,152,83"/>
 </map>
 </div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a99850030b2d08089366a0d1a7cf83add"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_event_func.html#a99850030b2d08089366a0d1a7cf83add">eventfunc</a> (me, EventID, X, Y, Value, Direction, Terminal)</td></tr>
-<tr class="separator:a99850030b2d08089366a0d1a7cf83add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae80e62d15499fdca7715398706e5cee4"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_event_func.html#ae80e62d15499fdca7715398706e5cee4">eventfunc</a> (me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)</td></tr>
+<tr class="separator:ae80e62d15499fdca7715398706e5cee4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Interface for a user-supplied procedure for computing events. </p>
+<div class="textblock"><p>Interface for a user-supplied procedure for computing events values during the integration. It is also called after an event is detected in order for the user to specify the event actions to be taken by the event handler. Note that if multiple events are triggered at the same location then only the event with the lowest index will be reported. </p>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00181">181</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00255">255</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 </div><h2 class="groupheader">Member Function/Subroutine Documentation</h2>
-<a id="a99850030b2d08089366a0d1a7cf83add"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99850030b2d08089366a0d1a7cf83add">&#9670;&nbsp;</a></span>eventfunc()</h2>
+<a id="ae80e62d15499fdca7715398706e5cee4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae80e62d15499fdca7715398706e5cee4">&#9670;&nbsp;</a></span>eventfunc()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure subroutine flint_base::EventFunc::eventfunc </td>
+          <td class="memname">subroutine flint_base::EventFunc::eventfunc </td>
           <td>(</td>
           <td class="paramtype">class(<a class="el" href="structflint__base_1_1diffeqsys.html">diffeqsys</a>), intent(in)&#160;</td>
           <td class="paramname"><em>me</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">integer, intent(in)&#160;</td>
-          <td class="paramname"><em>EventID</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -145,8 +139,14 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real(wp), dimension(:), intent(in)&#160;</td>
+          <td class="paramtype">real(wp), dimension(:), intent(inout)&#160;</td>
           <td class="paramname"><em>Y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer, dimension(:), intent(in)&#160;</td>
+          <td class="paramname"><em>EvalEvents</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
@@ -163,8 +163,14 @@ Public Member Functions</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">logical, dimension(:), intent(out)&#160;</td>
-          <td class="paramname"><em>Terminal</em>&#160;</td>
+          <td class="paramtype">integer, intent(in), optional&#160;</td>
+          <td class="paramname"><em>LocEvent</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer(kind(<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edda30a2216fe949c3ce68d01d9c2716873d">flint_eventaction_continue</a>)), intent(out), optional&#160;</td>
+          <td class="paramname"><em>LocEventAction</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -176,24 +182,31 @@ Public Member Functions</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">me</td><td>Object of class type DiffEqSys</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">eventid</td><td>Value is either 0 or between 1 and m. If 0, the event function must compute values for all the events. If its value is between 1 and m, then it needs only compute only one event with index EventID. Rest of the event are ignored.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>Current independent variable value</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td>Current solution value</td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">value</td><td>Size is m. If Value(i) changes sign, then the event with EventID i may trigger based on Direction(i). If Value(i) changes from/to NaN, then the event is not triggered.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The current independent variable value. When an event is detected, it contains the location of that event.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">y</td><td>Current solution value. User can modify this value from inside the event function, however it will only take effect if an event is located and the LocEvent contains the index of the located event. In that case, user user also must set the appropriate action in EventAction.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">evalevents</td><td>Size is m. User should evaluate only those event functions for which the corresponding index entry is 1 in EvalEvents.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">value</td><td>Size is m. If Value(i) changes sign, then the event "i" may trigger based on Direction(i). If Value(i) changes from/to NaN, then the sign change is ignored.</td></tr>
     <tr><td class="paramdir">[out]</td><td class="paramname">direction</td><td>Size must be same as Value.<ul>
 <li>Direction=1: only sign changes from -ve to +ve are detected</li>
 <li>Direction=-1: only sign changes from +ve to -ve are detected</li>
 <li>Direction=0: all sign changes are detected</li>
 </ul>
 </td></tr>
-    <tr><td class="paramdir">[out]</td><td class="paramname">terminal</td><td>Size must be same as that of Value. If true for any of the detected event, then all the events are detected at the current step and the integration is stopped with appropriate status code. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">locevent</td><td>FLINT will only call <a class="el" href="interfaceflint__base_1_1_event_func.html" title="Interface for a user-supplied procedure for computing events values during the integration....">EventFunc</a> with this option after an event is located. In that case, LocEventIndex will contain the index between 1 and m of the located event. User must check whether this parameter is "present" before using it.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">loceventaction</td><td>This parameter will be only present if an event has been located and LocEventIndex contains a valid index of the located event. In that case, user can specify a one of following actions that the event handler will take:<ul>
+<li>FLINT_EVENTACTION_CONTINUE: Continue the integration (default)</li>
+<li>FLINT_EVENTACTION_TERMINATE: Terminate the integration at the current value of X</li>
+<li>FLINT_EVENTACTION_CHANGESOLY: Change the solution value Y for the given X and use this value as the initial condition for computing the next step. The new value must be returned in "Y" by the user. EventStates will still contain the old value of Y that triggered the event.</li>
+<li>FLINT_EVENTACTION_RESTARTINT: Restart the integration from the current value of X </li>
+</ul>
+</td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00182">182</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00256">256</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
-<p class="reference">References <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
+<p class="reference">References <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00086">flint_base::flint_eventaction_continue</a>, and <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">flintutils::wp</a>.</p>
 
 </div>
 </div>
@@ -206,7 +219,7 @@ Public Member Functions</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li><li class="navelem"><a class="el" href="interfaceflint__base_1_1_event_func.html">EventFunc</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:09 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

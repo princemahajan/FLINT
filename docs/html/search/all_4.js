@@ -1,6 +1,7 @@
 var searchData=
 [
   ['e',['e',['../structerk_1_1erk__class.html#a0f0d0ed5baf9130c966b288b780eb85d',1,'erk::erk_class']]],
+  ['edgecolor',['edgecolor',['../namespaceplots.html#aa054b00e20df2c2afe4aff069c877c77',1,'plots']]],
   ['eps',['eps',['../namespaceflintutils.html#a191d3b80635a682af255eb3c00b7f5c7',1,'flintutils']]],
   ['erk',['erk',['../namespaceerk.html',1,'']]],
   ['erk_2ef90',['ERK.f90',['../_e_r_k_8f90.html',1,'']]],
@@ -16,7 +17,9 @@ var searchData=
   ['erkinit_2ef90',['ERKInit.f90',['../_e_r_k_init_8f90.html',1,'']]],
   ['erkintegrate_2ef90',['ERKIntegrate.f90',['../_e_r_k_integrate_8f90.html',1,'']]],
   ['erkinterp_2ef90',['ERKInterp.f90',['../_e_r_k_interp_8f90.html',1,'']]],
-  ['eventfunc',['EventFunc',['../interfaceflint__base_1_1_event_func.html',1,'flint_base::EventFunc'],['../interfaceflint__base_1_1_event_func.html#a99850030b2d08089366a0d1a7cf83add',1,'flint_base::EventFunc::eventfunc()']]],
+  ['etol',['etol',['../structflint__base_1_1flint__class.html#ab79468732182a3d80d590db515e6c416',1,'flint_base::flint_class']]],
+  ['eventfunc',['EventFunc',['../interfaceflint__base_1_1_event_func.html',1,'flint_base::EventFunc'],['../interfaceflint__base_1_1_event_func.html#ae80e62d15499fdca7715398706e5cee4',1,'flint_base::EventFunc::eventfunc()']]],
+  ['eventoptions',['eventoptions',['../structflint__base_1_1flint__class.html#a7b699d0c455f9ece069fa52fe51c6393',1,'flint_base::flint_class']]],
   ['eventson',['eventson',['../structflint__base_1_1flint__class.html#a370559f2d568f813d4ca890d9e8e419b',1,'flint_base::flint_class']]],
-  ['eventstepsz',['eventstepsz',['../structflint__base_1_1flint__class.html#a7fedbef8aa1bec8de15d2a14fb527da1',1,'flint_base::flint_class']]]
+  ['eventstepsz',['eventstepsz',['../structflint__base_1_1flint__class.html#a093c380dd985388880ca897bf173af48',1,'flint_base::flint_class']]]
 ];

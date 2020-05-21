@@ -24,6 +24,9 @@ function cr3bpeom(dX, X, p, t)
     end
 end
 
+
+
+
 function JacobiConstant(odesol)
     
     X = odesol[1:3,:]
@@ -53,7 +56,85 @@ function JacobiConstant(odesol)
 end;
 
 
-const Runs = 1000;
+# Event-1: detect a narrow square pulse
+# Note that discrete callback wont be able to precisely locate the
+# 0-crossings for this scenario
+condition1 = function (u, t, integrator)
+    if t > 0.5 && t < 0.5005
+       1
+    else
+       -1
+    end
+end
+
+function affect1(integrator)
+    # TBD: how to disable this callback efficiently?
+end
+
+function affect1_neg(integrator)
+    # TBD: how to disable this callback efficiently?
+end
+
+
+cb1 = ContinuousCallback(condition1, affect1, affect1_neg;
+            rootfind=true,save_positions=(true,true),abstol=0.001)
+
+# Event function-2: continuous callback
+Mask2 = false
+condition2 = function (u, t, integrator)
+    if Mask2 == false
+        if u[1] < 0
+            # TBD: how to safely ignore the event in this region?
+            -1
+        else
+            u[2]
+        end
+    else
+        -1
+    end
+end
+
+function affect2(integrator)
+    # TBD: how to remove the callback?
+    Mask2 = true
+end
+
+
+cb2 = ContinuousCallback(condition2, affect2;
+            rootfind=true,save_positions=(true,true),abstol=1e-9)
+
+# Event function-3: continuous callback
+Mask3 = false
+condition3 = function (u, t, integrator)
+    if Mask3 == false
+        if u[1] > 0
+            # TBD: how to safely ignore the event in this region?
+            -1
+        else
+            u[2]
+        end
+    else
+        -1
+    end
+end
+
+function affect3(integrator)
+    # modify solution to set it back to IC
+    integrator.u[1:3] = R0
+    integrator.u[4:6] = V0
+    # TBD: how to remove the callback?
+    Mask3 = true
+end
+
+
+cb3 = ContinuousCallback(condition3, affect3;
+            rootfind=true,save_positions=(true,true),abstol=1e-9)
+
+
+# callback set
+cb = CallbackSet(cb1,cb2,cb3)
+
+
 
 # The 2nd element of each solver sets the dense=true option
 # The 3rd element is the name used in results
@@ -94,9 +175,9 @@ end
 # Integrate ODE
 function FireODE(atol, rtol, method, prob, DenseOn)
  if DenseOn == true
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
     else 
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
     end
 end
             
@@ -130,7 +211,10 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
     
     ODETestResult(serr, ierr, rtime, sol)
 end
-            
+
+
+const Runs = 100
+
 # mass-ratio
 const mu = 0.012277471::Float64
 
@@ -143,7 +227,7 @@ Period = parse(Float64,"17.0652165601579625588917206249")
 
 # propagate for bunch of orbits
 t0 = 0.0::Float64;
-tf = 4.0*Period;
+tf = 2.5*Period;
 
 tspan = (t0, tf);
 
@@ -200,7 +284,7 @@ FLINT_res = [DOP54_t,DOP54_t,DOP853_t,Vern65E_t,Vern98R_t]
 FLINT_alg = ["DOP54","DOP54","DOP853","Vern65E","Vern98R"]
 
 print("\n")
-print("Julia time, FLINT time, Julia closing errors\n=======================================================\n")
+print("Solver: Julia time, FLINT time, Julia closing errors\n==============================================================\n")
 for ctr in 1:nsol
     @Printf.printf("%7s: %.5e, %.5e (FLINT %7s), %.5e\n",
     ODESolvers[ctr].name,SolResults3B[ctr,end].MeanTime,FLINT_res[ctr],FLINT_alg[ctr],SolResults3B[ctr,end].FinalStateErr)

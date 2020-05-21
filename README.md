@@ -10,7 +10,7 @@ Bharat Mahajan
 
 ### Copyright
 
-Copyright 2019 Bharat Mahajan <br><br>
+Copyright 2020 Bharat Mahajan <br><br>
 This work was performed at Odyssey Space Research LLC, Houston, TX as part of
 the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
 FLINT source code is licensed under the Apache License, Version 2.0 (the "License")
@@ -22,20 +22,20 @@ are available at http://people.math.sfu.ca/~jverner/.
 
 ### Introduction
 
-FLINT is a modern object-oriented Fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and event-detection support for each of the methods. The code is written such that any other ERK method can be  implemented by including its coefficients with minimum changes required in the code. The DOP853 integrator is the default method chosen, and its implementation is hand-optimized specific to its coefficients. For other integrators, a generic routine for step-integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in its internal memory. After that, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final points used during the integration. Interpolation is much faster than integration in FLINT, as the coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with event-masking (static and dynamic), event-direction, and termination options. Additionally, a step-size for event detection is also supported. In a nutshell, the features are:
-
-- Modern object-oriented, thread-safe, and optimized Fortran code
-- 4 Explicit Runge-Kutta (ERK) integrators: DOP54, DOP853, Verner98R, Verner65E (as of now)
-- Any ERK method can be implemented by just including their coefficients
-- Dense output with delayed interpolation (integrate once, interpolate as many times)
-- Multiple event-detection with event masking and separate event step-size
-- Stiffness detection
-
-User specifies the differential equations and events function in a separate class and their interfaces are provided. See the test program TestFLINT and the DiffEq module on how to use FLINT.
+FLINT is a modern object-oriented fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and multiple event-detection support for each of the methods. The code is written such that any other ERK method can be implemented by including its coefficients with minimum changes required in the code. The DOP853 integrator is the default method chosen, and its implementation is hand-optimized specific to its coefficients. For other integrators, a generic routine for step-integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in internal memory. Thereafter, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final conditions. Interpolation is much faster than integration, as the  coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with many features such as event root-finding, event step-size, event actions. In a nutshell, the features are:
+                  
++ Modern object-oriented, thread-safe, and optimized Fortran code
++ 4 Adaptive-step (fixed step-size also supported) ERK integrators: DOP54, DOP853, Verner98R, Verner65E
++ Any other ERK method can be implemented by just including their coefficients
++ Dense output with delayed interpolation (integrate once, interpolate as many times)
++ Multiple event-detection as well as finding location of events using root-finding  (Brent's algorithm) with static and dynamic event masking
++ Ability to set a maximum delay (referred to here as event step-size) after which events are guauanteed to be detected
++ Ability to restart the integration or change solution on the detection of events
++ Stiffness detection
 
 ### Installation
 
-FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing is also done with gfortran on Windows and Linux plaforms. Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists file is provided to generate Visual Studio projects or makefiles on Windows and Linux using cmake. Additionally, it generates cmake config files to easily link FLINT using the find_package() command. The steps to link FLINT in cmake-based projects are:
+FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows 2016 integrated with Microsoft Visual Studio Community version 2017. Some testing is also done with MinGW-W64 gfortran (gcc 8.1.0). Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists file is provided to generate Visual Studio projects or makefiles on Windows and Linux using cmake. Additionally, it generates cmake config files to easily link FLINT using the find_package() command. The steps to link FLINT in cmake-based projects are:
 
 + In cmake GUI or command-line, set FLINT_INSTALL_LIB_DIR to the desired directory, where the compiled library, modules, and cmake config files will be installed.
 + In cmake GUI or command-line, set FLINT_INSTALL_BIN_DIR to the desired directory, where the compiled test executables of FLINT will be installed.
@@ -46,7 +46,17 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
         target_link_libraries(<YOUR_TARGET_NAME> FLINT::FLINT)
     ```
 
+### Speed Comparison with Julia
+
+For performance comparison, the latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia test code along with results are provided in the media folder on the FLINT's GitHub repository https://github.com/princemahajan/FLINT.
+
+![Julia Results](media/julia_screenshot.png)
+
+
+
 ### How to Use
+
+See the test program files, test.f90 and DiffEq.f90, in tests folder for a comparatively complex example problem that uses multiple events. Following are the steps in brief for a simpler problem:
 
 1. Create a differential equation system class by providing differential equation function, events function (if any), and parameters (if any).
 
@@ -75,23 +85,35 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
         TwoBodyDE(4:6) = -me%GM/(norm2(Y(1:3))**3)*Y(1:3) ! Two-body orbit diffeq
     end function TwoBodyDE
 
-    subroutine SampleEventTB(me, EventID, X, Y, Value, Direction, Terminal)
+    subroutine SampleEventTB(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
         implicit none
         class(TBSys), intent(in) :: me !< Differential Equation object            
-        integer, intent(in) :: EventID        
         real(WP), intent(in) :: X
-        real(WP), dimension(:), intent(in) :: Y
+        real(WP), dimension(:), intent(inout) :: Y
+        integer, dimension(:), intent(in) :: EvalEvents
         real(WP), dimension(:), intent(out) :: Value
-        integer, dimension(size(Value)), intent(out) :: Direction
-        logical, dimension(size(Value)), intent(out) :: Terminal
+        integer, dimension(:), intent(out) :: Direction
+        integer, intent(in), optional :: LocEvent
+        integer(kind(FLINT_EVENTACTION_CONTINUE)), intent(out), optional :: LocEventAction
 
-        Value(1) = Y(2) ! detect y-crossing
-        Value(2) = Y(1) ! detect x-crossing    
+        if (EvalEvents(1)==1) Value(1) = Y(2) ! detect y-crossing
+        if (EvalEvents(2)==1) Value(2) = Y(1) ! detect x-crossing    
 
         Direction(1) = 1  ! detect -ve to +ve transitions for y coordinate
         Direction(2) = -1 ! detect +ve to -ve transitions for x coordinate
-        Terminal = [.FALSE., .FALSE.] ! continue integration after events
-    end subroutine SampleEventTB      
+
+        ! Set actions for each event if located
+        if (present(LocEvent) .AND. present(LocEventAction)) then
+            if (LocEvent == 1) then
+                LocEventAction = IOR(FLINT_EVENTACTION_CONTINUE, &
+                    FLINT_EVENTACTION_MASK)
+            else if (LocEvent == 2) then
+                ! Mask the event-2 after first trigger            
+                LocEventAction = IOR(FLINT_EVENTACTION_CONTINUE, &
+                        FLINT_EVENTACTION_MASK)
+            end if   
+        end if
+    end subroutine SampleEventTB  
 ```
 
 2. Initialize the differential equation and ERK class objects for using Runge-Kutta intgerators.
@@ -165,9 +187,7 @@ For all the FLINT status codes and options supported by Init, Integrate, and Int
 
 ### Testing
 
-The latest test results in addition to performance comparison with Julia DiffEq package can be seen in Travis-CI build [results](https://travis-ci.com/princemahajan/FLINT).
-
-The following test results were generated using the FLINT code from the first commit. In all of the following tests, the orbit is propagated for 4 orbital periods and the integration is repeated 5000 times. The tables give the total time for 5000 propagations and all other testing parameters are given for each integration. The relative tolerance is taken as 1e-11 and absolute tolerance as 1e-14 in all the cases except when explicitly mentioned otherwise. Interpolation is used to capture 1000 points per orbit period. Note that the delayed interpolation feature of FLINT is not used in these results.    
+The following tests were performed using the very first verion of FLINT and they are not updated for the latest version. In the tests, an orbit is propagated for 4 orbital periods and the integration is repeated 5000 times. The tables give the total time for 5000 propagations and all other testing parameters are given for each integration. The relative tolerance is taken as 1e-11 and absolute tolerance as 1e-14 in all the cases except when explicitly mentioned otherwise. Interpolation is used to capture 1000 points per orbit period. Note that the delayed interpolation feature of FLINT is not used in these results.    
 
 The initial conditions in Cartesian coodinates used are as follows:
 - Two-Body circular Earth orbit  (Units: km, sec)

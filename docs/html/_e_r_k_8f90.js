@@ -8,5 +8,6 @@ var _e_r_k_8f90 =
     [ "erk_dop853", "_e_r_k_8f90.html#ae28838432626982447374a804c75c7cb", null ],
     [ "erk_verner65e", "_e_r_k_8f90.html#ad63cc19d130dc18a257bfc04ee8b30e1", null ],
     [ "erk_verner98r", "_e_r_k_8f90.html#a39a042a00748be93e0be7ae3dd6c38ed", null ],
+    [ "maxnumstepszevents", "_e_r_k_8f90.html#a880a25df3a4e788456ef5c083e3cef87", null ],
     [ "stifftest_steps", "_e_r_k_8f90.html#a0fbb505f457864a2b36d0407360778c5", null ]
 ];

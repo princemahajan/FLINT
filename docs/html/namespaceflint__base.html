@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -108,13 +108,13 @@ Data Types</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">User must extend DiffEqSys and provide the DiffEq and Events function.  <a href="structflint__base_1_1diffeqsys.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_event_func.html">EventFunc</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for a user-supplied procedure for computing events.  <a href="interfaceflint__base_1_1_event_func.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for a user-supplied procedure for computing events values during the integration. It is also called after an event is detected in order for the user to specify the event actions to be taken by the event handler. Note that if multiple events are triggered at the same location then only the event with the lowest index will be reported.  <a href="interfaceflint__base_1_1_event_func.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">type &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structflint__base_1_1flint__class.html">flint_class</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">FLINT_class Abstract base class must be inherited by all the numerical integrator classes.  <a href="structflint__base_1_1flint__class.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Abstract base class that must be inherited by all the numerical integrator classes.  <a href="structflint__base_1_1flint__class.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_info.html">Info</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query method to get the current state information of FLINT. Should be called after each Integration to get the statistics.  <a href="interfaceflint__base_1_1_info.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Query method to get the current state information of FLINT. Can be called after each Integration to get the integration stats.  <a href="interfaceflint__base_1_1_info.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_init.html">Init</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for the Initializaition method. It must be called before Integration.  <a href="interfaceflint__base_1_1_init.html#details">More...</a><br /></td></tr>
@@ -123,7 +123,7 @@ Data Types</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interface for the main <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method. It must be called after initialization and can be called multiple times with different IC and options without calling the init routine first every time.  <a href="interfaceflint__base_1_1_integrate.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceflint__base_1_1_interpolate.html">Interpolate</a></td></tr>
-<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method for delayed interpolation. It must be called after at least one invocation of the <a class="el" href="interfaceflint__base_1_1_init.html" title="Interface for the Initializaition method. It must be called before Integration.">Init</a> and <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method with InterpOn option enabled. It can be called by the user any number of times with different points at which the solution is sought. FLINT computes the interpolation coefficients during integration and stores them internally at each natural step of the integrator. During interpolation, these coefficients are used to compute the solutions quickly. This is much less computationally intensive than the <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method.  <a href="interfaceflint__base_1_1_interpolate.html#details">More...</a><br /></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Method for delayed interpolation. It must be called after at least one invocation of the <a class="el" href="interfaceflint__base_1_1_init.html" title="Interface for the Initializaition method. It must be called before Integration.">Init</a> and <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method with the InterpOn option enabled. It can be called by the user any number of times with different points at which the solution is sought. FLINT computes the interpolation coefficients during integration and stores them internally at each natural step of the integrator. During interpolation, these coefficients are used to compute the solutions quickly. This is much less computationally intensive than using the <a class="el" href="interfaceflint__base_1_1_integrate.html" title="Interface for the main Integrate method. It must be called after initialization and can be called mul...">Integrate</a> method.  <a href="interfaceflint__base_1_1_interpolate.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="enum-members"></a>
@@ -147,24 +147,44 @@ Enumerations</h2></td></tr>
 &#160;&#160;<a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024a2807db5410cd60995963bd506c5517e2">flint_error_intp_off</a> = 12, 
 <a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024ae4872a1f53b5885dbcbba8a1beca2d66">flint_error_init_reqd</a> = 13, 
 <a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024abe20f4b53b58b0af4ecf914ca79230d0">flint_error_eventparams</a> = 14, 
-<a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024ae9cbbdcbc71f77f015531dd5cfb2c71d">flint_error_eventroot</a> = 15
+<a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024ae9cbbdcbc71f77f015531dd5cfb2c71d">flint_error_eventroot</a> = 15, 
+<br />
+&#160;&#160;<a class="el" href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024a6a90ce0cda23a45544dcde65bda87585">flint_error_conststepsz</a> = 16
 <br />
  }</td></tr>
 <tr class="memdesc:a5bcea50aa5364b5509b6bbfc0f334024"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supported Error Codes.  <a href="namespaceflint__base.html#a5bcea50aa5364b5509b6bbfc0f334024">More...</a><br /></td></tr>
 <tr class="separator:a5bcea50aa5364b5509b6bbfc0f334024"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8dc75eb18c9f4a851acac5fa36b3edd"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <br />
+&#160;&#160;<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edda30a2216fe949c3ce68d01d9c2716873d">flint_eventaction_continue</a> = 0, 
+<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3eddaf59b010da6274e872e79387f78162a90">flint_eventaction_terminate</a> = 1, 
+<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edda31d57bfaf894bf11afcbcc698e2fe788">flint_eventaction_changesoly</a> = 2, 
+<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edda749abaae294fc2b106e0beb87342aaa9">flint_eventaction_restartint</a> = 4, 
+<br />
+&#160;&#160;<a class="el" href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edda0acee5945f124b2b4bf9d6f918dcc3fe">flint_eventaction_mask</a> = 128
+<br />
+ }</td></tr>
+<tr class="memdesc:aa8dc75eb18c9f4a851acac5fa36b3edd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supported FLINT Event Actions.  <a href="namespaceflint__base.html#aa8dc75eb18c9f4a851acac5fa36b3edd">More...</a><br /></td></tr>
+<tr class="separator:aa8dc75eb18c9f4a851acac5fa36b3edd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9be5f832926ac9ec540f214470ebcce9"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom">{ <a class="el" href="namespaceflint__base.html#a9be5f832926ac9ec540f214470ebcce9a187d5426891cfb22bb19d4096fea30f8">flint_eventoption_rootfinding</a> = 0, 
+<a class="el" href="namespaceflint__base.html#a9be5f832926ac9ec540f214470ebcce9ad3045977973a6229113963e6f37e4410">flint_eventoption_stepbegin</a> = 1, 
+<a class="el" href="namespaceflint__base.html#a9be5f832926ac9ec540f214470ebcce9aaef8ca241ebfe80d10f0bb66a1aaf8e6">flint_eventoption_stepend</a> = 2
+ }</td></tr>
+<tr class="memdesc:a9be5f832926ac9ec540f214470ebcce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Supported FLINT Event Options.  <a href="namespaceflint__base.html#a9be5f832926ac9ec540f214470ebcce9">More...</a><br /></td></tr>
+<tr class="separator:a9be5f832926ac9ec540f214470ebcce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a86f65fc7e8005161a2ae24c107ddb0b1"><td class="memItemLeft" align="right" valign="top">integer, parameter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflint__base.html#a86f65fc7e8005161a2ae24c107ddb0b1">work_maxsize</a> = 20</td></tr>
-<tr class="separator:a86f65fc7e8005161a2ae24c107ddb0b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15135f078159b83af29d07495cb6d1ef"><td class="memItemLeft" align="right" valign="top">integer, parameter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflint__base.html#a15135f078159b83af29d07495cb6d1ef">int_maxsteps</a> = 1024</td></tr>
 <tr class="memdesc:a15135f078159b83af29d07495cb6d1ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default number of maximum steps that intgerator is allowed to take.  <a href="#a15135f078159b83af29d07495cb6d1ef">More...</a><br /></td></tr>
 <tr class="separator:a15135f078159b83af29d07495cb6d1ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28267823b60e942cf203e62644a7ff6b"><td class="memItemLeft" align="right" valign="top">character(len= *), dimension(0:16), parameter&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflint__base.html#a28267823b60e942cf203e62644a7ff6b">flint_errorstrings</a> = [character(len=64) :: 'Successfully Completed', 'Termination Event Occurred', 'Problem appears to be stiff', 'Unknown error', 'Incorrect user-provided parameters', 'Maximum integration steps reached', 'Memory allocation error', 'Memory deallocation error', 'Incorrect dimensions', 'Step size reduced to very small value', 'Incorrect interpolation states', 'Incorrect interpolation array provided', 'Interpolation is not enabled', '<a class="el" href="interfaceflint__base_1_1_init.html">Init</a> is not completed', 'Incorrect event-related parameters ', 'Event root-finding failed', 'Incorrect step size for the non-adaptive option' ]</td></tr>
+<tr class="memdesc:a28267823b60e942cf203e62644a7ff6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Error message strings for the supported error codes.  <a href="#a28267823b60e942cf203e62644a7ff6b">More...</a><br /></td></tr>
+<tr class="separator:a28267823b60e942cf203e62644a7ff6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>FLINT Base Module. </p>
 <p>It includes the abstract intefaces for every solver in FLINT in addition to the intefaces for the differential equation and event functions provided by the user. FLINT error codes are defined here as well. </p><dl class="section author"><dt>Author</dt><dd>Bharat Mahajan </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>01/25/2019 </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>Created: 01/25/2019 </dd></dl>
 </div><h2 class="groupheader">Enumeration Type Documentation</h2>
 <a id="a5bcea50aa5364b5509b6bbfc0f334024"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a5bcea50aa5364b5509b6bbfc0f334024">&#9670;&nbsp;</a></span>anonymous enum</h2>
@@ -208,17 +228,95 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a5bcea50aa5364b5509b6bbfc0f334024ae4872a1f53b5885dbcbba8a1beca2d66"></a>flint_error_init_reqd&#160;</td><td class="fielddoc"><p>FLINT <a class="el" href="interfaceflint__base_1_1_init.html" title="Interface for the Initializaition method. It must be called before Integration.">Init</a> is required. </p>
 </td></tr>
-<tr><td class="fieldname"><a id="a5bcea50aa5364b5509b6bbfc0f334024abe20f4b53b58b0af4ecf914ca79230d0"></a>flint_error_eventparams&#160;</td><td class="fielddoc"><p>Required event parameters are not specified. </p>
+<tr><td class="fieldname"><a id="a5bcea50aa5364b5509b6bbfc0f334024abe20f4b53b58b0af4ecf914ca79230d0"></a>flint_error_eventparams&#160;</td><td class="fielddoc"><p>Event related parameters are wrong or missing. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a5bcea50aa5364b5509b6bbfc0f334024ae9cbbdcbc71f77f015531dd5cfb2c71d"></a>flint_error_eventroot&#160;</td><td class="fielddoc"><p>Event root find is failed. </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a5bcea50aa5364b5509b6bbfc0f334024a6a90ce0cda23a45544dcde65bda87585"></a>flint_error_conststepsz&#160;</td><td class="fielddoc"><p>Wrong value of StepSz for constant step size option. </p>
+</td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00042">42</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00041">41</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+
+</div>
+</div>
+<a id="aa8dc75eb18c9f4a851acac5fa36b3edd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa8dc75eb18c9f4a851acac5fa36b3edd">&#9670;&nbsp;</a></span>anonymous enum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Supported FLINT Event Actions. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="aa8dc75eb18c9f4a851acac5fa36b3edda30a2216fe949c3ce68d01d9c2716873d"></a>flint_eventaction_continue&#160;</td><td class="fielddoc"><p>Continue the integration. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa8dc75eb18c9f4a851acac5fa36b3eddaf59b010da6274e872e79387f78162a90"></a>flint_eventaction_terminate&#160;</td><td class="fielddoc"><p>Terminate the integration. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa8dc75eb18c9f4a851acac5fa36b3edda31d57bfaf894bf11afcbcc698e2fe788"></a>flint_eventaction_changesoly&#160;</td><td class="fielddoc"><p>Change the solution. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa8dc75eb18c9f4a851acac5fa36b3edda749abaae294fc2b106e0beb87342aaa9"></a>flint_eventaction_restartint&#160;</td><td class="fielddoc"><p>Restart the integration. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="aa8dc75eb18c9f4a851acac5fa36b3edda0acee5945f124b2b4bf9d6f918dcc3fe"></a>flint_eventaction_mask&#160;</td><td class="fielddoc"><p>Mask the event for future detection. It can be masked with any of the other event actions. </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00084">84</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+
+</div>
+</div>
+<a id="a9be5f832926ac9ec540f214470ebcce9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9be5f832926ac9ec540f214470ebcce9">&#9670;&nbsp;</a></span>anonymous enum</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">anonymous enum</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Supported FLINT Event Options. </p>
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a9be5f832926ac9ec540f214470ebcce9a187d5426891cfb22bb19d4096fea30f8"></a>flint_eventoption_rootfinding&#160;</td><td class="fielddoc"><p>Locate the event as closely as possible using root-finding. </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9be5f832926ac9ec540f214470ebcce9ad3045977973a6229113963e6f37e4410"></a>flint_eventoption_stepbegin&#160;</td><td class="fielddoc"><p>Return the solution in EventStates at the beginning of the integrator's step (with natural or event step size) just after which the event function changed sign. </p>
+<p>Terminate the integration </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9be5f832926ac9ec540f214470ebcce9aaef8ca241ebfe80d10f0bb66a1aaf8e6"></a>flint_eventoption_stepend&#160;</td><td class="fielddoc"><p>Return the solution in EventStates at the end of the integrator's step (with natural or event step size) just before which the event function changed sign. </p>
+<p>Change the solution value </p>
+</td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00105">105</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a28267823b60e942cf203e62644a7ff6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28267823b60e942cf203e62644a7ff6b">&#9670;&nbsp;</a></span>flint_errorstrings</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">character(len=*), dimension(0:16), parameter flint_base::flint_errorstrings = [character(len=64) :: 'Successfully Completed', 'Termination Event Occurred', 'Problem appears to be stiff', 'Unknown error', 'Incorrect user-provided parameters', 'Maximum integration steps reached', 'Memory allocation error', 'Memory deallocation error', 'Incorrect dimensions', 'Step size reduced to very small value', 'Incorrect interpolation states', 'Incorrect interpolation array provided', 'Interpolation is not enabled', '<a class="el" href="interfaceflint__base_1_1_init.html">Init</a> is not completed', 'Incorrect event-related parameters ', 'Event root-finding failed', 'Incorrect step size for the non-adaptive option' ]</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Error message strings for the supported error codes. </p>
+
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00062">62</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
+
+</div>
+</div>
 <a id="a15135f078159b83af29d07495cb6d1ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a15135f078159b83af29d07495cb6d1ef">&#9670;&nbsp;</a></span>int_maxsteps</h2>
 
@@ -233,25 +331,7 @@ Variables</h2></td></tr>
 
 <p>Default number of maximum steps that intgerator is allowed to take. </p>
 
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00039">39</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
-
-</div>
-</div>
-<a id="a86f65fc7e8005161a2ae24c107ddb0b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a86f65fc7e8005161a2ae24c107ddb0b1">&#9670;&nbsp;</a></span>work_maxsize</h2>
-
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">integer, parameter flint_base::work_maxsize = 20</td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00036">36</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00286">flint_base::Integrate::integrate()</a>, and <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00355">flint_base::Interpolate::interpolate()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00038">38</a> of file <a class="el" href="_f_l_i_n_t__base_8f90_source.html">FLINT_base.f90</a>.</p>
 
 </div>
 </div>
@@ -261,7 +341,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflint__base.html">flint_base</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:09 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

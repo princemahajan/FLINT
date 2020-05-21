@@ -2,7 +2,7 @@ var _f_l_i_n_t_utils_8f90 =
 [
     [ "func", "interfaceflintutils_1_1func.html", "interfaceflintutils_1_1func" ],
     [ "binarysearch", "_f_l_i_n_t_utils_8f90.html#a7ea6dc204112ee43cc87b82601d2b94f", null ],
-    [ "root", "_f_l_i_n_t_utils_8f90.html#a9b6bdcf02f6cd0399aab6f6383d88c33", null ],
+    [ "root", "_f_l_i_n_t_utils_8f90.html#a03657968f207261a8ab099fdfd324488", null ],
     [ "default", "_f_l_i_n_t_utils_8f90.html#a71bfb7e60d5363297195a572a22a2052", null ],
     [ "double", "_f_l_i_n_t_utils_8f90.html#a954fac938151ec3ac329705b4af2d898", null ],
     [ "dp", "_f_l_i_n_t_utils_8f90.html#afea077837cda73cff0474af5c400e004", null ],

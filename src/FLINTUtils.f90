@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2020 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -15,9 +15,9 @@
 ! limitations under the License.
 !
 !> \brief       FLINTUtils Module
-!! \details     This module provides procedures for common utility functions.
+!! \details     This module provides common utility functions.
 !! \author      Bharat Mahajan
-!! \date        04/25/2019    
+!! \date        Created: 04/25/2019    
 !
 !############################################################################################
  
@@ -86,9 +86,9 @@ module FLINTUtils
         error = 0
         niter = 0
 
-        ! test
-        fa = f(a)
-        fb = f(b)
+        !! test
+        !fa = f(a)
+        !fb = f(b)
         
         ! Trivial cases
         if (abs(fa) <= NEARZERO) then

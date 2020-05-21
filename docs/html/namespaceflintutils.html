@@ -30,7 +30,7 @@
  <tr style="height: 56px;">
   <td id="projectalign" style="padding-left: 0.5em;">
    <div id="projectname">FLINT
-   &#160;<span id="projectnumber">0.9.1</span>
+   &#160;<span id="projectnumber">0.9.8</span>
    </div>
    <div id="projectbrief">Fortran Library for numerical INTegration of differential equations</div>
   </td>
@@ -107,9 +107,9 @@ Data Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions/Subroutines</h2></td></tr>
-<tr class="memitem:a9b6bdcf02f6cd0399aab6f6383d88c33"><td class="memItemLeft" align="right" valign="top">pure subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflintutils.html#a9b6bdcf02f6cd0399aab6f6383d88c33">root</a> (a, b, ya, yb, tol, f, x, fx, niter, error)</td></tr>
-<tr class="memdesc:a9b6bdcf02f6cd0399aab6f6383d88c33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing the root using Brent algorithm.  <a href="#a9b6bdcf02f6cd0399aab6f6383d88c33">More...</a><br /></td></tr>
-<tr class="separator:a9b6bdcf02f6cd0399aab6f6383d88c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a03657968f207261a8ab099fdfd324488"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflintutils.html#a03657968f207261a8ab099fdfd324488">root</a> (a, b, ya, yb, tol, f, x, fx, niter, error)</td></tr>
+<tr class="memdesc:a03657968f207261a8ab099fdfd324488"><td class="mdescLeft">&#160;</td><td class="mdescRight">Subroutine for computing the root using Brent algorithm.  <a href="#a03657968f207261a8ab099fdfd324488">More...</a><br /></td></tr>
+<tr class="separator:a03657968f207261a8ab099fdfd324488"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7ea6dc204112ee43cc87b82601d2b94f"><td class="memItemLeft" align="right" valign="top">pure integer function, dimension(size(sortedx))&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceflintutils.html#a7ea6dc204112ee43cc87b82601d2b94f">binarysearch</a> (SortedX, SortedDataArray)</td></tr>
 <tr class="memdesc:a7ea6dc204112ee43cc87b82601d2b94f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs binary search on a provided sorted array.  <a href="#a7ea6dc204112ee43cc87b82601d2b94f">More...</a><br /></td></tr>
 <tr class="separator:a7ea6dc204112ee43cc87b82601d2b94f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,8 +148,8 @@ Variables</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>FLINTUtils Module. </p>
-<p>This module provides procedures for common utility functions. </p><dl class="section author"><dt>Author</dt><dd>Bharat Mahajan </dd></dl>
-<dl class="section date"><dt>Date</dt><dd>04/25/2019 Module containing all the utility functions </dd></dl>
+<p>This module provides common utility functions. </p><dl class="section author"><dt>Author</dt><dd>Bharat Mahajan </dd></dl>
+<dl class="section date"><dt>Date</dt><dd>Created: 04/25/2019 Module containing all the utility functions </dd></dl>
 </div><h2 class="groupheader">Function/Subroutine Documentation</h2>
 <a id="a7ea6dc204112ee43cc87b82601d2b94f"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7ea6dc204112ee43cc87b82601d2b94f">&#9670;&nbsp;</a></span>binarysearch()</h2>
@@ -190,14 +190,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a9b6bdcf02f6cd0399aab6f6383d88c33"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9b6bdcf02f6cd0399aab6f6383d88c33">&#9670;&nbsp;</a></span>root()</h2>
+<a id="a03657968f207261a8ab099fdfd324488"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a03657968f207261a8ab099fdfd324488">&#9670;&nbsp;</a></span>root()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">pure subroutine flintutils::root </td>
+          <td class="memname">subroutine flintutils::root </td>
           <td>(</td>
           <td class="paramtype">real(<a class="el" href="namespaceflintutils.html#a3944cada4fec024ed8013142804c8fe5">wp</a>), intent(in)&#160;</td>
           <td class="paramname"><em>a</em>, </td>
@@ -504,7 +504,7 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00034">34</a> of file <a class="el" href="_f_l_i_n_t_utils_8f90_source.html">FLINTUtils.f90</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00162">flint_base::DEFunc::defunc()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00182">flint_base::EventFunc::eventfunc()</a>, <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00045">flintutils::func::func()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00380">flint_base::Info::info()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00221">flint_base::Init::init()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00286">flint_base::Integrate::integrate()</a>, and <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00355">flint_base::Interpolate::interpolate()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00232">flint_base::DEFunc::defunc()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00256">flint_base::EventFunc::eventfunc()</a>, <a class="el" href="_f_l_i_n_t_utils_8f90_source.html#l00045">flintutils::func::func()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00502">flint_base::Info::info()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00318">flint_base::Init::init()</a>, <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00399">flint_base::Integrate::integrate()</a>, and <a class="el" href="_f_l_i_n_t__base_8f90_source.html#l00473">flint_base::Interpolate::interpolate()</a>.</p>
 
 </div>
 </div>
@@ -514,7 +514,7 @@ Variables</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespaceflintutils.html">flintutils</a></li>
-    <li class="footer">Generated on Thu Aug 1 2019 13:44:10 for FLINT by
+    <li class="footer">Generated on Thu May 21 2020 03:01:34 for FLINT by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.15 </li>
   </ul>

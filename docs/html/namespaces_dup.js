@@ -6,5 +6,6 @@ var namespaces_dup =
     [ "flint_base", "namespaceflint__base.html", null ],
     [ "flintutils", "namespaceflintutils.html", null ],
     [ "mydiffeq", "namespacemydiffeq.html", null ],
+    [ "plots", "namespaceplots.html", null ],
     [ "stepsize", "namespacestepsize.html", null ]
 ];
