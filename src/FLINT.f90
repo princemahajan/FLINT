@@ -50,8 +50,8 @@
 !!              to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia 
 !!              test code along with results are provided in the media folder on the FLINT's GitHub repository
 !!              https://github.com/princemahajan/FLINT.
-!!              \image html "julia_screenshot.png"
-!!              \image latex "julia_screenshot.png"
+!!              \image html "julia_screenshot.PNG"
+!!              \image latex "julia_screenshot.PNG"
 !!   
 !!
 !! \section     Installation
