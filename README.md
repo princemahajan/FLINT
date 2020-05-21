@@ -50,7 +50,7 @@ FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Compo
 
 For performance comparison, the latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia test code along with results are provided in the media folder on the FLINT's GitHub repository https://github.com/princemahajan/FLINT.
 
-![Julia Results](media/julia_screenshot.png)
+![Julia Results](media/julia_screenshot.PNG)
 
 
 
