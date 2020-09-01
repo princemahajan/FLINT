@@ -28,9 +28,10 @@ FLINT is a modern object-oriented fortran library that provides four adaptive st
 + 4 Adaptive-step (fixed step-size also supported) ERK integrators: DOP54, DOP853, Verner98R, Verner65E
 + Any other ERK method can be implemented by just including their coefficients
 + Dense output with delayed interpolation (integrate once, interpolate as many times)
-+ Multiple event-detection as well as finding location of events using root-finding  (Brent's algorithm) with static and dynamic event masking
++ Multiple events can be defined for event detection during integration
++ Events location finding using root-finding  (Brent's algorithm) with static and dynamic event masking
 + Ability to set a maximum delay (referred to here as event step-size) after which events are guauanteed to be detected
-+ Ability to restart the integration or change solution on the detection of events
++ Ability to restart the integration or change solution on the detection of events for handling discontinuities in the differential equations
 + Stiffness detection
 
 
@@ -118,7 +119,7 @@ See the test program files, test.f90 and DiffEq.f90, in tests folder for a compa
     end subroutine SampleEventTB  
 ```
 
-2. Initialize the differential equation and ERK class objects for using Runge-Kutta intgerators.
+2. Initialize the differential equation and ERK class objects for using Runge-Kutta integrators.
 
 ```fortran
         use FLINT
@@ -156,7 +157,7 @@ See the test program files, test.f90 and DiffEq.f90, in tests folder for a compa
     end if    
 ```
 
-4. Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must intgerate the equations again before calling Interpolate.
+4. Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must integrate the equations again before calling Interpolate.
 
 ```fortran      
     real(WP), dimension(:), allocatable :: Xarr1, Xarr2

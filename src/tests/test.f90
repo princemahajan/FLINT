@@ -69,6 +69,7 @@
 
     type(ERK_class) erkvar
     type(CR3BPSys) :: CR3BPDEObject
+    type(TBSys) :: TBDEObject
     
     real(WP) :: x0, xf, xfval, rnum
     real(WP), dimension(6) :: y0, yf, y0r
@@ -85,9 +86,54 @@
     integer :: method
     
     real(WP) :: t0, tf
- 
-    ! Arenstorf orbit: Earth-moon mass-ratio
-    real(wp), parameter :: EMmu  = 0.012277471_WP
+
+    real(WP), parameter :: Moon_GM = 4902.800066163796_WP
+    real(WP), parameter :: EMmu  = 0.012277471_WP
+
+    ! Two-Body Orbit
+    real(WP), parameter :: TOF0 = -43139.98958152457_WP
+    real(WP), parameter :: TOF1 = TOF0 + 43200.0_WP
+    real(WP), parameter, dimension(6) :: y0tb = [-1.15997748e+04_WP, &
+                                                2.11325321e+04_WP,&
+                                                -1.53669890e+04_WP,&
+                                                1.08821230e-01_WP, &
+                                                -2.35407098e-01_WP,&
+                                                3.36994476e-01_WP]
+    
+    TBDEObject%GM = Moon_GM    
+    TBDEObject%n = 6
+    TBDEObject%m = 0
+
+    
+    stepsz0 = 0.0E-3_WP    ! let FLINT compute the initial step-size    
+    stifftestval = 1  ! check for stiffness and stop integration if stiff
+
+    
+    ! Two-Body propagation
+    call erkvar%Init(TBDEObject, MAX_STEPS, Method=ERK_DOP853, ATol=[tol*1.0e-3], RTol=[tol],&
+        InterpOn=.FALSE., EventsOn=.FALSE. )
+    if (erkvar%status == FLINT_SUCCESS) then       
+        y0r = y0tb
+        stiffstatus = stifftestval
+        stepsz = stepsz0
+        xfval = TOF1
+        call erkvar%Integrate(TOF0, y0r, xfval, yf, StepSz=stepsz, UseConstStepSz=CONST_STEPSZ, &
+            IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
+            EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+        
+        if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM &
+                .OR. erkvar%status == FLINT_ERROR_MAXSTEPS) then 
+            call erkvar%Info(stiffstatus, errstr, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
+            
+            print *, xfval, yf, fcalls, naccpt, nrejct
+        else
+            call erkvar%Info(stiffstatus, errstr)
+            print *, mname//': Integrate failed: ', erkvar%status, ':', errstr
+        end if
+    end if
+
+    
+    ! Arenstorf orbit: Earth-moon system
     x0    = 0.0
     xf    = 17.0652165601579625588917206249_WP
     y0    = [0.994_WP, 0.0_WP, 0.0_WP, 0.0_WP, -2.00158510637908252240537862224_WP, 0.0_WP]  !! initial `y` value
@@ -102,8 +148,6 @@
     Xarr = [(x0+ipdx*itr,itr=0,(nIp-1))]
     allocate(Yarr(6,size(Xarr)))
     
-    stepsz0 = 0.0E-3_WP    ! let FLINT compute the initial step-size    
-    stifftestval = 1  ! check for stiffness and stop integration if stiff
     
     ! create results file
     open(unit=17,file= fname, status = 'replace')
