@@ -1,0 +1,23 @@
+name = "FLINT"
+author = "Bharat Mahajan"
+copyright  = "Copyright 2020 Bharat Mahajan"
+license = "Apache-2.0"
+description = "Fortran Library for numerical INTegration of differential equations"
+homepage = "https://github.com/princemahajan/FLINT"
+keywords = ["ode", "runge-kutta"]
+
+[build]
+auto-executables = false
+auto-examples = false
+auto-tests = false
+
+[library]
+source-dir = "src"
+
+[install]
+library = true
+
+[[test]]
+name = "test"
+source-dir = "src/tests"
+main = "test.f90"
