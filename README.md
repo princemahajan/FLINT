@@ -118,7 +118,7 @@ See the test program files, test.f90 and DiffEq.f90, in tests folder for a compa
     end subroutine SampleEventTB  
 ```
 
-2. Initialize the differential equation and ERK class objects for using Runge-Kutta intgerators.
+2. Initialize the differential equation and ERK class objects for using Runge-Kutta integrators.
 
 ```fortran
         use FLINT
@@ -156,7 +156,7 @@ See the test program files, test.f90 and DiffEq.f90, in tests folder for a compa
     end if    
 ```
 
-4. Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must intgerate the equations again before calling Interpolate.
+4. Call the Interpolate function for computing solution on the desired grid of x values. The last parameter must be specified as True if user wants FLINT to keep the internal storage for calling Interpolate again. Otherwise, the internal storage is deleted and the user must integrate the equations again before calling Interpolate.
 
 ```fortran      
     real(WP), dimension(:), allocatable :: Xarr1, Xarr2

@@ -94,7 +94,7 @@ module FLINT_base
         !> Restart the integration
         enumerator :: FLINT_EVENTACTION_RESTARTINT  = 4
         
-        !> Mask the event for future detection. It can be masked with 
+        !> Mask the event for future detection. It can be combined with 
         !! any of the other event actions.
         enumerator :: FLINT_EVENTACTION_MASK        = 128   
     end enum
@@ -109,12 +109,12 @@ module FLINT_base
         !> Return the solution in EventStates at the beginning of the integrator's step 
         !! (with natural or event step size) just after which the event function 
         !! changed sign.
-        enumerator :: FLINT_EVENTOPTION_STEPBEGIN  = 1   !< Terminate the integration
+        enumerator :: FLINT_EVENTOPTION_STEPBEGIN  = 1
 
         !> Return the solution in EventStates at the end of the integrator's step 
         !! (with natural or event step size) just before which the event function
         !! changed sign.        
-        enumerator :: FLINT_EVENTOPTION_STEPEND    = 2   !< Change the solution value
+        enumerator :: FLINT_EVENTOPTION_STEPEND    = 2
     end enum
 
 
@@ -285,14 +285,14 @@ module FLINT_base
             !! + Direction=0: all sign changes are detected
             integer, dimension(:), intent(out) :: Direction
             
-            !> FLINT will only call EventFunc with this option after an event is located.
-            !! In that case, LocEventIndex will contain the index between 1 and m of the 
+            !> FLINT will only call EventFunc with this parameter after an event is located.
+            !! In that case, it will contain the index between 1 and m of the 
             !! located event. User must check whether this parameter is "present" before
             !! using it.
             integer, intent(in), optional :: LocEvent
 
             !> This parameter will be only present if an event has been located and
-            !! LocEventIndex contains a valid index of the located event. In that case,
+            !! LocEvent contains a valid index of the located event. In that case,
             !! user can specify a one of following actions that the event handler
             !! will take:
             !! + FLINT_EVENTACTION_CONTINUE: Continue the integration (default)

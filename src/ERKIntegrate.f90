@@ -682,9 +682,9 @@ submodule (ERK) ERKIntegrate
                     EventStates = reshape(EventData, [n+2, int(size(EventData)/(n+2))])
                 end if
 
-                if (X == Xf .AND. status == FLINT_SUCCESS) then
+                if (LAST_STEP .AND. status == FLINT_SUCCESS) then
                     ! we finished like we should
-                elseif (EventsOn .AND. status == FLINT_EVENT_TERM) then
+                elseif (EventsOn .AND. LAST_STEP .AND. status == FLINT_EVENT_TERM) then
                     ! One of the terminal event has triggered, do nothing
                 else if (TotalSteps >= MaxSteps .AND. status == FLINT_SUCCESS) then
                     ! maximum steps reached

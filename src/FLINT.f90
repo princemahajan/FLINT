@@ -140,7 +140,7 @@
 !!                  end subroutine SampleEventTB  
 !!              \endcode
 !!
-!!              + Initialize the differential equation and ERK class objects for using Runge-Kutta intgerators
+!!              + Initialize the differential equation and ERK class objects for using Runge-Kutta integrators
 !!
 !!              \code{.f90}
 !!                      use FLINT
@@ -181,7 +181,7 @@
 !!              + Call the Interpolate function for computing solution on the desired grid of x values.
 !!              The last parameter must be specified as True if user wants FLINT to keep the internal storage
 !!              for calling Interpolate again. Otherwise, the internal storage is deleted and the user
-!!              must intgerate the equations again before calling Interpolate.
+!!              must integrate the equations again before calling Interpolate.
 !!
 !!              \code{.f90}
 !!                  real(WP), dimension(:), allocatable :: Xarr1, Xarr2

@@ -45,7 +45,7 @@ module ERK
     !> Stiffness test default number of steps. See Hairer's DOP853 code.
     integer, parameter :: STIFFTEST_STEPS = 1000
     
-    !< All the supported ERK Methods
+    !> All the supported ERK Methods
     enum, bind(C)
         enumerator :: ERK_DOP853 = 17   !< Hairer's DOP853
         enumerator :: ERK_DOP54       !< Dormand-Prince 5(4)
@@ -61,7 +61,7 @@ module ERK
     public :: ERK_DOP853, ERK_DOP54, ERK_VERNER98R, ERK_VERNER65E  !, ERK_VERNER98E, ERK_VERNER87R, ERK_VERNER87E 
     !public :: ERK_VERNER76R, ERK_VERNER76E
     
-    !< The ERK class for all the ERK methods available to the user. It inherits FLINT_class.
+    !> The ERK class for all the ERK methods available to the user. It inherits FLINT_class.
     type, extends(FLINT_class), public :: ERK_class
     
         private
