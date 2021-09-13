@@ -1,6 +1,6 @@
 using DifferentialEquations, LinearAlgebra, Printf, StaticArrays;
 
-print("FLINT Performance comparison with Julia DiffEq Package\n")
+print("FLINT Performance comparison with Julia DiffEq Package (No Events)\n")
 print("\n")
 
 ###### @show rtol = 1.0./10.0.^(6:1:13);
@@ -177,11 +177,11 @@ end
 # Integrate ODE
 function FireODE(atol, rtol, method, prob, DenseOn)
  if DenseOn == true
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
-        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
     else 
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
-        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
     end
 end
             
@@ -255,7 +255,7 @@ end
 
 # Extract FLINT computation results from results.txt file
 cd(@__DIR__)
-DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results.txt") do f
+DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results_no_events.txt") do f
     dop54 = 0.0
     dop853 = 0.0
     vern65e = 0.0

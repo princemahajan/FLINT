@@ -52,7 +52,7 @@
     real(WP), dimension(3) :: evtol = [0.001_WP,1.0e-9_WP,1.0e-9_WP]
 
     ! scalar tolerance
-    real(WP), parameter :: rtol   = 1.0e-14_WP  
+    real(WP), parameter :: rtol   = 1.0e-11_WP  
     real(WP), parameter :: atol   = rtol*1.0e-3_WP  
     
     ! max no. of steps
