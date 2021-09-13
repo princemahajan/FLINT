@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@
         logical, intent(in), optional :: InterpOn
         integer, dimension(:), intent(in), optional :: InterpStates
         real(WP), intent(in), optional :: MinStepSize, MaxStepSize
-        real(WP), dimension(5), intent(in), optional :: StepSzParams
+        real(WP), dimension(6), intent(in), optional :: StepSzParams
         logical, intent(in), optional :: EventsOn
         real(WP), dimension(:), intent(in), optional :: EventStepSz
         integer(kind(FLINT_EVENTOPTION_ROOTFINDING)), &
@@ -109,10 +109,12 @@
             me%StepSzParams = StepSzParams
         else
             select case (me%method)
-            case (ERK_DOP853,ERK_DOP54,ERK_VERNER98R, ERK_VERNER65E)
-                me%StepSzParams = [SF, SFMIN, SFMAX, BETA, hbyhoptOLD]
+            case (ERK_DOP54)
+                me%StepSzParams = [SF, SFMIN, SFMAX, DOP54_BETA, DOP54_BETA_MULT, hbyhoptOld]
+            case (ERK_DOP853)
+                me%StepSzParams = [SF, SFMIN, SFMAX, DOP853_BETA, DOP853_BETA_MULT, hbyhoptOld]                
             case default
-                ! Not implemented yet
+                me%StepSzParams = [SF, SFMIN, SFMAX, 0.0_WP, 0.0_WP, hbyhoptOld]                
             end select
             
         end if
@@ -190,63 +192,75 @@
         select case (me%method)
         
             case (ERK_DOP853)
-                me%s = DOP853_s
-                me%sint = DOP853_sint
-                me%a(1:int((me%s-1)/2.0*me%s)) = DOP853_a
-                me%b(1:me%sint) = DOP853_b
-                me%c(2:me%s) = DOP853_c
-                me%e(1:me%sint) = DOP853_e
-                me%IsFSALMethod = DOP853_FSAL
+                me%s                            = DOP853_s
+                me%sint                         = DOP853_sint
+                me%p                            = DOP853_p
+                me%phat                         = DOP853_phat
+                me%q                            = DOP853_q
+                me%a(1:int((me%s-1)/2.0*me%s))  = DOP853_a
+                me%b(1:me%sint)                 = DOP853_b
+                me%c(2:me%s)                    = DOP853_c
+                me%e(1:me%sint)                 = DOP853_e
+                me%IsFSALMethod                 = DOP853_FSAL
 
                 if (me%InterpOn .OR. me%EventsOn) then
-                    me%pstar = DOP853_pstar
-                    me%dinz(1:size(DOP853_di_NZ)+1) = [DOP853_di_NZ, -1]
+                    me%pstar                                        = DOP853_pstar
+                    me%dinz(1:size(DOP853_di_NZ)+1)                 = [DOP853_di_NZ, -1]
                     me%d(1:size(DOP853_di_NZ),1:size(DOP853_dj_NZ)) = DOP853_d
                 end if
                 
             case (ERK_VERNER98R)
-                me%s = Verner98R_s
-                me%sint = Verner98R_sint
-                me%a(1:int((me%s-1)/2.0*me%s)) = Verner98R_a
-                me%b(1:me%sint) = Verner98R_b
-                me%c(2:me%s) = Verner98R_c
-                me%e(1:me%sint) = Verner98R_e
-                me%IsFSALMethod = Verner98R_FSAL                
+                me%s                            = Verner98R_s
+                me%sint                         = Verner98R_sint
+                me%p                            = Verner98R_p
+                me%phat                         = Verner98R_phat
+                me%q                            = Verner98R_q
+                me%a(1:int((me%s-1)/2.0*me%s))  = Verner98R_a
+                me%b(1:me%sint)                 = Verner98R_b
+                me%c(2:me%s)                    = Verner98R_c
+                me%e(1:me%sint)                 = Verner98R_e
+                me%IsFSALMethod                 = Verner98R_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
-                    me%pstar = Verner98R_pstar
-                    me%dinz(1:size(Verner98R_di_NZ)+1) = [Verner98R_di_NZ, -1]
+                    me%pstar                                        = Verner98R_pstar
+                    me%dinz(1:size(Verner98R_di_NZ)+1)              = [Verner98R_di_NZ, -1]
                     me%d(1:size(Verner98R_di_NZ),1:Verner98R_pstar) = Verner98R_d
                 end if
                 
             case (ERK_VERNER65E)
-                me%s = Verner65E_s
-                me%sint = Verner65E_sint
-                me%a(1:int((me%s-1)/2.0*me%s)) = Verner65E_a
-                me%b(1:me%sint) = Verner65E_b
-                me%c(2:me%s) = Verner65E_c
-                me%e(1:me%sint) = Verner65E_e
-                me%IsFSALMethod = Verner65E_FSAL                
+                me%s                            = Verner65E_s
+                me%sint                         = Verner65E_sint
+                me%p                            = Verner65E_p
+                me%phat                         = Verner65E_phat
+                me%q                            = Verner65E_q                
+                me%a(1:int((me%s-1)/2.0*me%s))  = Verner65E_a
+                me%b(1:me%sint)                 = Verner65E_b
+                me%c(2:me%s)                    = Verner65E_c
+                me%e(1:me%sint)                 = Verner65E_e
+                me%IsFSALMethod                 = Verner65E_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
-                    me%pstar = Verner65E_pstar
-                    me%dinz(1:size(Verner65E_di_NZ)+1) = [Verner65E_di_NZ, -1]
+                    me%pstar                                        = Verner65E_pstar
+                    me%dinz(1:size(Verner65E_di_NZ)+1)              = [Verner65E_di_NZ, -1]
                     me%d(1:size(Verner65E_di_NZ),1:Verner65E_pstar) = Verner65E_d
                 end if                
 
             case (ERK_DOP54)
-                me%s = DOP54_s
-                me%sint = DOP54_sint
-                me%a(1:int((me%s-1)/2.0*me%s)) = DOP54_a
-                me%b(1:me%sint) = DOP54_b
-                me%c(2:me%s) = DOP54_c
-                me%e(1:me%sint) = DOP54_e
-                me%IsFSALMethod = DOP54_FSAL                
+                me%s                            = DOP54_s
+                me%sint                         = DOP54_sint
+                me%p                            = DOP54_p
+                me%phat                         = DOP54_phat
+                me%q                            = DOP54_q
+                me%a(1:int((me%s-1)/2.0*me%s))  = DOP54_a
+                me%b(1:me%sint)                 = DOP54_b
+                me%c(2:me%s)                    = DOP54_c
+                me%e(1:me%sint)                 = DOP54_e
+                me%IsFSALMethod                 = DOP54_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
-                    me%pstar = DOP54_pstar
-                    me%dinz(1:size(DOP54_di_NZ)+1) = [DOP54_di_NZ, -1]
-                    me%d(1:size(DOP54_di_NZ),1:2) = DOP54_d
+                    me%pstar                        = DOP54_pstar
+                    me%dinz(1:size(DOP54_di_NZ)+1)  = [DOP54_di_NZ, -1]
+                    me%d(1:size(DOP54_di_NZ),1:2)   = DOP54_d
                 end if                
                 
             case default

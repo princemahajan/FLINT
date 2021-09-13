@@ -22,24 +22,24 @@ are available at http://people.math.sfu.ca/~jverner/.
 
 ### Introduction
 
-FLINT is a modern object-oriented fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and multiple event-detection support for each of the methods. The code is written such that any other ERK method can be implemented by including its coefficients with minimum changes required in the code. The DOP853 integrator is the default method chosen, and its implementation is hand-optimized specific to its coefficients. For other integrators, a generic routine for step-integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in internal memory. Thereafter, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final conditions. Interpolation is much faster than integration, as the  coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with many features such as event root-finding, event step-size, event actions. In a nutshell, the features are:
+FLINT is a modern object-oriented Fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and multiple event-detection support for each of the methods. The code is written such that any other ERK method can be implemented by including its coefficients with minimum changes required in the code. The DOP853 integrator is the default method chosen, and its implementation is hand-optimized specific to its coefficients. For other integrators, a generic routine for step-integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in internal memory. Thereafter, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final conditions. Interpolation is much faster than integration, as the coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with many features such as event root-finding, event step-size, event actions. In a nutshell, the features are:
                   
 + Modern object-oriented, thread-safe, and optimized Fortran code
 + 4 Adaptive-step (fixed step-size also supported) ERK integrators: DOP54, DOP853, Verner98R, Verner65E
-+ Any other ERK method can be implemented by just including their coefficients
++ Any other ERK method can be implemented by including their coefficients
 + Dense output with delayed interpolation (integrate once, interpolate as many times)
 + Multiple event-detection as well as finding location of events using root-finding  (Brent's algorithm) with static and dynamic event masking
-+ Ability to set a maximum delay (referred to here as event step-size) after which events are guauanteed to be detected
++ Ability to set a maximum delay (referred to here as event step-size) after which events are guaranteed to be detected
 + Ability to restart the integration or change solution on the detection of events
 + Stiffness detection
 
 
-### Speed Comparison with Julia
+### Performance comparison with Julia
 
-For performance comparison, the latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia test code along with results are provided in the media folder on the FLINT's GitHub repository https://github.com/princemahajan/FLINT.
+The latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** with and without event detection as shown in the following screenshots. The Julia test code along with results are provided in the media folder on FLINT's GitHub repository https://github.com/princemahajan/FLINT.
 
+![Julia Results](media/julia_screenshot_no_events.PNG)
 ![Julia Results](media/julia_screenshot.PNG)
-
 
 
 ### Installation

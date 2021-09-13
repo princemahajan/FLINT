@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -26,10 +26,14 @@
 module MyDiffEq
 
     use FLINT
+    !use ddeabm_module
+
     use, intrinsic :: IEEE_ARITHMETIC
 
     implicit none
     
+    real(WP), parameter :: mu = 0.012277471_WP
+
     ! user diff eq system
 
     type, extends(DiffEqSys) :: TBSys
@@ -41,13 +45,21 @@ module MyDiffEq
     end type TBSys
     
     type, extends(DiffEqSys) :: CR3BPSys
-        real(WP) :: mu = 0.012277471_WP
+        real(WP) :: mu = mu
         real(WP) :: GM = 0.0_wp
     contains
         procedure :: F => CR3BPDE
         procedure :: G => SampleEventCR3BP
     end type CR3BPSys
     
+    !type, extends(ddeabm_with_event_class) :: CR3BPSys_ddeabm
+    !    real(WP) :: mu = mu         
+    !    integer :: FEvals = 0       
+    !    logical :: First = .TRUE. 
+    !end type CR3BPSys_ddeabm
+
+
+
     contains
     
     function TwoBodyDE(me, X, Y, Params)
@@ -81,12 +93,8 @@ module MyDiffEq
     end function TwoBodyDE
         
         
-    function CR3BPDE(me, X, Y, Params)
-    
-        implicit none
-        
+    function CR3BPDE(me, X, Y, Params)    
         intrinsic :: size
-        
         class(CR3BPSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
         real(WP), intent(in), dimension(:) :: Y
@@ -94,33 +102,22 @@ module MyDiffEq
         
         real(WP), dimension(size(Y)) :: CR3BPDE
         
-        real(WP) :: MyParams
-        
-        real(WP), dimension(2) :: R1, R2
-        
-        if (present(Params)) then
-            MyParams = Params(1)
-        else
-            MyParams = 1.0_WP        
-        end if 
-        
-        R1 =  [(Y(1) + me%mu), Y(2)]
-        R2 =  [(Y(1) - 1 + me%mu), Y(2)]
-
-        CR3BPDE(1:3) = Y(4:6)
-        CR3BPDE(4) = Y(1) + 2.0*Y(5) - (1.0-me%mu)*(Y(1) + me%mu)/norm2(R1)**3 &
-                                - me%mu*(Y(1) - 1.0 + me%mu)/norm2(R2)**3
-
-        CR3BPDE(5) = Y(2) - 2.0*Y(4) - (1.0-me%mu)*Y(2)/norm2(R1)**3 &
-                                - me%mu*Y(2)/norm2(R2)**3
-        CR3BPDE(6) = 0.0
-        
-        ! add impulse
-        !if(X > 100 .AND. X < 200) TwoBodyDE(4:6) = TwoBodyDE(4:6) + 0.5*TwoBodyDE(4:6)
-        
+        CR3BPDE = CR3BP_DiffEq(X, Y, me%mu)
     end function CR3BPDE    
     
-    
+    !subroutine CR3BPDE_DDEABM(me, X, Y, Ydot)    
+    !    intrinsic :: size
+    !    class(ddeabm_class), intent(inout) :: me !< Differential Equation object
+    !    real(WP), intent(in) :: X
+    !    real(WP), intent(in), dimension(:) :: Y
+    !    real(WP), intent(out), dimension(:) :: Ydot
+    !
+    !    select type (me)
+    !    class is (CR3BPSys_ddeabm)
+    !        Ydot = CR3BP_DiffEq(X, Y, me%mu)
+    !    end select
+    !end subroutine CR3BPDE_DDEABM    
+    !
 
     
     subroutine SampleEventTB(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
@@ -165,7 +162,7 @@ module MyDiffEq
         ! We will also mask this event after the first detection to
         ! reduce unnecessary event checking after the first detection.
         if (EvalEvents(1) == 1) then
-            if (X > 0.5 .AND. X < 0.5005) then
+            if (X > 0.5_WP .AND. X < 0.5005_WP) then
                 Value(1) = 1        
             else
                 Value(1) = -1
@@ -175,7 +172,7 @@ module MyDiffEq
 
         ! Event-2: only detect y2-crossings in the region y1>0
         if (EvalEvents(2) == 1) then
-            if (Y(1) < 0.0) then
+            if (Y(1) < 0.0_WP) then
                 Value(2) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
             else
                 Value(2) = Y(2)
@@ -185,7 +182,7 @@ module MyDiffEq
 
         ! Event-3: Detect y2 crossings in region y1<0
         if (EvalEvents(3)==1) then
-            if (Y(1) > 0.0) then
+            if (Y(1) > 0.0_WP) then
                 Value(3) = IEEE_VALUE(1.0,IEEE_QUIET_NAN) 
             else
                 Value(3) = Y(2)
@@ -214,7 +211,28 @@ module MyDiffEq
         end if
         
     end subroutine SampleEventCR3BP          
+
     
+    pure function CR3BP_DiffEq(X, Y, mu)
+        real(WP), intent(in) :: X
+        real(WP), intent(in), dimension(:) :: Y
+        real(WP), intent(in) :: mu
+        
+        real(WP), dimension(size(Y)) :: CR3BP_DiffEq
+                
+        real(WP) :: r1cube, r2cube
+                
+        r1cube =  norm2([(Y(1) + mu), Y(2)])**3
+        r2cube =  norm2([(Y(1) - (1.0_WP - mu)), Y(2)])**3
+
+        CR3BP_DiffEq(1:3) = Y(4:6)
+
+        CR3BP_DiffEq(4) = Y(1) + 2.0_WP*Y(5) - (1.0_WP-mu)*(Y(1)+mu)/r1cube &
+                                     - mu*(Y(1)-(1.0_WP-mu))/r2cube
+        CR3BP_DiffEq(5) = Y(2) - 2.0_WP*Y(4) - (1.0_WP-mu)*Y(2)/r1cube &
+                                     - mu*Y(2)/r2cube
+        CR3BP_DiffEq(6) = 0.0_WP
+    end function CR3BP_DiffEq
     
     function TBIOM(mu, X)
         real(wp), intent(in) :: mu
@@ -234,9 +252,9 @@ module MyDiffEq
         
         r1 = sqrt((X(1,:) + mu)**2 + X(2,:)**2 + X(3,:)**2)
         r2 = sqrt((X(1,:) - 1.0 + mu)**2 + X(2,:)**2+X(3,:)**2)
-        Omega = 1.0/2.0*sum(X(1:3,:)**2,1) + (1.0-mu)/r1 + mu/r2
+        Omega = 1.0_WP/2.0_WP*sum(X(1:3,:)**2,1) + (1.0-mu)/r1 + mu/r2
         ! Jacobian's Constant
-        JacobiC = sum(X(4:6,:)**2,1)/2 - Omega
+        JacobiC = sum(X(4:6,:)**2,1)/2.0_WP - Omega
     end function JacobiC
 
     

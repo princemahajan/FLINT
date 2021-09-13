@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ submodule (ERK) ERKIntegrate
 
         real(WP), dimension(me%pDiffEqSys%n, me%s) :: k                
         real(WP), dimension(size(me%InterpStates), 0:me%pstar) :: Bip
-        real(WP), dimension(5) :: StepSzParams        
+        real(WP), dimension(6) :: StepSzParams        
 
         real(WP) :: h, hSign, hnew, hmax, X, Err
         real(WP), dimension(me%pDiffEqSys%n) :: Y1, Y2, F0, Sc0, Yint12
@@ -265,7 +265,7 @@ submodule (ERK) ERKIntegrate
 
                 ! if we are only slightly away from the final state
                 ! then adjust to step size to finish the integration
-                if (hSign*(X + 1.01_WP*h - Xf) > 0.0) then
+                if (hSign*(X + 1.01_WP*h - Xf) > 0.0_WP) then
                     h = Xf - X 
                     LAST_STEP = .TRUE.
                 end if
@@ -598,9 +598,6 @@ submodule (ERK) ERKIntegrate
                         if (abs(hnew) > hmax) hnew = hsign*hmax
                         ! if the last step was rejected, then dont increase step size
                         if (LastStepRejected .EQV. .TRUE.) hnew = hSign*min(abs(hnew),abs(h))
-                        ! Update the Lund stabilization parameter hbyhoptOld
-                        ! this should be after computing the new step size
-                        StepSzParams(5) = max(Err, hbyhoptOLD)
                         ! reset
                         LastStepRejected = .FALSE.
                     else
@@ -762,12 +759,12 @@ submodule (ERK) ERKIntegrate
             ! check for event trigger    
             select case (EventDir(EventId))
             case (0)
-                if ((val0<=0 .AND. val1>=0) &
-                        .OR.(val0>=0 .AND. val1<=0)) EvDetected = .TRUE.
+                if ((val0<=0.0_WP .AND. val1>=0.0_WP) &
+                        .OR.(val0>=0.0_WP .AND. val1<=0.0_WP)) EvDetected = .TRUE.
             case (1)
-                if ((val0<=0 .AND. val1>=0)) EvDetected = .TRUE.
+                if ((val0<=0.0_WP .AND. val1>=0.0_WP)) EvDetected = .TRUE.
             case (-1)
-                if ((val0>=0 .AND. val1<=0)) EvDetected = .TRUE.
+                if ((val0>=0.0_WP .AND. val1<=0.0_WP)) EvDetected = .TRUE.
             end select
 
         end if             
@@ -852,10 +849,11 @@ submodule (ERK) ERKIntegrate
             do concurrent (j = 1:sint)
                 temp = temp + k(:,j)*me%e(j)
             end do
-            Err = abs(h)*sqrt(sum((temp/Sc)**2)/n)
+            !Err = abs(h)*sqrt(sum((temp/Sc)**2)/n)
+            Err = sqrt(sum((h*temp/Sc)**2)/n)
             end block
         else
-            Err = 0.0
+            Err = 0.0_WP
         end if
         
         ! If this step is accepted then return the new solution
@@ -999,7 +997,7 @@ submodule (ERK) ERKIntegrate
             if (DenomErr == 0.0_WP) DenomErr = 1.0_WP
             Err = abs(h)*Err*sqrt(1.0/(n*DenomErr))
         else
-            Err = 0.0
+            Err = 0.0_WP
         end if
         
 
@@ -1165,10 +1163,10 @@ submodule (ERK) ERKIntegrate
 
             ! Estimate the error. We assume that the error coeffcients are precomputed,
             ! i.e., e_i = b_i - bhat_i
-            Err = abs(h)*sqrt(sum(((k(:,1)*me%e(1) + k(:,3)*me%e(3) + k(:,4)*me%e(4) &
-                                + k(:,5)*me%e(5) + k(:,6)*me%e(6) + k(:,7)*me%e(7))/Sc)**2)/n)
+            Err = sqrt(sum(((h*(k(:,1)*me%e(1) + k(:,3)*me%e(3) + k(:,4)*me%e(4) &
+                                + k(:,5)*me%e(5) + k(:,6)*me%e(6) + k(:,7)*me%e(7)))/Sc)**2)/n)
         else
-            Err = 0.0
+            Err = 0.0_WP
         end if
         
         ! If this step is accepted then return the new solution
@@ -1284,7 +1282,7 @@ submodule (ERK) ERKIntegrate
                 integer :: istage
                 real(WP), dimension(size(InterpStates)) :: cont
                 
-                cont = 0.0
+                cont = 0.0_WP
         sloop: do i = 1,s
                     ! get the current stage that gets multiplied by non-zero dij
                     istage = me%dinz(i)
@@ -1330,15 +1328,15 @@ submodule (ERK) ERKIntegrate
         real(WP) :: StiffN, StiffD, hLamb
 
         IsProblemStiff = .FALSE.
-        hLamb = 0.0
+        hLamb = 0.0_WP
         
         if (mod(AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
             StiffN = norm2(F0 - k(:,sint-1))
             StiffD = norm2(Y2 - Yint12)
 
-            if (StiffD > 0.0) hLamb = abs(h)*StiffN/StiffD
+            if (StiffD > 0.0_WP) hLamb = abs(h)*StiffN/StiffD
             
-            if (hLamb > 6.1) then
+            if (hLamb > 6.1_WP) then
                 NonStiffThreshold = 0
                 StiffThreshold = StiffThreshold + 1
                 if (StiffThreshold == 15) then

@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -37,7 +37,8 @@ submodule (ERK) ERKInterp
 
         logical :: DeallocMem
         integer :: n, ctr, X0loc, X0start
-        real(WP) :: h, hSign, X0
+        real(WP) :: h, X0
+        real(WP) :: hSign
         
         ! if interpolation mode is not on then return with an error
         if (.NOT. me%InterpOn) then
@@ -59,18 +60,20 @@ submodule (ERK) ERKInterp
         block
             real(WP), dimension(size(Xarr)-1) :: tXarr
             tXarr = Xarr(1:(n-1)) - Xarr(2:n)
-            if (any((hSign*tXarr) >= 0)) then
+            if (any((hSign*tXarr) >= 0.0_WP)) then
                 me%status = FLINT_ERROR_INTP_ARRAY
                 return            
             end if
         end block
 
-        ! Xarr elements must lie between the initial and final values of X
-        if (hSign*(Xarr(1)-me%Xint(1)) < 0 .OR. hSign*(Xarr(n)-me%Xint(me%AcceptedSteps+1))>0) then
+        ! All Xarr elements must belong to [x0, xf] closed set but we need to
+        ! check the first and last elements as this is a sorted array.
+        if (hSign*(Xarr(1)-me%Xint(1)) < 0.0_WP &
+                        .OR. hSign*(Xarr(n)-me%Xint(me%AcceptedSteps+1)) > 0.0_WP) then
             me%status = FLINT_ERROR_INTP_ARRAY
             return
         end if
-
+                
         ! Binary search seems to be slower than the linear search. May be
         ! because Xarr is also a sorted array
         ! Xarrloc = BinarySearch(Xarr, me%Xint)
@@ -83,7 +86,7 @@ submodule (ERK) ERKInterp
             ! Find X0loc s.t. Xarr(ctr) belongs to ( Xint(X0loc-1), Xint(X0loc) ]
             do while (X0start <= me%AcceptedSteps)
                 X0start = X0start + 1                
-                if (hSign*(me%Xint(X0start)-Xarr(ctr)) >= 0) then
+                if (hSign*(me%Xint(X0start)-Xarr(ctr)) >= 0.0_WP) then
                     X0loc = X0start - 1
                     exit
                 end if
@@ -95,7 +98,7 @@ submodule (ERK) ERKInterp
             else
                 ! There is a problem, we should never reach here!
                 X0 = Xarr(ctr)
-                h = 0.0
+                h = 0.0_WP
             end if
             
             ! compute the interpolation polynomial  

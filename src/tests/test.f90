@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2019 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -35,28 +35,32 @@
     ! Simulation Parameters
     
     ! Number of periodic orbits to run and loops for benchmark
-    real, parameter :: norb = 2.5
+    real(WP), parameter :: norb = 2.5_WP
     integer, parameter :: nloops = 100
+    
+    ! solvers to run from 1 to 4
+    integer, parameter :: nmethod = 4
     
     ! Turn on the events
     logical, parameter :: EventsEnabled = .TRUE.
     logical, dimension(3), parameter :: EvMask = [.TRUE.,.TRUE.,.TRUE.]
     
     ! Event step size
-    real, parameter :: evstepsz = 0.00001
+    real(WP), parameter :: evstepsz = 0.00001_WP
 
     ! event tolerance
-    real(WP), dimension(3) :: evtol = [0.001,1.0e-9,1.0e-9]
+    real(WP), dimension(3) :: evtol = [0.001_WP,1.0e-9_WP,1.0e-9_WP]
 
     ! scalar tolerance
-    real(WP),parameter :: tol   = 1.0e-11_WP  
+    real(WP), parameter :: rtol   = 1.0e-14_WP  
+    real(WP), parameter :: atol   = rtol*1.0e-3_WP  
     
     ! max no. of steps
     integer, parameter :: MAX_STEPS = 100000
     logical, parameter :: CONST_STEPSZ = .FALSE.
 
     ! random dispersion of IC: this multiplies the random number
-    real, parameter :: randon = 0.000000000001
+    real(WP), parameter :: randon = 0.000000000000_WP
     
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0*norb)
@@ -88,7 +92,7 @@
  
     ! Arenstorf orbit: Earth-moon mass-ratio
     real(wp), parameter :: EMmu  = 0.012277471_WP
-    x0    = 0.0
+    x0    = 0.0_WP
     xf    = 17.0652165601579625588917206249_WP
     y0    = [0.994_WP, 0.0_WP, 0.0_WP, 0.0_WP, -2.00158510637908252240537862224_WP, 0.0_WP]  !! initial `y` value
     ! final time
@@ -100,6 +104,7 @@
     ! arrays for interpolated data
     ipdx = (xf-x0)/(nIp-1)
     Xarr = [(x0+ipdx*itr,itr=0,(nIp-1))]
+    Xarr(nIp) = xf
     allocate(Yarr(6,size(Xarr)))
     
     stepsz0 = 0.0E-3_WP    ! let FLINT compute the initial step-size    
@@ -126,7 +131,7 @@
 
     ! Solution at natural step size
 
-    do itr = 1,4
+    do itr = 1,nmethod
         
         select case (itr)
         case (1)
@@ -143,7 +148,7 @@
             method = ERK_Verner98R
         end select            
           
-        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
+        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[atol], RTol=[rtol],&
             InterpOn=.FALSE., EventsOn=EventsEnabled, EventStepSz=[real(WP)::evstepsz,0.0,0.0], &
             EventTol = evtol)
         if (erkvar%status == FLINT_SUCCESS) then
@@ -194,7 +199,6 @@
                 end do
             end if
         
-
             if (allocated(Xint)) deallocate(Xint)
             if (allocated(Yint)) deallocate(Yint)
         else
@@ -217,8 +221,8 @@
     ! Solution at interpolated grid
     write(17, *) 'B. Interpolated Grid'
     write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
-
-    do itr = 1,4
+    
+    do itr = 1,nmethod
         
         select case (itr)
         case (1)
@@ -235,11 +239,11 @@
             method = ERK_Verner98R
         end select            
           
-        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[tol*1.0e-3], RTol=[tol],&
+        call erkvar%Init(CR3BPDEObject, MAX_STEPS, Method=method, ATol=[atol], RTol=[rtol],&
             InterpOn=.TRUE., EventsOn=EventsEnabled, EventStepSz=[real(WP)::evstepsz,0.0,0.0],&
             EventTol = evtol)
         
-
+    
         if (erkvar%status == FLINT_SUCCESS) then
             
             call CPU_TIME(t0)
@@ -256,7 +260,7 @@
             call CPU_TIME(tf)            
             
             if (stiffstatus == -1) write(17, *) mname//': problem is stiff'
-
+    
             if (erkvar%status == FLINT_SUCCESS .OR. erkvar%status == FLINT_EVENT_TERM &
                         .OR. erkvar%status == FLINT_ERROR_MAXSTEPS) then 
                 call erkvar%Info(stiffstatus, errstr, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
@@ -264,20 +268,20 @@
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
                     JacobiC(Emmu, Yarr(:,1:1))-JacobiC(Emmu, Yarr(:,ubound(Yarr,2):ubound(Yarr,2))), &
                     fcalls, naccpt, nrejct
-
+    
             else
                 call erkvar%Info(stiffstatus, errstr)
                 write(17,*) mname//': Integrate failed: ', erkvar%status, ':',errstr
             end if
     
-
+    
             ! write states
             if (itr == 2) then
                 do ctr = 1, size(Xarr)
                     write(19, '(7E18.9)') Xarr(ctr), Yarr(1:6,ctr)
                 end do    
             end if
-
+    
             ! write events
             if (EventsEnabled) then
                 write(20, *) mname
@@ -288,15 +292,15 @@
                        EventStates(6,ctr),EventStates(7,ctr)
                 end do
             end if
-
-
-
+    
+    
+    
         else
             write(17,*) mname//': Init failed: ', erkvar%status            
         end if
     end do
-
-
+    
+    
     if (EventsEnabled) then
         write(17, *) 'X-axis (Y1) and Y-axis (Y2) crossing events'
         write(17, '(5A12)') 'Event Index','X','Y1','Y2','Y3'             

@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -37,14 +37,9 @@ module StepSize
     !> Maximum safety factor, so we dont increase the step size too fast    
     real(WP), parameter :: SFMAX = 6.0_WP
     
-    !> beta for Lund stabilization
-    !> Positive values (< 0.04) make the step size control more stable
-    real(WP), parameter :: BETA = 0.0_WP
-
-    !> Also for Lund stabilization (see Hairer's code)
-    real(WP), parameter :: hbyhoptOLD = 1.0e-4_WP
-    
-    
+    !> Lund stabilization PI control term (see Hairer's code)
+    real(WP), parameter :: hbyhoptOld = 1.0e-4_WP
+     
 
     contains
     
@@ -82,7 +77,7 @@ module StepSize
         d1 = norm2(F0/Sc)
     
         ! first guess
-        if (d0 <= 1.0e-5 .or. d1 <= 1.0e-5) then
+        if (d0 <= 1.0e-5_WP .or. d1 <= 1.0e-5_WP) then
             h0 = 1.0e-6_WP
         else
             h0 = 0.01_WP*d0/d1
@@ -103,10 +98,10 @@ module StepSize
         !! \f[ h_1^{p+1} max(d1, d2) = 0.01 \f]
         !! In Hairer's dop853 code, he actually uses \f$p\f$ instead of \f$p+1\f$
         !! as the power of \f$h_1\f$ for reasons unknown. He uses \f$p=8\f$ for his dop853.
-        if (dMax <= 1.0e-15 ) then
+        if (dMax <= 1.0e-15_WP ) then
             h1 = max(1.0e-6_WP, abs(h0)*1.0e-3_WP)
         else
-            h1 = (0.01_WP/dMax)**(1.0/(p))
+            h1 = (0.01_WP/dMax)**(1.0_WP/p)
         end if
     
         ! choose the final value for the initial step size
@@ -122,21 +117,21 @@ module StepSize
     !> \brief Pure function for computing the new step size using Hairer's algorithm.
     !! \details For details on the algorithm, see Hairer's book "Solving ODE I" or his code dop853.f
     !! at http://www.unige.ch/~hairer/prog/nonstiff/dop853.f.
-    pure function StepSzHairer(h, IsStepRejected, q, e, StepSzParams)
+    function StepSzHairer(h, IsLastStepRejected, q, e, StepSzParams)
  
         implicit none
         
         intrinsic :: sqrt, max, min
     
         real(WP), intent(in)                  :: h     !< current step size        
-        logical, intent(in)                   :: IsStepRejected !< If true then the step size is decreased else increased.
+        logical, intent(in)                   :: IsLastStepRejected !< If true then the step size is decreased else increased.
         integer, intent(in)                   :: q     !< q = min(p,phat) but Hairer uses q=8 in DOP853.
         real(WP), intent(in)                  :: e     !< Error norm
-        real(WP), dimension(5), intent(in) :: StepSzParams        
+        real(WP), dimension(6), intent(inout) :: StepSzParams        
         
         real(WP) :: StepSzHairer
         
-        real(WP) :: hbyhopt, hbyhoptOld, beta, SF, SFmin, SFmax
+        real(WP) :: hbyhopt, hbyhoptOld, beta, beta_mult, SF, SFmin, SFmax
         
         ! Algorithm starts here    
 
@@ -145,14 +140,15 @@ module StepSize
         SFmin = StepSzParams(2) !< Min safety factor so that we dont decrease the step size too fast
         SFmax = StepSzParams(3) !< Max safety factor so that we dont increase the step size too fast
         beta = StepSzParams(4) !< Lund stabilization parameter
-        hbyhoptOld = StepSzParams(5) !< Needed for Lund stabilization                
+        beta_mult = StepSzParams(5) !< Lund stabilization parameter multiplier
+        hbyhoptOld = StepSzParams(6) !< Lund stabilization PI control term                
         
         !> \remark Optimal step computed using the equations:
         !! \f[  err = C h^{(q+1)}  \f]
         !! \f[ 1 = C h_{opt}^{q+1} \f]
-        hbyhopt = e**(1.0_WP/(q+1.0_WP) - beta*0.2_WP)
+        hbyhopt = e**(1.0_WP/(q+1.0_WP) - beta*beta_mult)
         
-        if (IsStepRejected .EQV. .FALSE.) then
+        if (IsLastStepRejected .EQV. .FALSE.) then
             
             ! The current step is accepted, so we can safely increase the step size
             
@@ -162,6 +158,10 @@ module StepSize
             !> \remark New step chosen such that
             !! \f[ SF_{min} <= SF\, h_{new}/h_{old} <= SF_{max}  \f]
             StepSzHairer = h*min(SFmax, max(SFmin, SF*1.0_WP/hbyhopt))
+            
+            ! Update the Lund stabilization parameter hbyhoptOld
+            ! this should be after computing the new step size
+            StepSzParams(6) = max(e, hbyhoptOld)
         
         else
             

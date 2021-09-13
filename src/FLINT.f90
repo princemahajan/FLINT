@@ -16,7 +16,7 @@
 !!              The coefficients for Verner65E and Verner98R methods were derived by Jim Verner, and 
 !!              are available at http://people.math.sfu.ca/~jverner/.    
 !! \section     sec Introduction 
-!!              FLINT is a modern object-oriented fortran library that provides four adaptive step-size 
+!!              FLINT is a modern object-oriented Fortran library that provides four adaptive step-size 
 !!              explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and 
 !!              multiple event-detection support for each of the methods. The code is written such that 
 !!              any other ERK method can be implemented by including its coefficients with minimum changes
@@ -35,24 +35,26 @@
 !!              - Modern object-oriented, thread-safe, and optimized Fortran code
 !!              - 4 Adaptive-step (fixed step-size also supported) ERK integrators: DOP54, DOP853, Verner98R, 
 !!                  Verner65E
-!!              - Any other ERK method can be implemented by just including their coefficients
+!!              - Any other ERK method can be implemented by including their coefficients
 !!              - Dense output with delayed interpolation (integrate once, interpolate as many times)
 !!              - Multiple event-detection as well as finding location of events using root-finding 
 !!                  (Brent's algorithm) with static and dynamic event masking
 !!              - Ability to set a maximum delay (referred to here as event step-size) after which events 
-!!                  are guauanteed to be detected
+!!                  are guaranteed to be detected
 !!              - Ability to restart the integration or change solution on the detection of events
 !!              - Stiffness detection
 !!
-!! \section     compsec Speed Comparison with Julia
-!!              For performance comparison, the latest FLINT code is tested against Julia's
+!! \section     compsec Performance comparison with Julia
+!!              The latest FLINT code is tested against Julia's
 !!              DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears 
-!!              to be ***faster*** by at least an order of magnitude as shown in the following screenshot. The Julia 
-!!              test code along with results are provided in the media folder on the FLINT's GitHub repository
+!!              to be ***faster*** with and without event detection as shown in the following screenshots. The 
+!!              Julia test code along with results are provided in the media folder in FLINT's GitHub repository
 !!              https://github.com/princemahajan/FLINT.
+!!              \image html "julia_screenshot_no_events.PNG"
+!!              \image latex "julia_screenshot_no_events.PNG"
 !!              \image html "julia_screenshot.PNG"
 !!              \image latex "julia_screenshot.PNG"
-!!   
+!!
 !!
 !! \section     Installation
 !!              FLINT is tested with ifort (18.0.2) compiler from Intel Parallel Studio XE Composer for Windows

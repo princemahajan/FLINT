@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -122,7 +122,7 @@ module ERK
         logical, intent(in), optional :: InterpOn
         integer, dimension(:), intent(in), optional :: InterpStates
         real(WP), intent(in), optional :: MinStepSize, MaxStepSize        
-        real(WP), dimension(5), intent(in), optional :: StepSzParams
+        real(WP), dimension(6), intent(in), optional :: StepSzParams
         logical, intent(in), optional :: EventsOn
         real(WP), dimension(:), intent(in), optional :: EventStepSz
         integer(kind(FLINT_EVENTOPTION_ROOTFINDING)), dimension(:), &

@@ -1,6 +1,6 @@
 !#################################################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -77,17 +77,22 @@ integer :: doI
 !! Dormand-Prince 5(4) Tableau and specific parameters
 !!######################################################
 
-integer, parameter :: DOP54_q = 4 !< min(p, phat) used in step-size computation
-integer, parameter :: DOP54_p = 5 !< Order of the propagating stage
-integer, parameter :: DOP54_phat = 4 !< Order of the error stage
-integer, parameter :: DOP54_pstar = 4 !< Order of interpolants
-integer, parameter :: DOP54_s = 7 !< Total Number of stages
-logical, parameter :: DOP54_FSAL = .TRUE. !< Is this a FSAL method?
+integer, parameter :: DOP54_q       = 4 !< min(p, phat) used in step-size computation
+integer, parameter :: DOP54_p       = 5 !< Order of the propagating stage
+integer, parameter :: DOP54_phat    = 4 !< Order of the error stage
+integer, parameter :: DOP54_pstar   = 4 !< Order of interpolants
+integer, parameter :: DOP54_s       = 7 !< Total Number of stages
+logical, parameter :: DOP54_FSAL    = .TRUE. !< Is this a FSAL method?
 
 !> Number of stages needed for integration without interpolation for dense output.
 !! It is assumed that these stages start from 2 to sint and the extra stages for 
 !! interpolation occur after the integration stages.
-integer, parameter :: DOP54_sint = 7
+integer, parameter :: DOP54_sint    = 7
+
+!> Lund stabilization parameters: beta and beta_multiplier. Positive values (< 0.1)
+!! make the step size control more stable.  See Hairer's original DOPRI5 codes.
+real(WP), parameter :: DOP54_BETA       = 0.04_WP
+real(WP), parameter :: DOP54_BETA_MULT  = 0.75_WP
 
 !> c_i where i = 2 to s, s=number of stages
 real(WP), parameter :: DOP54_c(2:*) = &
@@ -210,6 +215,10 @@ logical, parameter :: DOP853_FSAL = .TRUE. !< Is this a FSAL method?
 !! interpolation occur after the integration stages. 
 integer, parameter :: DOP853_sint = 13
 
+!> Lund stabilization parameters: beta and beta_multiplier. Positive values (< 0.1)
+!! make the step size control more stable.  See Hairer's original DOPRI5 codes.
+real(WP), parameter :: DOP853_BETA       = 0.0_WP
+real(WP), parameter :: DOP853_BETA_MULT  = 0.2_WP
 
 !> c_i where i = 2 to s, s=number of stages
 real(WP), parameter :: DOP853_c(2:*) = &

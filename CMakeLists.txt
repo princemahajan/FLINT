@@ -97,7 +97,7 @@ target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
 
 # No optimization
 set(COption "/Od" "-O0")
-GetPlatformCompilerFlag("${COption}" TRUE Fortran)
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Debug>:${_Flag}>)
 
 # Generate full debug information, passed to the linker
@@ -117,7 +117,7 @@ target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Debug>:${_Flag}>)
 
 # Array bounds checking
 set(COption "/check:all" "-check all" "-fcheck=all")
-GetPlatformCompilerFlag("${COption}" TRUE Fortran)
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Debug>:${_Flag}>)
 
 
@@ -133,7 +133,7 @@ target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Release>:${_Flag}>)
 
 # Most optimization enabled
 set(COption "/O3" "-O3")
-GetPlatformCompilerFlag("${COption}" TRUE Fortran)
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Release>:${_Flag}>)
 
 # Enable auto-parallelizer

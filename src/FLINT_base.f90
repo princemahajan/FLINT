@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -165,7 +165,7 @@ module FLINT_base
         
         real(WP) :: InitialStepSize     !< Initial step size
         
-        real(WP), dimension(5) :: StepSzParams  !< Step size method-specific tuning parameters
+        real(WP), dimension(6) :: StepSzParams  !< Step size method-specific tuning parameters
         
         logical :: EventsOn = .FALSE. !< Events checking off by default
         
@@ -359,13 +359,13 @@ module FLINT_base
             
             !> Step-size computation specific parameters. User can specify these for a 
             !! soecific step-size computation method, otherwise defaults are used.
-            !! For Hairer's DOP853 code:
+            !! For Hairer's DOPRI5/DOP853 codes:
             !! + StepSzParams(1): Safety-factor 
             !! + StepSzParams(2): Minimum safety-factor
             !! + StepSzParams(3): Maximum safety-factor
             !! + StepSzParams(4): Lund Stabilization parameter beta
-            !! + StepSzParams(1): Lund Stabilization parameter
-            real(WP), dimension(5), intent(in), optional :: StepSzParams
+            !! + StepSzParams(1): Lund Stabilization parameter beta multiplier
+            real(WP), dimension(6), intent(in), optional :: StepSzParams
             
             logical, intent(in), optional :: EventsOn !< Set true for events detection
             

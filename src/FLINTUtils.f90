@@ -1,6 +1,6 @@
 !############################################################################################
 !
-! Copyright 2020 Bharat Mahajan
+! Copyright 2021 Bharat Mahajan
 !
 ! Licensed under the Apache License, Version 2.0 (the "License");
 ! you may not use this file except in compliance with the License.
@@ -26,12 +26,13 @@
 module FLINTUtils
 
     ! import the fortran environment module for precision-related constants
-    use, intrinsic :: iso_fortran_env, only: real64, real128
+    use, intrinsic :: iso_fortran_env, only: real32, real64, real128
 
     !> By default, use 64-bit double precision (IEEE-754)
+    integer, parameter, public :: SP = real32   !> Single precision kind parameter
     integer, parameter, public :: DP = real64   !> Double precision kind parameter
     integer, parameter, public :: QP = real128  !> Quadruple precision kind parameter
-    integer, parameter, public :: WP = DP       !> Default word precision used
+    integer, parameter, public :: WP = DP       !> choose the precision kind
 
     !> Smallest positive real satisfying 1.0_WP + eps > 1.0_WP
     real(WP), parameter, public :: EPS = epsilon(1.0_WP)
@@ -102,7 +103,7 @@ module FLINTUtils
         end if
         
         ! if root is not bracketed then return error
-        if ((fa>0 .AND. fb>0) .OR. (fa<0 .AND. fb<0)) then
+        if ((fa>0.0_WP .AND. fb>0.0_WP) .OR. (fa<0.0_WP .AND. fb<0.0_WP)) then
             error = 1
             niter = 0
             return
@@ -115,7 +116,7 @@ module FLINTUtils
         do while (done .EQV. .FALSE. .AND. itr < MAX_ITERATIONS)
             
             ! if root is NOT bracketed between C and B, then C = A
-            if ((fc>0 .AND. fb>0) .OR. (fc<0 .AND. fb<0)) then
+            if ((fc>0.0_WP .AND. fb>0.0_WP) .OR. (fc<0.0_WP .AND. fb<0.0_WP)) then
                 cc = aa
                 fc = fa
                 dd = bb - aa
@@ -131,9 +132,9 @@ module FLINTUtils
                 fc = fa
             end if
             ! tolerance on the independent variable
-            tolx = 2.0*EPS*abs(bb) + 0.5*tol
+            tolx = 2.0_WP*EPS*abs(bb) + 0.5_WP*tol
             ! middle point
-            xm = 0.5*(cc - bb)
+            xm = 0.5_WP*(cc - bb)
             
             if (abs(xm) <= tolx .OR. abs(fa) < NEARZERO) then
                 ! root has been found
@@ -145,19 +146,19 @@ module FLINTUtils
                     ss = fb/fa ! make sure |ss| < 1
                     if (abs(aa - cc) < NEARZERO) then
                         ! linear interpolation
-                        pp = 2.0*xm*ss
-                        qq = 1.0 - ss
+                        pp = 2.0_WP*xm*ss
+                        qq = 1.0_WP - ss
                     else
                         ! Inverse quadratic interpolation
                         qq = fa/fc
                         rr = fb/fc
-                        pp = ss*(2.0*xm*qq*(qq-rr)-(bb-aa)*(rr-1.0))
-                        qq = (qq - 1.0)*(rr - 1.0)*(ss - 1.0)
+                        pp = ss*(2.0_WP*xm*qq*(qq-rr)-(bb-aa)*(rr-1.0_WP))
+                        qq = (qq - 1.0_WP)*(rr - 1.0_WP)*(ss - 1.0_WP)
                     end if
                     
                     if (pp > NEARZERO) qq = -qq
                     pp = abs(pp)
-                    if ((2.0*pp) < min(3.0*xm*qq-abs(tolx*qq), abs(ee*qq))) then
+                    if ((2.0_WP*pp) < min(3.0_WP*xm*qq-abs(tolx*qq), abs(ee*qq))) then
                         ! use linear or inverse quadratic interpolation
                         ee = dd
                         dd = pp/qq
@@ -178,7 +179,7 @@ module FLINTUtils
                     bb = bb + dd
                 else
                     ! Correction term too small, advance by at least tolx
-                    if (xm > 0) then
+                    if (xm > 0.0_WP) then
                         bb = bb + abs(tolx)
                     else
                         bb = bb - abs(tolx)
@@ -234,7 +235,7 @@ module FLINTUtils
                 n = b - a + 1
         
                 ! mid-point
-                m = floor((n+1)/2.0) + (a-1)
+                m = floor((n+1)/2.0_WP) + (a-1)
         
                 if (x < SortedDataArray(m)) then    
                     ! search the lower half

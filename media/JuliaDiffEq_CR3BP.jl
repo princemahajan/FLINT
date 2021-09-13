@@ -1,4 +1,4 @@
-using DifferentialEquations, LinearAlgebra, Printf;
+using DifferentialEquations, LinearAlgebra, Printf, StaticArrays;
 
 print("FLINT Performance comparison with Julia DiffEq Package\n")
 print("\n")
@@ -10,17 +10,19 @@ print("\n")
 function cr3bpeom(dX, X, p, t)
     @inbounds begin
         r1 = sqrt((X[1] + mu)^2 + X[2]^2)
-        r2 = sqrt((X[1] - 1 + mu)^2 + X[2]^2)
+        r2 = sqrt((X[1] - 1.0 + mu)^2 + X[2]^2)
 
-        # @view makes Julia slower! 
-        #dX[1:3] .= @view X[4:6] 
-        dX[1] = X[4]
-        dX[2] = X[5]
-        dX[3] = X[6]
-        dX[4] = X[1] + 2*X[5] - (1 - mu)*(X[1] + mu)/r1^3 - mu*(X[1] - 1 + mu)/r2^3
-        dX[5] = X[2] - 2*X[4] - (1 - mu)*X[2]/r1^3 - mu*X[2]/r2^3
-        dX[6] = 0.0
-        #@SVector [X[4],X[5],X[6],dX4,dX5,0.0]
+        # dX[1:3] .= @view X[4:6] 
+        # dX[1] = X[4]
+        # dX[2] = X[5]
+        # dX[3] = X[6]
+        # dX[4] = X[1] + 2*X[5] - (1 - mu)*(X[1] + mu)/r1^3 - mu*(X[1] - 1 + mu)/r2^3
+        # dX[5] = X[2] - 2*X[4] - (1 - mu)*X[2]/r1^3 - mu*X[2]/r2^3
+        # dX[6] = 0.0
+
+        dX4 = X[1] + 2*X[5] - (1 - mu)*(X[1] + mu)/r1^3 - mu*(X[1] - 1 + mu)/r2^3
+        dX5 = X[2] - 2*X[4] - (1 - mu)*X[2]/r1^3 - mu*X[2]/r2^3
+        @SVector [X[4],X[5],X[6],dX4,dX5,0.0]
     end
 end
 
@@ -61,9 +63,9 @@ end;
 # 0-crossings for this scenario
 condition1 = function (u, t, integrator)
     if t > 0.5 && t < 0.5005
-       1
+       1.0
     else
-       -1
+       -1.0
     end
 end
 
@@ -76,27 +78,27 @@ function affect1_neg(integrator)
 end
 
 
-cb1 = ContinuousCallback(condition1, affect1, affect1_neg;
+cb1 = ContinuousCallback(condition1, nothing;
             rootfind=true,save_positions=(true,true),abstol=0.001)
 
 # Event function-2: continuous callback
-Mask2 = false
+Mask2 = Ref(false)
 condition2 = function (u, t, integrator)
-    if Mask2 == false
+    if Mask2[] == false
         if u[1] < 0
             # TBD: how to safely ignore the event in this region?
-            -1
+            -1.0
         else
             u[2]
         end
     else
-        -1
+        -1.0
     end
 end
 
 function affect2(integrator)
     # TBD: how to remove the callback?
-    Mask2 = true
+    Mask2[] = true
 end
 
 
@@ -104,17 +106,17 @@ cb2 = ContinuousCallback(condition2, affect2;
             rootfind=true,save_positions=(true,true),abstol=1e-9)
 
 # Event function-3: continuous callback
-Mask3 = false
+Mask3 = Ref(false)
 condition3 = function (u, t, integrator)
-    if Mask3 == false
+    if Mask3[] == false
         if u[1] > 0
             # TBD: how to safely ignore the event in this region?
-            -1
+            -1.0
         else
             u[2]
         end
     else
-        -1
+        -1.0
     end
 end
 
@@ -123,7 +125,7 @@ function affect3(integrator)
     integrator.u[1:3] = R0
     integrator.u[4:6] = V0
     # TBD: how to remove the callback?
-    Mask3 = true
+    Mask3[] = true
 end
 
 
@@ -176,8 +178,10 @@ end
 function FireODE(atol, rtol, method, prob, DenseOn)
  if DenseOn == true
         solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
     else 
         solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
     end
 end
             
@@ -193,7 +197,7 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
 
     rtime = @elapsed for i in 1:Runs
         # randomsize initial conditions
-        X0new[1] = X0new[1] + 0.000000000001*X0new[1].*rand()
+        X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
 
         # Define ODE problem
         prob = ODEProblem(ODE, X0new, tspan);                
@@ -284,7 +288,7 @@ FLINT_res = [DOP54_t,DOP54_t,DOP853_t,Vern65E_t,Vern98R_t]
 FLINT_alg = ["DOP54","DOP54","DOP853","Vern65E","Vern98R"]
 
 print("\n")
-print("Solver: Julia time, FLINT time, Julia closing errors\n==============================================================\n")
+print("Solver: Julia time (s), FLINT time (s), Julia closing errors\n============================================================\n")
 for ctr in 1:nsol
     @Printf.printf("%7s: %.5e, %.5e (FLINT %7s), %.5e\n",
     ODESolvers[ctr].name,SolResults3B[ctr,end].MeanTime,FLINT_res[ctr],FLINT_alg[ctr],SolResults3B[ctr,end].FinalStateErr)
