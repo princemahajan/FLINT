@@ -82,7 +82,7 @@ cb1 = ContinuousCallback(condition1, nothing;
             rootfind=true,save_positions=(true,true),abstol=0.001)
 
 # Event function-2: continuous callback
-Mask2 = Ref(false)
+const Mask2 = Ref(false)
 condition2 = function (u, t, integrator)
     if Mask2[] == false
         if u[1] < 0
@@ -106,7 +106,7 @@ cb2 = ContinuousCallback(condition2, affect2;
             rootfind=true,save_positions=(true,true),abstol=1e-9)
 
 # Event function-3: continuous callback
-Mask3 = Ref(false)
+const Mask3 = Ref(false)
 condition3 = function (u, t, integrator)
     if Mask3[] == false
         if u[1] > 0
