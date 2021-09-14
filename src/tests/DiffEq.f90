@@ -245,16 +245,16 @@ module MyDiffEq
     
     function JacobiC(mu, X)
         real(wp), intent(in) :: mu
-        real(wp), dimension(:,:), intent(in) :: X
-        real(wp), dimension(size(X,2)) :: JacobiC
-        real(wp), dimension(size(X,2)) :: Omega
-        real(WP), dimension(size(X,2)) :: r1, r2
+        real(wp), dimension(:), intent(in) :: X
+        real(wp) :: JacobiC
+        real(wp) :: Omega
+        real(WP) :: r1, r2
         
-        r1 = sqrt((X(1,:) + mu)**2 + X(2,:)**2 + X(3,:)**2)
-        r2 = sqrt((X(1,:) - 1.0 + mu)**2 + X(2,:)**2+X(3,:)**2)
-        Omega = 1.0_WP/2.0_WP*sum(X(1:3,:)**2,1) + (1.0-mu)/r1 + mu/r2
+        r1 = sqrt((X(1) + mu)**2 + X(2)**2 + X(3)**2)
+        r2 = sqrt((X(1) - 1.0 + mu)**2 + X(2)**2+X(3)**2)
+        Omega = 1.0_WP/2.0_WP*sum(X(1:3)**2) + (1.0-mu)/r1 + mu/r2
         ! Jacobian's Constant
-        JacobiC = sum(X(4:6,:)**2,1)/2.0_WP - Omega
+        JacobiC = sum(X(4:6)**2)/2.0_WP - Omega
     end function JacobiC
 
     

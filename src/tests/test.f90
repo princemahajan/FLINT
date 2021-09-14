@@ -36,14 +36,14 @@
     
     ! Number of periodic orbits to run and loops for benchmark
     real(WP), parameter :: norb = 2.5_WP
-    integer, parameter :: nloops = 100
+    integer, parameter :: nloops = 1000
     
     ! solvers to run from 1 to 4
     integer, parameter :: nmethod = 4
     
     ! Turn on the events
     logical, parameter :: EventsEnabled = .TRUE.
-    logical, dimension(3), parameter :: EvMask = [.TRUE.,.TRUE.,.TRUE.]
+    logical, dimension(3), parameter :: EvMask = [.FALSE.,.TRUE.,.FALSE.]
     
     ! Event step size
     real(WP), parameter :: evstepsz = 0.00001_WP
@@ -60,7 +60,7 @@
     logical, parameter :: CONST_STEPSZ = .FALSE.
 
     ! random dispersion of IC: this multiplies the random number
-    real(WP), parameter :: randon = 0.000000000000_WP
+    real(WP), parameter :: randon = 0.000000000001_WP
     
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0*norb)
@@ -206,8 +206,7 @@
                 call RANDOM_NUMBER(rnum) ! randomize initial condition
                 y0r(1) = y0r(1) + rnum*randon*y0r(1)
                 call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz, UseConstStepSz=CONST_STEPSZ, &
-                    IntStepsOn=.TRUE.,Xint = Xint, Yint = Yint, &
-                    EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
+                    IntStepsOn=.FALSE., EventStates=EventStates, EventMask = EvMask,StiffTest=stiffstatus)
             end do
             call CPU_TIME(tf)
         
@@ -218,19 +217,19 @@
                 call erkvar%Info(stiffstatus, errstr, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
-                    JacobiC(Emmu, Yint(:,1:1))-JacobiC(Emmu, Yint(:,ubound(Yint,2):ubound(Yint,2))), &
+                    JacobiC(Emmu, y0r)-JacobiC(Emmu, yf), &
                     fcalls, naccpt, nrejct
             else
                 call erkvar%Info(stiffstatus, errstr)
                 write(17,*) mname//': Integrate failed: ', erkvar%status, ':', errstr
             end if
         
-            ! write states
-            if (itr == 2) then
-                do ctr = 1, size(Xint)
-                    write(18, '(7E18.9)') Xint(ctr), Yint(1:6,ctr)
-                end do    
-            end if
+            ! ! write states
+            ! if (itr == 2) then
+            !     do ctr = 1, size(Xint)
+            !         write(18, '(7E18.9)') Xint(ctr), Yint(1:6,ctr)
+            !     end do    
+            ! end if
 
             ! write events
             if (EventsEnabled) then
@@ -310,7 +309,7 @@
                 call erkvar%Info(stiffstatus, errstr, nAccept=naccpt, nReject=nrejct, nFCalls=fcalls)
             
                 write(17, '(A12,3E12.3,3I12.1)') mname, (tf-t0), norm2(y0(1:3)-yf(1:3)), &
-                    JacobiC(Emmu, Yarr(:,1:1))-JacobiC(Emmu, Yarr(:,ubound(Yarr,2):ubound(Yarr,2))), &
+                    JacobiC(Emmu, y0r)-JacobiC(Emmu, yf), &
                     fcalls, naccpt, nrejct
     
             else
