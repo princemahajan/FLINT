@@ -1,13 +1,15 @@
+##
+
 using DifferentialEquations, LinearAlgebra, Printf, StaticArrays;
 
-print("FLINT Performance comparison with Julia DiffEq Package (No Events)\n")
+print("FLINT Performance comparison with Julia DiffEq Package\n")
 print("\n")
 
 ###### @show rtol = 1.0./10.0.^(6:1:13);
 @show rtol = 1.0./10.0.^(11);
 @show atol = rtol*1e-3;
 
-function cr3bpeom(dX, X, p, t)
+function cr3bpeom(X, p, t)
     @inbounds begin
         r1 = sqrt((X[1] + mu)^2 + X[2]^2)
         r2 = sqrt((X[1] - 1.0 + mu)^2 + X[2]^2)
@@ -177,11 +179,11 @@ end
 # Integrate ODE
 function FireODE(atol, rtol, method, prob, DenseOn)
  if DenseOn == true
-        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false,callback=cb)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
     else 
-        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
+        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false)  
     end
 end
             
@@ -216,6 +218,7 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
     ODETestResult(serr, ierr, rtime, sol)
 end
 
+##
 
 const Runs = 100
 
@@ -253,9 +256,10 @@ for itr in 1:ntol
     print(string("tol: ", rtol[itr],"\n"))
 end
 
-# Extract FLINT computation results from results.txt file
+## Extract FLINT computation results from results.txt file
+
 cd(@__DIR__)
-DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results_no_events.txt") do f
+DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results.txt") do f
     dop54 = 0.0
     dop853 = 0.0
     vern65e = 0.0

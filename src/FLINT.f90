@@ -6,9 +6,9 @@
 !! \author      Bharat Mahajan
 !! \version     0.9.8
 !! \date        Created: 01/25/2019    
-!! \copyright   Copyright 2020 Bharat Mahajan <br><br>
-!!              This work was performed at Odyssey Space Research LLC, Houston, TX as part of
-!!              the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
+!! \copyright   Copyright 2021 Bharat Mahajan <br><br>
+!!              The initial code was written by Bharat Mahajan at Odyssey Space Research LLC, Houston, TX
+!!              as part of the work under contract no. 80JSC017D0001 with NASA-Johnson Space Center. 
 !!              FLINT source code is licensed under the Apache License, Version 2.0 (the "License")
 !!              found in LICENSE file contained in this distribution. <br><br>
 !!              The coefficients for DOP853 method were derived by Ernest Hairer. 
