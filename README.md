@@ -36,7 +36,7 @@ FLINT is a modern object-oriented Fortran library that provides four adaptive st
 
 ### Performance comparison with Julia
 
-The latest FLINT code is tested against Julia's DifferentialEquations package (https://docs.sciml.ai/release-2.0/index.html) and FLINT appears to be ***faster*** with and without event detection as shown in the following screenshots. The Julia test code along with results are provided in the media folder on FLINT's GitHub repository https://github.com/princemahajan/FLINT.
+The latest FLINT code is tested against Julia's DifferentialEquations package (https://diffeq.sciml.ai/stable/) and FLINT appears to be ***faster*** with and without event detection as shown in the following screenshots. The Julia test code along with results are provided in the media folder on FLINT's GitHub repository https://github.com/princemahajan/FLINT.
 
 ![Julia Results](media/julia_screenshot_no_events.PNG)
 ![Julia Results](media/julia_screenshot.PNG)
