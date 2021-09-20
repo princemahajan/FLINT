@@ -36,8 +36,14 @@ module ERK
     real(WP), parameter :: DEFAULT_ABSTOL = 1.0e-9_WP !< default absolute tolerance
     real(WP), parameter :: DEFAULT_RELTOL = 1.0e-6_WP !< default relative tolerance
 
+    !> If the final point is within the range of this expansion factor times
+    !! the current step size, the current step size is adjusted to attain the
+    !! the final point in this last step. It is not used for constant step size.
+    real(WP), parameter :: LASTSTEP_EXPFAC = 1.01_WP
+
+
     !> Maximum number of events that can be detected during event-checking inside the 
-    !! integrator's step using the event step size
+    !! integrator's internal step using the event step size
     integer, parameter :: MAXNUMSTEPSZEVENTS = 4
     
     real(WP), parameter :: DEFAULT_EVENTTOL = 1.0e-6_WP !< this value is used to detect events
@@ -47,15 +53,15 @@ module ERK
     
     !> All the supported ERK Methods
     enum, bind(C)
-        enumerator :: ERK_DOP853 = 17   !< Hairer's DOP853
-        enumerator :: ERK_DOP54       !< Dormand-Prince 5(4)
-        enumerator :: ERK_VERNER98R     !< Verner's 9th-order Robust coefficients
-        !enumerator :: ERK_VERNER98E     !< Verner's 9th-order Efficient coefficients
-        !enumerator :: ERK_VERNER87R     !< Verner's 8th-order Robust coefficients
-        !enumerator :: ERK_VERNER87E     !< Verner's 8th-order Efficient coefficients
-        !enumerator :: ERK_VERNER76R     !< Verner's 7th-order Robust coefficients
-        !enumerator :: ERK_VERNER76E     !< Verner's 7th-order Efficient coefficients
-        enumerator :: ERK_VERNER65E      !< Verner's 6th-order Robust coefficients
+        enumerator :: ERK_DOP853 = 17       !< Hairer's DOP853
+        enumerator :: ERK_DOP54             !< Dormand-Prince 5(4)
+        enumerator :: ERK_VERNER98R         !< Verner's 9th-order Robust coefficients
+        !enumerator :: ERK_VERNER98E        !< Verner's 9th-order Efficient coefficients
+        !enumerator :: ERK_VERNER87R        !< Verner's 8th-order Robust coefficients
+        !enumerator :: ERK_VERNER87E        !< Verner's 8th-order Efficient coefficients
+        !enumerator :: ERK_VERNER76R        !< Verner's 7th-order Robust coefficients
+        !enumerator :: ERK_VERNER76E        !< Verner's 7th-order Efficient coefficients
+        enumerator :: ERK_VERNER65E         !< Verner's 6th-order Efficient coefficients
     end enum
 
     public :: ERK_DOP853, ERK_DOP54, ERK_VERNER98R, ERK_VERNER65E  !, ERK_VERNER98E, ERK_VERNER87R, ERK_VERNER87E 

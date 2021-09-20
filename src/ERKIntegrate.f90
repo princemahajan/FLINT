@@ -57,7 +57,7 @@ submodule (ERK) ERKIntegrate
         real(WP), dimension(size(me%InterpStates), 0:me%pstar) :: Bip
         real(WP), dimension(6) :: StepSzParams        
 
-        real(WP) :: h, hSign, hnew, hmax, X, Err
+        real(WP) :: h, hSign, hnew, hmax, X, Err, LastStepSzFac
         real(WP), dimension(me%pDiffEqSys%n) :: Y1, Y2, F0, Sc0, Yint12
 
         integer :: n, m, FCalls, TotalFCalls, AcceptedSteps, RejectedSteps 
@@ -117,6 +117,13 @@ submodule (ERK) ERKIntegrate
             if (ConstStepSz .AND. ((hSign*StepSz) <= 0)) status = FLINT_ERROR_CONSTSTEPSZ
         end if
 
+        ! set the last step size expansion factor
+        if (ConstStepSz) then
+            LastStepSzFac = 1.0_WP
+        else
+            LastStepSzFac = LASTSTEP_EXPFAC
+        end if
+
         ! If Interpolation is OFF and solution at integrator steps is needed,
         ! then allocate the storage for steps that will be returned to the user. 
         ! If Interpolation is ON, then no need as we already allocated the internal
@@ -130,12 +137,17 @@ submodule (ERK) ERKIntegrate
             end if            
         end if
 
-        ! allocate 1 more than max steps to accommodate the initial condition
         if (IntStepsNeeded) then
-            allocate(Xint(MaxSteps+1), stat=stat)
-            if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
-            allocate(Yint(pDiffEqSys%n,MaxSteps+1), stat=stat)
-            if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
+            if (present(Xint) .AND. present(Yint)) then
+                ! allocate 1 more than max steps to accommodate the initial condition
+                allocate(Xint(MaxSteps+1), stat=stat)
+                if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
+                allocate(Yint(pDiffEqSys%n,MaxSteps+1), stat=stat)
+                if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
+            else
+                ! With IntStepsNeeded, Xint and Yint must be provided
+                status = FLINT_ERROR_PARAMS
+            end if
         end if
         
         ! stiffness test options
@@ -259,13 +271,13 @@ submodule (ERK) ERKIntegrate
         ! Main loop for computing the steps
 
         do
-
+        
             if (status == FLINT_SUCCESS .AND. (.NOT. LAST_STEP)    &
                     .AND. (TotalSteps < MaxSteps)) then
 
                 ! if we are only slightly away from the final state
                 ! then adjust to step size to finish the integration
-                if (hSign*(X + 1.01_WP*h - Xf) > 0.0_WP) then
+                if (hSign*(X + LastStepSzFac*h - Xf) > 0) then
                     h = Xf - X 
                     LAST_STEP = .TRUE.
                 end if
@@ -703,12 +715,13 @@ submodule (ERK) ERKIntegrate
                 ! save the stats in any case
                 Xf = X
                 Yf = Y1
-                StepSz = h                
+                if (.NOT. ConstStepSz) StepSz = h                
                 me%Xf = Xf
                 me%hf = StepSz
                 me%Yf = Yf
                 me%AcceptedSteps = AcceptedSteps
                 me%RejectedSteps = RejectedSteps
+                me%TotalSteps = TotalSteps
                 me%FCalls = TotalFCalls                
                 me%status = status
                 
@@ -770,13 +783,6 @@ submodule (ERK) ERKIntegrate
         end if             
         
     end subroutine DetectEvent
-
-
-
-
-
-
-
 
 
     

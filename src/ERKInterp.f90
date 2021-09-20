@@ -16,7 +16,7 @@
 !
 !> \brief       ERK Interpolation Module
 !! \details     Provides implementation for the dense output features.
-!! \author      Bharat Mahajan (bharat.mahajan@nasa.gov).
+!! \author      Bharat Mahajan
 !! \date        Created: 02/04/2019    
 !
 !############################################################################################

@@ -52,9 +52,9 @@ module FLINT_base
         enumerator :: FLINT_ERROR_INTPSTATES        = 10  !< Wrong interpolation states specified
         enumerator :: FLINT_ERROR_INTP_ARRAY        = 11  !< Array provided for interpolation is wrong
         enumerator :: FLINT_ERROR_INTP_OFF          = 12  !< Interpolation is not enabled
-        enumerator :: FLINT_ERROR_INIT_REQD         = 13  !< FLINT Init is required
+        enumerator :: FLINT_ERROR_INIT_REQD         = 13  !< FLINT Init is required first
         enumerator :: FLINT_ERROR_EVENTPARAMS       = 14  !< Event related parameters are wrong or missing
-        enumerator :: FLINT_ERROR_EVENTROOT         = 15  !< Event root find is failed
+        enumerator :: FLINT_ERROR_EVENTROOT         = 15  !< Event root find failed
         enumerator :: FLINT_ERROR_CONSTSTEPSZ       = 16  !< Wrong value of StepSz for constant step size option
     end enum
 
@@ -73,9 +73,9 @@ module FLINT_base
                             'Incorrect interpolation states',                   &
                             'Incorrect interpolation array provided',           &
                             'Interpolation is not enabled',                     &
-                            'Init is not completed',                            &
+                            'Init is required',                            		&
                             'Incorrect event-related parameters ',              &
-                            'Event root-finding failed',                        &
+                            'Event root finding failed',                        &
                             'Incorrect step size for the non-adaptive option'   &
                             ]
 

@@ -37,6 +37,7 @@
     ! Number of periodic orbits to run and loops for benchmark
     real(WP), parameter :: norb = 2.5_WP
     integer, parameter :: nloops = 1000
+    integer, parameter :: floops = 10000000
     
     ! solvers to run from 1 to 4
     integer, parameter :: nmethod = 4
@@ -147,6 +148,7 @@
     CR3BPDEObject%n = 6
     CR3BPDEObject%m = 3
 
+    
     ! arrays for interpolated data
     ipdx = (xf-x0)/(nIp-1)
     Xarr = [(x0+ipdx*itr,itr=0,(nIp-1))]
@@ -156,7 +158,8 @@
     
     ! create results file
     open(unit=17,file= fname, status = 'replace')
-    write(17, *) '--- FLINT Stat Results (',norb, ' orbits, ', nloops, ' loops)  ---'
+    write(17, *) '--- FLINT Stats (',norb, ' orbits, ', nloops, ' loops)  ---'
+        
     write(17, *) ' '
     write(17, *) 'A. Natural Step-size'
     write(17, '(7A12)') 'Method', 'Time(s)', 'Closing Err','Jacobi Err', 'FCalls', 'Accepted', 'Rejected'
@@ -173,7 +176,7 @@
     open(unit=20,file= efname, status = 'replace')
     write(20, '(8A12)') 'Event','X', 'Y1','Y2','Y3','Y4','Y5','Y6'             
 
-    ! Solution at natural step size
+    ! Solution at internal step size
 
     do itr = 1,nmethod
         
@@ -353,6 +356,20 @@
               EventStates(2,ctr),EventStates(3,ctr),EventStates(4,ctr)
         end do
     end if
+    
+       
+    ! function test
+    y0r = y0*0.0_WP    
+    call CPU_TIME(t0)
+    do ctr = 1, floops
+        y0 = y0 + 0.0000001_WP*y0
+        yf = CR3BPDEObject%F(x0, y0)
+        y0r = y0r + yf
+    end do
+    call CPU_TIME(tf)
+    write(17, *) ' '    
+    write(17, '(I12,A13,F12.1,A5)') floops, ' Func calls: ', (tf-t0)*1.0e3, ' ms'    
+    
     
     
     contains
