@@ -53,12 +53,21 @@ add_library(${FLINTBIN} STATIC ${FLINT_SRC})
 target_include_directories(${FLINTBIN} INTERFACE ${FLINT_INSTALL_LIB_DIR})
 
 # The test executable 
-file(GLOB TestFLINT_SRC src/tests/*.f90)
-set(TestFLINTBIN TestFLINT)
+set(TestFLINT_SRC src/tests/test_CR3BP.f90)
+set(TestFLINTBIN TestFLINT_CR3BP)
 add_executable(${TestFLINTBIN} ${TestFLINT_SRC})
 
 # link
 target_link_libraries(${TestFLINTBIN} ${FLINTBIN})
+
+# The test executable for Lorenz diffeq
+set(TestFLINT_Lorenz_SRC src/tests/test_Lorenz.f90)
+set(TestFLINT_LorenzBIN TestFLINT_Lorenz)
+add_executable(${TestFLINT_LorenzBIN} ${TestFLINT_Lorenz_SRC})
+
+# link
+target_link_libraries(${TestFLINT_LorenzBIN} ${FLINTBIN})
+
 
 ###########################
 # Compile Options for FLINT
@@ -76,6 +85,11 @@ add_compile_options("${_Flag}")
 
 # Add ifort specific options
 
+# standard
+set(COption "/stand:f08" "-stand f08")
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
+target_compile_options(${FLINTBIN} PUBLIC "${_Flag}")
+
 # Data alignment always
 set(COption "/align:all" "-align all")
 GetPlatformCompilerFlag("${COption}" FALSE Fortran)
@@ -87,7 +101,7 @@ GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
 
 # Generate auto-dispatch code paths for better optimization if available 
-set(COption "/QaxCORE-AVX2" "-axCORE-AVX2")
+set(COption "/QxHost" "-xHost")
 GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
 

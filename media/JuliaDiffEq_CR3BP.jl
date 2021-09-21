@@ -1,6 +1,6 @@
 ##
 
-using DifferentialEquations, LinearAlgebra, Printf, StaticArrays;
+using DifferentialEquations, LinearAlgebra, Printf, StaticArrays, CPUTime;
 
 
 function cr3bpeom(dX, X, (mu), t)
@@ -131,8 +131,8 @@ function FireODE(atol, rtol, method, prob, DenseOn, cb)
          #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=true,callback=cb)  
 #         solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
 #     else 
-        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb)  
-        #solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
+        solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false,callback=cb,dense=false)  
+        # solve(prob,method,abstol=atol, reltol=rtol,timeseries_errors = false, dense_errors=false, dense=false)  
     # end
 end
             
@@ -148,9 +148,9 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
 
     cb1 = ContinuousCallback(condition1, nothing;
             rootfind=true,save_positions=(true,true),abstol=0.001)
-    cb2 = ContinuousCallback(condition2, affect2;
+    cb2 = ContinuousCallback(condition2, affect2!;
             rootfind=true,save_positions=(true,true),abstol=1e-9)
-    cb3 = ContinuousCallback(condition3, affect3;
+    cb3 = ContinuousCallback(condition3, affect3!;
             rootfind=true,save_positions=(true,true),abstol=1e-9)
     # callback set
     #cb = CallbackSet(cb1,cb2,cb3)
@@ -189,14 +189,14 @@ end
 
 function main()
 
-    print("FLINT Performance comparison with Julia DiffEq Package\n")
+    print("FLINT benchmarks against Julia DiffEq package (CR3BP w/ events)\n")
     print("\n")
-    
+
     Runs = 1000
 
     ###### @show rtol = 1.0./10.0.^(6:1:13);
-    @show rtol = 1.0./10.0.^(11);
-    @show atol = rtol*1e-3;
+    rtol = 1.0./10.0.^(11);
+    atol = rtol*1e-3;
 
     mu = 0.012277471::Float64
 
@@ -210,10 +210,10 @@ function main()
     # propagate for bunch of orbits
     t0 = 0.0::Float64;
     tf = 2.5*Period;
-
     tspan = [t0, tf];
 
-    X0 = [R0; V0]
+    X0 = [R0;V0]
+    # X0 = MVector{6,Float64}([R0[1],R0[2],R0[3],V0[1],V0[2],V0[3]])
 
     #op1 = ODEProblem(cr3bpeom,X0,tspan);
 
@@ -244,7 +244,7 @@ function main()
 
     for itr in 1:ntol
         for ctr in 1:nsol
-            #print(string("Running: ",ODESolvers[ctr].name, "\n"))
+            # print(string("Running: ",ODESolvers[ctr].name, "\n"))
             SolResults3B[ctr,itr] = FireODEIntTest(X0, cr3bpeom, tspan, ODESolvers[ctr].solver,  atol[itr], rtol[itr], [R0; V0], 0, JacobiConstant, ODESolvers[ctr].dense,Runs,(mu));
         end
         #print(string("tol: ", rtol[itr],"\n"))
@@ -253,7 +253,7 @@ function main()
     # Extract FLINT computation results from results.txt file
 
     cd(@__DIR__)
-    DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results.txt") do f
+    DOP54_t, DOP853_t,Vern65E_t,Vern98R_t = open("results_CR3BP.txt") do f
         dop54 = 0.0
         dop853 = 0.0
         vern65e = 0.0
@@ -295,7 +295,25 @@ function main()
         FLINT_alg[ctr])
     end
 
+
+    # function test
+    y0r = @MVector [R0[1],R0[2],R0[3],V0[1],V0[2],V0[3]]
+    yfr = @MVector [0.0,0.0,0.0,0.0,0.0,0.0]
+    dy = copy(yfr)
+    t0 = 0.0
+    floops = 10_000_000
+    rtime = @CPUelapsed for i in 1:floops
+        y0r = y0r + 0.0001*y0r
+        cr3bpeom(dy, y0r, (mu), t0)
+        yfr = yfr + dy
+    end
+    println(floops, " Func calls: ", rtime*1e3, " ms")
+
+
     #return SolResults3B
+
+
+
 end
 
 

@@ -795,7 +795,7 @@ submodule (ERK) ERKIntegrate
         real(WP), dimension(n), intent(in) :: Y0
         real(WP), dimension(n), intent(out) :: Y1
         
-        real(WP), dimension(n) :: Yint, Sc, aijkj
+        real(WP), dimension(n) :: Yint
         integer :: i
     
         ! first stage
@@ -806,6 +806,7 @@ submodule (ERK) ERKIntegrate
         do i = 2,sint
             block
             integer :: astart, j
+            real(WP), dimension(n) :: aijkj
             ! starting index of a_ij, where i=i, j=1:(i-1)
             ! It is a series sum: 1 + 2 + 3 + ...
             astart = int((i-1)/2.0*(i-2))
@@ -839,23 +840,21 @@ submodule (ERK) ERKIntegrate
         end if
 
         if (.NOT. ConstStepSz) then
+            ! Estimate the error. We assume that the error coeffcients are precomputed,
+            ! i.e., e_i = b_i - bhat_i
+            block
+            real(WP), dimension(n) :: temp, Sc
+            integer :: j
             ! The scale factor for error computations
             if (IsScalarTol .EQV. .FALSE.) then
                 Sc = me%ATol + me%RTol*max(abs(Y0), abs(Yint))
             else
                 Sc = me%ATol(1) + me%RTol(1)*max(abs(Y0), abs(Yint))
             end if 
-
-            ! Estimate the error. We assume that the error coeffcients are precomputed,
-            ! i.e., e_i = b_i - bhat_i
-            block
-            real(WP), dimension(n) :: temp
-            integer :: j
             temp = 0.0_WP
             do concurrent (j = 1:sint)
                 temp = temp + k(:,j)*me%e(j)
             end do
-            !Err = abs(h)*sqrt(sum((temp/Sc)**2)/n)
             Err = sqrt(sum((h*temp/Sc)**2)/n)
             end block
         else
@@ -889,6 +888,72 @@ submodule (ERK) ERKIntegrate
         
     end subroutine stepint
     
+    function IntpCoeff(X0, Y0, X1, Y1, InterpStates) result(IpCoeff)
+
+        implicit none
+    
+        real(WP), intent(in) :: X0, X1
+        real(WP), dimension(n), intent(in) :: Y0, Y1
+        integer, dimension(:), intent(in) :: InterpStates
+        
+        real(WP), dimension(size(InterpStates),0:me%pstar) :: IpCoeff
+        
+        real(WP), dimension(n) :: Yint
+        integer :: i, j
+        
+        ! Compute extra stages needed for interpolation
+    
+        ! compute rest of the stages (the following compact code is slower!)   
+        do i = (sint+1),s
+            block
+            integer :: astart, j
+            real(WP), dimension(n) :: aijkj
+            ! starting index of a_ij, where i=i, j=1:(i-1)
+            ! It is a series sum: 1 + 2 + 3 + ...
+            astart = int((i-1)/2.0*(i-2))
+            ! In my testing, I am seeing matmul performing better than 
+            ! MKL's gemv. However, do concurrent is faster than both but 
+            ! but still slower than hard-coded computations
+            ! call gemv(k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
+            ! aijkj = matmul(k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
+            aijkj = 0.0_WP
+            do concurrent (j = 1:(i-1))
+                aijkj = aijkj + k(:,j)*me%a(astart + j)
+            end do
+            
+            Yint = Y0 + h*aijkj
+            k(:,i) = pDiffEqSys%F(X0 + h*me%c(i), Yint, params)
+            end block
+        end do
+        
+        FCalls = s - sint
+
+        !> \remark Dense output coefficients are coefficients of theta interpolating polynomial, where
+        !! \f$0\,<\,\theta = (u_{desired} - x_0)/h\,<\,1\f$. These are computed using the contributions from 
+        !! all the integration stages. An 8th order interpolating polynomial is
+        !! \f[ u_{desired}(\theta) = Y0 + Bip(1)*\theta + Bip(2)*\theta^2 + ...+ Bip(8)*\theta^8 \f],
+        !! where \f$ Bip(i) = d(i,1)*k_1 + d(i,2)*k_2 + ... + d(i,s)*k_s \f$.
+        
+        IpCoeff(:,0) = Y0(InterpStates)
+        do concurrent (j = 1:pstar)
+            block
+                integer :: istage
+                real(WP), dimension(size(InterpStates)) :: cont
+                
+                cont = 0.0_WP
+        sloop: do i = 1,s
+                    ! get the current stage that gets multiplied by non-zero dij
+                    istage = me%dinz(i)
+                    ! -1 means we are at the end of the list
+                    if (istage == -1) exit sloop
+                    
+                    cont = cont + me%d(i,j)*k(InterpStates,istage)
+                end do sloop
+                IpCoeff(:,j) = h*cont
+
+            end block
+        end do
+    end function IntpCoeff    
 
     !> It advances integrator by 1 step by computing stages
     subroutine DOP853_stepint(X0, Y0, Y1)
@@ -1202,7 +1267,7 @@ submodule (ERK) ERKIntegrate
         
         real(WP), dimension(size(InterpStates),0:4) :: IntpCoeff
         
-        real(WP), dimension(n) :: Yint, aijkj
+        real(WP), dimension(n) :: Yint
         real(WP), dimension(size(InterpStates)) :: cont0, cont1, cont2, cont3, cont4
         integer :: i, j
         
@@ -1237,71 +1302,6 @@ submodule (ERK) ERKIntegrate
 
     end function DOP54_IntpCoeff    
     
-    function IntpCoeff(X0, Y0, X1, Y1, InterpStates) result(IpCoeff)
-
-        implicit none
-    
-        real(WP), intent(in) :: X0, X1
-        real(WP), dimension(n), intent(in) :: Y0, Y1
-        integer, dimension(:), intent(in) :: InterpStates
-        
-        real(WP), dimension(size(InterpStates),0:me%pstar) :: IpCoeff
-        
-        real(WP), dimension(n) :: Yint, aijkj
-        integer :: i, j
-        
-        ! Compute extra stages needed for interpolation
-    
-        ! compute rest of the stages (the following compact code is slower!)   
-        do i = (sint+1),s
-            block
-            integer :: astart, j
-            ! starting index of a_ij, where i=i, j=1:(i-1)
-            ! It is a series sum: 1 + 2 + 3 + ...
-            astart = int((i-1)/2.0*(i-2))
-            ! In my testing, I am seeing matmul performing better than 
-            ! MKL's gemv. However, do concurrent is faster than both but 
-            ! but still slower than hard-coded computations
-            ! call gemv(k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
-            ! aijkj = matmul(k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
-            aijkj = 0.0_WP
-            do concurrent (j = 1:(i-1))
-                aijkj = aijkj + k(:,j)*me%a(astart + j)
-            end do
-            
-            Yint = Y0 + h*aijkj
-            k(:,i) = pDiffEqSys%F(X0 + h*me%c(i), Yint, params)
-            end block
-        end do
-        
-        FCalls = s - sint
-
-        !> \remark Dense output coefficients are coefficients of theta interpolating polynomial, where
-        !! \f$0\,<\,\theta = (u_{desired} - x_0)/h\,<\,1\f$. These are computed using the contributions from 
-        !! all the integration stages. An 8th order interpolating polynomial is
-        !! \f[ u_{desired}(\theta) = Y0 + Bip(1)*\theta + Bip(2)*\theta^2 + ...+ Bip(8)*\theta^8 \f],
-        !! where \f$ Bip(i) = d(i,1)*k_1 + d(i,2)*k_2 + ... + d(i,s)*k_s \f$.
-        
-        IpCoeff(:,0) = Y0(InterpStates)
-        do concurrent (j = 1:pstar)
-            block
-                integer :: istage
-                real(WP), dimension(size(InterpStates)) :: cont
-                
-                cont = 0.0_WP
-        sloop: do i = 1,s
-                    ! get the current stage that gets multiplied by non-zero dij
-                    istage = me%dinz(i)
-                    ! -1 means we are at the end of the list
-                    if (istage == -1) exit sloop
-                    
-                    cont = cont + me%d(i,j)*k(InterpStates,istage)
-                end do sloop
-                IpCoeff(:,j) = h*cont
-
-            end block
-        end do
-    end function IntpCoeff    
     
     
     !> This procedure is passed to Root function for finding its zeros.
