@@ -89,6 +89,9 @@ module ERK
         real(WP), dimension(2:ERK_MAXSTAGES) :: c       !< c_i
         real(WP), dimension(1:ERK_MAXSTAGES) :: e       !< e_i        
 
+        ! k values for each each stage, used in integration step routines
+        real(WP), dimension(:, :), allocatable :: k
+
         !> Stages that gets multiplied by non-zero dij, in other words the stages specified by dinz
         !! are the ones that contribute to the interpolating polynomial coefficients.
         !! Specify the stages in dinz and terminate the list by -1.
@@ -105,6 +108,9 @@ module ERK
         procedure, public :: Interpolate => erk_interp
         procedure, public :: Info => erk_info
         
+        procedure, private :: StepInt => erk_stepint
+        procedure, private :: InterpCoeff => erk_intpcoeff
+
         final :: erk_destroy !< destructor
         
     end type ERK_class
@@ -148,7 +154,7 @@ module ERK
         real(WP), intent(in) :: X0
         real(WP), dimension(me%pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(inout) :: Xf            
-        real(WP), dimension(me%pDiffEqSys%n), intent(out) :: Yf
+        real(WP), dimension(size(Y0)), intent(out) :: Yf
         real(WP), intent(inout) :: StepSz
         logical, intent(in), optional :: UseConstStepSz            
         logical, intent(in), optional :: IntStepsOn
@@ -214,6 +220,29 @@ module ERK
     end subroutine erk_destroy    
     
 
+
+    module subroutine erk_stepint(me, X0, Y0, h, Y1, Yint12, FCalls, EstimateErr, Err, params)
+        class(ERK_class), intent(inout) :: me
+        real(WP), intent(in) :: X0
+        real(WP), dimension(me%pDiffEqSys%n), intent(in) :: Y0
+        real(WP), intent(in) :: h
+        real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
+        integer, intent(out) :: FCalls
+        logical, intent(in) :: EstimateErr
+        real(WP), intent(out) :: Err
+        real(WP), dimension(:), intent(in), optional :: params
+    end subroutine erk_stepint
+
+    module subroutine erk_intpcoeff(me, X0, Y0, h, Y1, Bip, Fcalls, params)
+        class(ERK_class), intent(inout) :: me
+        real(WP), intent(in) :: X0
+        real(WP), dimension(me%pDiffEqSys%n), intent(in) :: Y0
+        real(WP), intent(in) :: h
+        real(WP), dimension(size(Y0)), intent(in) :: Y1
+        real(WP), dimension(size(me%InterpStates),0:me%pstar), intent(out) :: Bip        
+        integer, intent(out) :: FCalls
+        real(WP), dimension(:), intent(in), optional :: params        
+    end subroutine erk_intpcoeff
 
 
     end interface

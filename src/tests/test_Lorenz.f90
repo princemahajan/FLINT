@@ -47,7 +47,7 @@ module LorenzDiffEq
         intrinsic :: size  
         class(LorenzSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
-        real(WP), intent(in), dimension(:) :: Y
+        real(WP), intent(in), dimension(me%n) :: Y
         real(WP), intent(in), dimension(:), optional :: Params
         
         real(WP), dimension(size(Y)) :: LorenzDE
@@ -99,7 +99,7 @@ end module LorenzDiffEq
     logical, parameter :: CONST_STEPSZ = .FALSE.
     
     ! random dispersion of IC: this multiplies the random number
-    real(WP), parameter :: randon = 0.000000000001_WP
+    real(WP), parameter :: randon = 0.000000000000_WP
 
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0)

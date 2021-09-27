@@ -3,7 +3,7 @@
 using DifferentialEquations, LinearAlgebra, Printf, StaticArrays, CPUTime;
 
 
-function cr3bpeom(dX, X, (mu), t)
+function cr3bpeom(X, (mu), t)
     @inbounds begin
         r1 = sqrt((X[1] + mu)^2 + X[2]^2)
         r2 = sqrt((X[1] - 1.0 + mu)^2 + X[2]^2)
@@ -15,8 +15,8 @@ function cr3bpeom(dX, X, (mu), t)
 
         dX4 = X[1] + 2*X[5] - (1 - mu)*(X[1] + mu)/r1^3 - mu*(X[1] - 1 + mu)/r2^3
         dX5 = X[2] - 2*X[4] - (1 - mu)*X[2]/r1^3 - mu*X[2]/r2^3
-        dX .= @SVector [X[4],X[5],X[6],dX4,dX5,0.0]
     end
+    SA_F64[X[4],X[5],X[6],dX4,dX5,0.0]
 end
 
 
@@ -156,12 +156,15 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
     #cb = CallbackSet(cb1,cb2,cb3)
     cb = CallbackSet(cb2)
 
+    # Define ODE problem
+    prob = ODEProblem(ODE, X0new, tspan, par);                
+
     rtime = @elapsed for i in 1:Runs
         # randomsize initial conditions
-        X0new[1] = X0new[1] + 0.000000000001*X0new[1].*rand()
+        X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
         
-        # Define ODE problem
-        prob = ODEProblem(ODE, X0new, tspan, par);                
+        # # Define ODE problem
+        # prob = ODEProblem(ODE, X0new, tspan, par);                
         
         #GC.gc()
         sol = FireODE(atol, rtol, OdeMethod, prob, DenseOn, cb)
@@ -187,7 +190,7 @@ struct Solver
 end
 
 
-function main()
+function main_CR3BP()
 
     print("FLINT benchmarks against Julia DiffEq package (CR3BP w/ events)\n")
     print("\n")
@@ -212,8 +215,8 @@ function main()
     tf = 2.5*Period;
     tspan = [t0, tf];
 
-    X0 = [R0;V0]
-    # X0 = MVector{6,Float64}([R0[1],R0[2],R0[3],V0[1],V0[2],V0[3]])
+    # X0 = [R0;V0]
+    X0 = MVector{6,Float64}([0.994,0,0,0,parse(Float64,"-2.00158510637908252240537862224"),0.0])
 
     #op1 = ODEProblem(cr3bpeom,X0,tspan);
 
@@ -244,7 +247,7 @@ function main()
 
     for itr in 1:ntol
         for ctr in 1:nsol
-            # print(string("Running: ",ODESolvers[ctr].name, "\n"))
+            print(string("Running: ",ODESolvers[ctr].name, "\n"))
             SolResults3B[ctr,itr] = FireODEIntTest(X0, cr3bpeom, tspan, ODESolvers[ctr].solver,  atol[itr], rtol[itr], [R0; V0], 0, JacobiConstant, ODESolvers[ctr].dense,Runs,(mu));
         end
         #print(string("tol: ", rtol[itr],"\n"))
@@ -297,14 +300,14 @@ function main()
 
 
     # function test
-    y0r = @MVector [R0[1],R0[2],R0[3],V0[1],V0[2],V0[3]]
-    yfr = @MVector [0.0,0.0,0.0,0.0,0.0,0.0]
+    y0r = MVector{6,Float64}([R0[1],R0[2],R0[3],V0[1],V0[2],V0[3]])
+    yfr = MVector{6,Float64}([0.0,0.0,0.0,0.0,0.0,0.0])
     dy = copy(yfr)
     t0 = 0.0
     floops = 10_000_000
     rtime = @CPUelapsed for i in 1:floops
         y0r = y0r + 0.0001*y0r
-        cr3bpeom(dy, y0r, (mu), t0)
+        dy = cr3bpeom(y0r, (mu), t0)
         yfr = yfr + dy
     end
     println(floops, " Func calls: ", rtime*1e3, " ms")

@@ -2,15 +2,15 @@
   
  A. Internal Step-size
       Method     Time(s)      FCalls    Accepted    Rejected Total Steps
-  DOP54            1.250      257926       42849         166       43015
-  DOP853           0.297       75141        5861         437        6298
-  Verner65E        1.031      175388       21813         126       21939
-  Verner98R        0.469       74172        4420         230        4650
+  DOP54            1.094      256647       42655         143       42798
+  DOP853           0.281       74888        5839         438        6277
+  Verner65E        1.094      177861       22123         125       22248
+  Verner98R        0.453       73507        4385         223        4608
  B. Interpolated Grid
       Method     Time(s)      FCalls    Accepted    Rejected Total Steps
-  DOP54            2.312      257688       42806         170       42976
-  DOP853           0.672       92128        5822         436        6258
-  Verner65E        2.312      196422       21735         115       21850
-  Verner98R        1.125       96020        4413         223        4636
+  DOP54            1.641      512577       42655         143       42798
+  DOP853           0.422      144956        5839         438        6277
+  Verner65E        1.438      354845       22123         125       22248
+  Verner98R        0.547      143667        4385         223        4608
   
    100000000 Func calls:       187.50   ms

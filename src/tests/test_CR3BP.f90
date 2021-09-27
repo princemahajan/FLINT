@@ -67,7 +67,7 @@ module MyDiffEq
         intrinsic :: size  
         class(TBSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
-        real(WP), intent(in), dimension(:) :: Y
+        real(WP), intent(in), dimension(me%n) :: Y
         real(WP), intent(in), dimension(:), optional :: Params
         
         real(WP), dimension(size(Y)) :: TwoBodyDE
@@ -95,7 +95,7 @@ module MyDiffEq
         intrinsic :: size
         class(CR3BPSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
-        real(WP), intent(in), dimension(:) :: Y
+        real(WP), intent(in), dimension(me%n) :: Y
         real(WP), intent(in), dimension(:), optional :: Params
         
         real(WP), dimension(size(Y)) :: CR3BPDE
@@ -299,7 +299,7 @@ end module MyDiffEq
     logical, parameter :: CONST_STEPSZ = .FALSE.
 
     ! random dispersion of IC: this multiplies the random number
-    real(WP), parameter :: randon = 0.000000000001_WP
+    real(WP), parameter :: randon = 0.000000000000_WP
     
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0*norb)

@@ -2,21 +2,21 @@
   
  A. Internal Step Size
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
-  DOP54            3.469   0.222E+01  -0.576E-10       26512        4380          46
-  DOP853           1.188   0.222E+01   0.287E-10       11782         677         148
-  Verner65E        3.719   0.222E+01  -0.588E-11       21898        2409          31
-  Verner98R        1.953   0.222E+01  -0.126E-11       11974         502          96
+  DOP54            2.922   0.224E+01  -0.587E-10       52921        4390          49
+  DOP853           0.891   0.224E+01   0.285E-10       18004         680         154
+  Verner65E        2.422   0.224E+01  -0.684E-11       38910        2417          36
+  Verner98R        1.094   0.224E+01  -0.125E-11       17521         503          97
  X-axis (Y1) and Y-axis (Y2) crossing events
  Event Index           X          Y1          Y2          Y3
-           20.399136E+000.748351E+00-.557943E-140.000000E+00
+           20.392538E+00         NaN0.246425E-200.278813E-09
  B. Interpolated Grid
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
-  DOP54            4.891   0.219E+01  -0.566E-10       26501        4379          45
-  DOP853           2.172   0.216E+01   0.371E-10       11818         677         151
-  Verner65E        4.859   0.212E+01  -0.674E-11       22156        2432          38
-  Verner98R        3.125   0.208E+01  -0.114E-11       11954         502          94
+  DOP54            4.438   0.224E+01  -0.587E-10       52927        4390          49
+  DOP853           1.875   0.224E+01   0.285E-10       18016         680         154
+  Verner65E        3.609   0.224E+01  -0.684E-11       38926        2417          36
+  Verner98R        2.172   0.224E+01  -0.125E-11       17553         503          97
  X-axis (Y1) and Y-axis (Y2) crossing events
  Event Index           X          Y1          Y2          Y3
-           20.399137E+000.748351E+00-.477519E-140.000000E+00
+           20.452084E+00-.136576E+00-.136576E+00-.153648E+00
   
     10000000 Func calls:       281.25   ms

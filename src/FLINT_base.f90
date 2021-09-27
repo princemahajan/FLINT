@@ -236,7 +236,7 @@ module FLINT_base
             
             class(DiffEqSys), intent(in) :: me      !< Differential Equation object
             real(WP), intent(in) :: X   !< Independent variable value
-            real(WP), intent(in), dimension(:) :: Y !< Initial condition
+            real(WP), intent(in), dimension(me%n) :: Y !< Initial condition
             
             !> 'TBD' Optional array of double-precision parameters for sensitivity analysis
             real(WP), dimension(:), intent(in), optional :: params 

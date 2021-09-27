@@ -188,7 +188,8 @@
 
 
 
-        ! choose method-specific parameters
+        ! choose method-specific parameters and allocate space for k
+        ! TBD: Do we still need to do this?
         select case (me%method)
         
             case (ERK_DOP853)
@@ -265,8 +266,17 @@
                 
             case default
                 ! We will never be friends, so why are you here?
-        end select
+            end select
 
+        ! allocate memory for k vars
+        ! TBD: We should just use a constant size for k based on max stages supported
+        if (allocated(me%k)) deallocate(me%k)                  
+        allocate(me%k(me%pDiffEqSys%n,me%s), stat=status)
+        if (status /= 0) then
+            me%status = FLINT_ERROR_MEMALLOC
+            return
+        end if
+    
         !> \remark Things to do if Interpolation is needed: 
         !! + Choose number of ERK stages
         !! + Allocate memeory for internal state: allocate now using max number of
@@ -393,7 +403,8 @@
         if (allocated(me%Xint)) deallocate(me%Xint)
         if (allocated(me%Bip)) deallocate(me%Bip)                  
         if (allocated(me%Y0)) deallocate(me%Y0)                  
-        if (allocated(me%Yf)) deallocate(me%Yf)                  
+        if (allocated(me%Yf)) deallocate(me%Yf)
+        if (allocated(me%k)) deallocate(me%k)                  
         
     end subroutine erk_destroy    
     

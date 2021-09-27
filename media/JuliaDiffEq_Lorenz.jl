@@ -19,13 +19,15 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, DenseOn, Runs, p
     rtime = 0.0
     X0new = copy(X0)
 
+    # Define ODE problem
+    prob = ODEProblem(ODE, X0new, tspan, par);                
 
     rtime = @elapsed for i in 1:Runs        
         # randomsize initial conditions
         X0new[1] = X0new[1] + 0.000000000001*X0new[1].*rand()
     
-        # Define ODE problem
-        prob = ODEProblem(ODE, X0new, tspan, par);                
+        # # Define ODE problem
+        # prob = ODEProblem(ODE, X0new, tspan, par);                
 
         #GC.gc()
         sol = solve(prob, OdeMethod,reltol=rtol,abstol=atol, dense=DenseOn)
@@ -37,7 +39,7 @@ end
 
 ##
 
-function main()
+function main_Lorenz()
 
 
     print("FLINT benchmarks against Julia DiffEq package (Lorenz w/o events)\n")
@@ -121,7 +123,7 @@ function main()
     floops = 100_000_000
     rtime = @CPUelapsed for i in 1:floops
         #su0 = su0 + 0.0001*su0
-        y = lorenz_static(su0,p,t0)
+        y = lorenz(su0,p,t0)
         y0 = y + y0
     end
     println(floops, " Func calls: ", rtime*1e3, " ms")
