@@ -33,9 +33,9 @@ module LorenzDiffEq
     ! user diff eq system
 
     type, extends(DiffEqSys) :: LorenzSys
-        ! real(WP) :: sigma = 10.0_WP
-        ! real(WP) :: rho = 28.0_WP
-        ! real(WP) :: beta = 8.0_WP/3.0_WP
+        real(WP) :: sigma = 10.0_WP
+        real(WP) :: rho = 28.0_WP
+        real(WP) :: beta = 8.0_WP/3.0_WP
     contains
         procedure :: F => LorenzDE
         procedure :: G => SampleEvent
@@ -43,7 +43,7 @@ module LorenzDiffEq
     
     contains
     
-    pure function LorenzDE(me, X, Y, Params)    
+    function LorenzDE(me, X, Y, Params)    
         intrinsic :: size  
         class(LorenzSys), intent(in) :: me !< Differential Equation object
         real(WP), intent(in) :: X
@@ -52,9 +52,9 @@ module LorenzDiffEq
         
         real(WP), dimension(size(Y)) :: LorenzDE
 
-        LorenzDE(1) = Params(1)*(Y(2) - Y(1))
-        LorenzDE(2) = Y(1)*(Params(2) - Y(3)) - Y(2)
-        LorenzDE(3) = Y(1)*Y(2) - Params(3)*Y(3)
+        LorenzDE(1) = me%sigma*(Y(2) - Y(1))
+        LorenzDE(2) = Y(1)*(me%rho - Y(3)) - Y(2)
+        LorenzDE(3) = Y(1)*Y(2) - me%beta*Y(3)
     end function LorenzDE
         
     subroutine SampleEvent(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)            
@@ -108,7 +108,7 @@ end module LorenzDiffEq
     character(len=20) :: fname = 'results_Lorenz.txt'
     character(len=20) :: spfname = 'states_ip_Lorenz.txt'
 
-    type(ERK_class) erkvar
+    type(ERK_class) :: erkvar
     type(LorenzSys) :: LorenzObj
     
     real(WP) :: x0, xf, xfval, rnum
@@ -191,7 +191,7 @@ end module LorenzDiffEq
                 y0r(1) = y0r(1) + rnum*randon*y0r(1)
 
                 call erkvar%Integrate(x0, y0r, xfval, yf, StepSz=stepsz, UseConstStepSz=CONST_STEPSZ, &
-                    IntStepsOn=.FALSE.,StiffTest=stiffstatus, params=params)
+                    IntStepsOn=.FALSE.,StiffTest=stiffstatus)
             end do
             call CPU_TIME(tf)
         

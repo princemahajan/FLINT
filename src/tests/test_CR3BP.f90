@@ -497,7 +497,7 @@ end module MyDiffEq
              
         nevents = int(size(EventStates,2))
         do ctr = 1,nevents
-         write(17, '(I12.1, 4E12.6)') int(EventStates(8,ctr)),EventStates(1,ctr),&
+         write(17, '(I12.1, 4E13.6)') int(EventStates(8,ctr)),EventStates(1,ctr),&
                EventStates(2,ctr),EventStates(3,ctr),EventStates(4,ctr)
         end do
     end if
@@ -590,7 +590,7 @@ end module MyDiffEq
         write(17, '(5A12)') 'Event Index','X','Y1','Y2','Y3'             
         nevents = int(size(EventStates,2))
         do ctr = 1,nevents
-        write(17, '(I12.1, 4E12.6)') int(EventStates(8,ctr)),EventStates(1,ctr),&
+        write(17, '(I12.1, 4E13.6)') int(EventStates(8,ctr)),EventStates(1,ctr),&
               EventStates(2,ctr),EventStates(3,ctr),EventStates(4,ctr)
         end do
     end if

@@ -94,18 +94,18 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: FCalls
         real(WP), dimension(:), intent(in), optional :: params        
 
-        select case (method)
+        select case (me%method)
         case (ERK_DOP853)
             call DOP853_IntpCoeff(me%pDiffEqSys, X0, Y0, h, Y1, me%InterpStates, me%k, Bip, FCalls, params)
         case (ERK_DOP54)
             call DOP54_IntpCoeff(me%pDiffEqSys, X0, Y0, h, Y1, me%InterpStates, me%k, Bip, FCalls, params)
         case (ERK_VERNER65E)
             call IntpCoeff(me%pDiffEqSys, X0, Y0, h, me%InterpStates, Verner65E_sint, &
-                    Verner65E_s, Verner65E_a, Verner65E_c, Verner65E_d, &
+                    Verner65E_s, Verner65E_a, Verner65E_c(Verner65E_sint+1:Verner65E_s), Verner65E_d, &
                     [Verner65E_di_NZ,-1], Verner65E_pstar, me%k, Bip, FCalls, params)
         case (ERK_VERNER98R)
             call IntpCoeff(me%pDiffEqSys, X0, Y0, h, me%InterpStates, Verner98R_sint, &
-                    Verner98R_s, Verner98R_a, Verner98R_c, Verner98R_d, &
+                    Verner98R_s, Verner98R_a, Verner98R_c(Verner98R_sint+1:Verner98R_s), Verner98R_d, &
                     [Verner98R_di_NZ,-1], Verner98R_pstar, me%k, Bip, FCalls, params)
         case default
             me%status = FLINT_ERROR
@@ -246,7 +246,7 @@ submodule (ERK) ERKStepInt
         integer, dimension(:), intent(in) :: InterpStates
         integer, intent(in) :: sint, s
         real(WP), dimension(:), intent(in) :: a
-        real(WP), dimension(2:sint), intent(in) :: c
+        real(WP), dimension(sint+1:s), intent(in) :: c
         real(WP), dimension(:,:), intent(in) :: d
         integer, dimension(:), intent(in) :: dinz
         integer, intent(in) :: pstar
@@ -263,7 +263,7 @@ submodule (ERK) ERKStepInt
         do i = (sint+1),s
             block
             integer :: astart, j
-            real(WP), dimension(n) :: aijkj
+            real(WP), dimension(size(Y0)) :: aijkj
             ! starting index of a_ij, where i=i, j=1:(i-1)
             ! It is a series sum: 1 + 2 + 3 + ...
             astart = int((i-1)/2.0*(i-2))
