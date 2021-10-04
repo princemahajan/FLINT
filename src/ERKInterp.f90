@@ -39,6 +39,7 @@ submodule (ERK) ERKInterp
         integer :: n, X0loc, X0start
         real(WP) :: h, X0
         real(WP) :: hSign
+        integer :: ctr
         
         ! if interpolation mode is not on then return with an error
         if (.NOT. me%InterpOn) then
@@ -81,7 +82,7 @@ submodule (ERK) ERKInterp
         ! Main Interpolation loop
         X0start = 1
         
-        do concurrent (integer:: ctr = 1:n)
+        do concurrent (ctr = 1:n)
             
             ! Find X0loc s.t. Xarr(ctr) belongs to ( Xint(X0loc-1), Xint(X0loc) ]
             do while (X0start <= me%AcceptedSteps)

@@ -1,6 +1,6 @@
 name = "FLINT"
 author = "Bharat Mahajan"
-copyright  = "Copyright 2020 Bharat Mahajan"
+copyright  = "Copyright 2021 Bharat Mahajan"
 license = "Apache-2.0"
 description = "Fortran Library for numerical INTegration of differential equations"
 homepage = "https://github.com/princemahajan/FLINT"

@@ -27,7 +27,8 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, DenseOn, Runs, p
         X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
     
         # Define ODE problem
-        prob = ODEProblem(ODE, X0new, tspan, par);                
+        # prob = ODEProblem(ODE, X0new, tspan, par);   
+        prob = remake(prob; u0 = X0new);                  
 
         #GC.gc()
         sol = solve(prob, OdeMethod,reltol=rtol,abstol=atol, dense=DenseOn)

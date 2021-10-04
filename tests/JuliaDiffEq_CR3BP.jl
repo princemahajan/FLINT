@@ -164,7 +164,8 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
         X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
         
         # Define ODE problem
-        prob = ODEProblem(ODE, X0new, tspan, par);                
+        # prob = ODEProblem(ODE, X0new, tspan, par);                
+        prob = remake(prob; u0 = X0new);                
         
         #GC.gc()
         sol = FireODE(atol, rtol, OdeMethod, prob, DenseOn, cb)
@@ -247,7 +248,7 @@ function main_CR3BP()
 
     for itr in 1:ntol
         for ctr in 1:nsol
-            print(string("Running: ",ODESolvers[ctr].name, "\n"))
+            # print(string("Running: ",ODESolvers[ctr].name, "\n"))
             SolResults3B[ctr,itr] = FireODEIntTest(X0, cr3bpeom, tspan, ODESolvers[ctr].solver,  atol[itr], rtol[itr], [R0; V0], 0, JacobiConstant, ODESolvers[ctr].dense,Runs,(mu));
         end
         #print(string("tol: ", rtol[itr],"\n"))

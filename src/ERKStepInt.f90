@@ -255,7 +255,7 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: Fcalls
         real(WP), dimension(:), intent(in), optional :: params
         
-        integer :: i
+        integer :: i, j
         
         ! Compute extra stages needed for interpolation
     
@@ -273,7 +273,7 @@ submodule (ERK) ERKStepInt
             ! call gemv(me%k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
             ! aijkj = matmul(me%k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
             aijkj = 0.0_WP
-            do concurrent (integer:: j = 1:(i-1))
+            do concurrent (j = 1:(i-1))
                 aijkj = aijkj + k(:,j)*a(astart + j)
             end do
             
@@ -290,7 +290,7 @@ submodule (ERK) ERKStepInt
         !! where \f$ Bip(i) = d(i,1)*k_1 + d(i,2)*k_2 + ... + d(i,s)*k_s \f$.
         
         IpCoeff(:,0) = Y0(InterpStates)
-        do concurrent (integer:: j = 1:pstar)
+        do concurrent (j = 1:pstar)
             block
                 integer :: istage
                 real(WP), dimension(size(InterpStates)) :: cont
@@ -515,20 +515,26 @@ submodule (ERK) ERKStepInt
                     + DOP853_d(13-4,4)*k(InterpStates,13) + DOP853_d(14-4,4)*k(InterpStates,14) &
                     + DOP853_d(15-4,4)*k(InterpStates,15) + DOP853_d(16-4,4)*k(InterpStates,16))
             
-        cont5(:) = h*(DOP853_d(1,5)*k(InterpStates,1) + DOP853_d(6-4,5)*k(InterpStates,6) + DOP853_d(7-4,5)*k(InterpStates,7) &
-                    + DOP853_d(8-4,5)*k(InterpStates,8) + DOP853_d(9-4,5)*k(InterpStates,9) + DOP853_d(10-4,5)*k(InterpStates,10) &
-                    + DOP853_d(11-4,5)*k(InterpStates,11) + DOP853_d(12-4,5)*k(InterpStates,12) + DOP853_d(13-4,5)*k(InterpStates,13) &
-                    + DOP853_d(14-4,5)*k(InterpStates,14) + DOP853_d(15-4,5)*k(InterpStates,15) + DOP853_d(16-4,5)*k(InterpStates,16))
+        cont5(:) = h*(DOP853_d(1,5)*k(InterpStates,1) + DOP853_d(6-4,5)*k(InterpStates,6) &
+                    + DOP853_d(7-4,5)*k(InterpStates,7) + DOP853_d(8-4,5)*k(InterpStates,8) &
+                    + DOP853_d(9-4,5)*k(InterpStates,9) + DOP853_d(10-4,5)*k(InterpStates,10) &
+                    + DOP853_d(11-4,5)*k(InterpStates,11) + DOP853_d(12-4,5)*k(InterpStates,12) &
+                    + DOP853_d(13-4,5)*k(InterpStates,13) + DOP853_d(14-4,5)*k(InterpStates,14) &
+                    + DOP853_d(15-4,5)*k(InterpStates,15) + DOP853_d(16-4,5)*k(InterpStates,16))
             
-        cont6(:) = h*(DOP853_d(1,6)*k(InterpStates,1) + DOP853_d(6-4,6)*k(InterpStates,6) + DOP853_d(7-4,6)*k(InterpStates,7) &
-                    + DOP853_d(8-4,6)*k(InterpStates,8) + DOP853_d(9-4,6)*k(InterpStates,9) + DOP853_d(10-4,6)*k(InterpStates,10) &
-                    + DOP853_d(11-4,6)*k(InterpStates,11) + DOP853_d(12-4,6)*k(InterpStates,12) + DOP853_d(13-4,6)*k(InterpStates,13) &
-                    + DOP853_d(14-4,6)*k(InterpStates,14) + DOP853_d(15-4,6)*k(InterpStates,15) + DOP853_d(16-4,6)*k(InterpStates,16))
+        cont6(:) = h*(DOP853_d(1,6)*k(InterpStates,1) + DOP853_d(6-4,6)*k(InterpStates,6) &
+                    + DOP853_d(7-4,6)*k(InterpStates,7) + DOP853_d(8-4,6)*k(InterpStates,8) &
+                    + DOP853_d(9-4,6)*k(InterpStates,9) + DOP853_d(10-4,6)*k(InterpStates,10) &
+                    + DOP853_d(11-4,6)*k(InterpStates,11) + DOP853_d(12-4,6)*k(InterpStates,12) &
+                    + DOP853_d(13-4,6)*k(InterpStates,13) + DOP853_d(14-4,6)*k(InterpStates,14) &
+                    + DOP853_d(15-4,6)*k(InterpStates,15) + DOP853_d(16-4,6)*k(InterpStates,16))
         
-        cont7(:) = h*(DOP853_d(1,7)*k(InterpStates,1) + DOP853_d(6-4,7)*k(InterpStates,6) + DOP853_d(7-4,7)*k(InterpStates,7) &
-                    + DOP853_d(8-4,7)*k(InterpStates,8) + DOP853_d(9-4,7)*k(InterpStates,9) + DOP853_d(10-4,7)*k(InterpStates,10) &
-                    + DOP853_d(11-4,7)*k(InterpStates,11) + DOP853_d(12-4,7)*k(InterpStates,12) + DOP853_d(13-4,7)*k(InterpStates,13) &
-                    + DOP853_d(14-4,7)*k(InterpStates,14) + DOP853_d(15-4,7)*k(InterpStates,15) + DOP853_d(16-4,7)*k(InterpStates,16))
+        cont7(:) = h*(DOP853_d(1,7)*k(InterpStates,1) + DOP853_d(6-4,7)*k(InterpStates,6) &
+                    + DOP853_d(7-4,7)*k(InterpStates,7) + DOP853_d(8-4,7)*k(InterpStates,8) &
+                    + DOP853_d(9-4,7)*k(InterpStates,9) + DOP853_d(10-4,7)*k(InterpStates,10) &
+                    + DOP853_d(11-4,7)*k(InterpStates,11) + DOP853_d(12-4,7)*k(InterpStates,12) &
+                    + DOP853_d(13-4,7)*k(InterpStates,13) + DOP853_d(14-4,7)*k(InterpStates,14) &
+                    + DOP853_d(15-4,7)*k(InterpStates,15) + DOP853_d(16-4,7)*k(InterpStates,16))
             
         ! check Hairer's contd8 routine for verifying the following code
         IntpCoeff(:,0) = cont0(:)
@@ -631,7 +637,7 @@ submodule (ERK) ERKStepInt
     
     
     subroutine DOP54_IntpCoeff(n, Y0, h, Y1, InterpStates, k, IntpCoeff, FCalls)
-        integer, intent(inout) :: n
+        integer, intent(in) :: n
         real(WP), dimension(n), intent(in) :: Y0
         real(WP), intent(in) :: h
         real(WP), dimension(size(Y0)), intent(in) :: Y1
