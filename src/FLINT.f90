@@ -50,7 +50,7 @@
 !!              without event detection in the most cases as shown in the following screenshots. 
 !!              In the case of Lorenz equations, Julia's Vern9 appear to be faster especially when
 !!              the initial conditions are kept the same in all the benchmark runs. The Julia test code 
-!!              along with results are provided in the media folder on FLINT's GitHub 
+!!              along with results are provided in the tests folder on FLINT's GitHub 
 !!              repository https://github.com/princemahajan/FLINT.
 !!              - Three-Body problem propagation
 !!              \image html "julia_screenshot_CR3BP.PNG"

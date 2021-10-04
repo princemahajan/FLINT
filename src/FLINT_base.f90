@@ -234,7 +234,7 @@ module FLINT_base
             implicit none
             intrinsic :: size
             
-            class(DiffEqSys), intent(in) :: me      !< Differential Equation object
+            class(DiffEqSys), intent(inout) :: me      !< Differential Equation object
             real(WP), intent(in) :: X   !< Independent variable value
             real(WP), intent(in), dimension(me%n) :: Y !< Initial condition
             
@@ -257,7 +257,7 @@ module FLINT_base
             import :: WP, DiffEqSys, FLINT_EVENTACTION_CONTINUE
             implicit none
             
-            class(DiffEqSys), intent(in) :: me  !< Object of class type DiffEqSys            
+            class(DiffEqSys), intent(inout) :: me  !< Object of class type DiffEqSys            
             
             !> The current independent variable value. When an event is detected, it contains
             !! the location of that event.

@@ -45,7 +45,7 @@ module LorenzDiffEq
     
     function LorenzDE(me, X, Y, Params)    
         intrinsic :: size  
-        class(LorenzSys), intent(in) :: me !< Differential Equation object
+        class(LorenzSys), intent(inout) :: me !< Differential Equation object
         real(WP), intent(in) :: X
         real(WP), intent(in), dimension(me%n) :: Y
         real(WP), intent(in), dimension(:), optional :: Params
@@ -58,7 +58,7 @@ module LorenzDiffEq
     end function LorenzDE
         
     subroutine SampleEvent(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)            
-        class(LorenzSys), intent(in) :: me !< Differential Equation object            
+        class(LorenzSys), intent(inout) :: me !< Differential Equation object            
         real(WP), intent(in) :: X
         real(WP), dimension(:), intent(inout) :: Y
         integer, dimension(:), intent(in) :: EvalEvents

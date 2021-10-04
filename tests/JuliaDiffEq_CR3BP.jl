@@ -163,8 +163,8 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
         # randomsize initial conditions
         X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
         
-        # # Define ODE problem
-        # prob = ODEProblem(ODE, X0new, tspan, par);                
+        # Define ODE problem
+        prob = ODEProblem(ODE, X0new, tspan, par);                
         
         #GC.gc()
         sol = FireODE(atol, rtol, OdeMethod, prob, DenseOn, cb)

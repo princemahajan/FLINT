@@ -189,7 +189,7 @@
 
 
         ! choose method-specific parameters and allocate space for k
-        ! TBD: Do we still need to do this?
+        ! TBD: Can we move all the ERK-method specific stuff to Integrate?
         select case (me%method)
         
             case (ERK_DOP853)
@@ -198,16 +198,16 @@
                 me%p                            = DOP853_p
                 me%phat                         = DOP853_phat
                 me%q                            = DOP853_q
-                me%a(1:int((me%s-1)/2.0*me%s))  = DOP853_a
-                me%b(1:me%sint)                 = DOP853_b
-                me%c(2:me%s)                    = DOP853_c
-                me%e(1:me%sint)                 = DOP853_e
+                ! me%a(1:int((me%s-1)/2.0*me%s))  = DOP853_a
+                ! me%b(1:me%sint)                 = DOP853_b
+                ! me%c(2:me%s)                    = DOP853_c
+                ! me%e(1:me%sint)                 = DOP853_e
                 me%IsFSALMethod                 = DOP853_FSAL
 
                 if (me%InterpOn .OR. me%EventsOn) then
                     me%pstar                                        = DOP853_pstar
-                    me%dinz(1:size(DOP853_di_NZ)+1)                 = [DOP853_di_NZ, -1]
-                    me%d(1:size(DOP853_di_NZ),1:size(DOP853_dj_NZ)) = DOP853_d
+                    ! me%dinz(1:size(DOP853_di_NZ)+1)                 = [DOP853_di_NZ, -1]
+                    ! me%d(1:size(DOP853_di_NZ),1:size(DOP853_dj_NZ)) = DOP853_d
                 end if
                 
             case (ERK_VERNER98R)
@@ -216,16 +216,16 @@
                 me%p                            = Verner98R_p
                 me%phat                         = Verner98R_phat
                 me%q                            = Verner98R_q
-                me%a(1:int((me%s-1)/2.0*me%s))  = Verner98R_a
-                me%b(1:me%sint)                 = Verner98R_b
-                me%c(2:me%s)                    = Verner98R_c
-                me%e(1:me%sint)                 = Verner98R_e
+                ! me%a(1:int((me%s-1)/2.0*me%s))  = Verner98R_a
+                ! me%b(1:me%sint)                 = Verner98R_b
+                ! me%c(2:me%s)                    = Verner98R_c
+                ! me%e(1:me%sint)                 = Verner98R_e
                 me%IsFSALMethod                 = Verner98R_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
                     me%pstar                                        = Verner98R_pstar
-                    me%dinz(1:size(Verner98R_di_NZ)+1)              = [Verner98R_di_NZ, -1]
-                    me%d(1:size(Verner98R_di_NZ),1:Verner98R_pstar) = Verner98R_d
+                    ! me%dinz(1:size(Verner98R_di_NZ)+1)              = [Verner98R_di_NZ, -1]
+                    ! me%d(1:size(Verner98R_di_NZ),1:Verner98R_pstar) = Verner98R_d
                 end if
                 
             case (ERK_VERNER65E)
@@ -234,16 +234,16 @@
                 me%p                            = Verner65E_p
                 me%phat                         = Verner65E_phat
                 me%q                            = Verner65E_q                
-                me%a(1:int((me%s-1)/2.0*me%s))  = Verner65E_a
-                me%b(1:me%sint)                 = Verner65E_b
-                me%c(2:me%s)                    = Verner65E_c
-                me%e(1:me%sint)                 = Verner65E_e
+                ! me%a(1:int((me%s-1)/2.0*me%s))  = Verner65E_a
+                ! me%b(1:me%sint)                 = Verner65E_b
+                ! me%c(2:me%s)                    = Verner65E_c
+                ! me%e(1:me%sint)                 = Verner65E_e
                 me%IsFSALMethod                 = Verner65E_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
                     me%pstar                                        = Verner65E_pstar
-                    me%dinz(1:size(Verner65E_di_NZ)+1)              = [Verner65E_di_NZ, -1]
-                    me%d(1:size(Verner65E_di_NZ),1:Verner65E_pstar) = Verner65E_d
+                    ! me%dinz(1:size(Verner65E_di_NZ)+1)              = [Verner65E_di_NZ, -1]
+                    ! me%d(1:size(Verner65E_di_NZ),1:Verner65E_pstar) = Verner65E_d
                 end if                
 
             case (ERK_DOP54)
@@ -252,16 +252,16 @@
                 me%p                            = DOP54_p
                 me%phat                         = DOP54_phat
                 me%q                            = DOP54_q
-                me%a(1:int((me%s-1)/2.0*me%s))  = DOP54_a
-                me%b(1:me%sint)                 = DOP54_b
-                me%c(2:me%s)                    = DOP54_c
-                me%e(1:me%sint)                 = DOP54_e
+                ! me%a(1:int((me%s-1)/2.0*me%s))  = DOP54_a
+                ! me%b(1:me%sint)                 = DOP54_b
+                ! me%c(2:me%s)                    = DOP54_c
+                ! me%e(1:me%sint)                 = DOP54_e
                 me%IsFSALMethod                 = DOP54_FSAL                
             
                 if (me%InterpOn .OR. me%EventsOn) then
                     me%pstar                        = DOP54_pstar
-                    me%dinz(1:size(DOP54_di_NZ)+1)  = [DOP54_di_NZ, -1]
-                    me%d(1:size(DOP54_di_NZ),1:2)   = DOP54_d
+                    ! me%dinz(1:size(DOP54_di_NZ)+1)  = [DOP54_di_NZ, -1]
+                    ! me%d(1:size(DOP54_di_NZ),1:2)   = DOP54_d
                 end if                
                 
             case default

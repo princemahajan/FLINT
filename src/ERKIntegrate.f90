@@ -50,7 +50,6 @@ submodule (ERK) ERKIntegrate
 
 
         class(DiffEqSys), pointer :: pDiffEqSys
-        integer(kind(ERK_DOP853)) :: method
 
         integer(kind(FLINT_SUCCESS)) :: status, stat
 
@@ -60,13 +59,11 @@ submodule (ERK) ERKIntegrate
         real(WP) :: h, hSign, hnew, hmax, X, Err, LastStepSzFac
         real(WP), dimension(me%pDiffEqSys%n) :: Y1, Y2, F0, Sc0, Yint12
 
-        integer :: n, m, FCalls, TotalFCalls, AcceptedSteps, RejectedSteps 
-        integer :: TotalSteps, MaxSteps, s, sint, p, pstar, q, nInterpStates
+        integer :: FCalls, nInterpStates
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
         
         logical :: IntStepsNeeded, LastStepRejected, LAST_STEP, ConstStepSz, IsProblemStiff
-        logical :: IsScalarTol, IsFSALMethod, InterpOn, EventsOn, BipComputed
-
+        logical :: InterpOn, EventsOn, BipComputed
 
         ! Events related variables
         integer :: EventId
@@ -85,24 +82,12 @@ submodule (ERK) ERKIntegrate
         LAST_STEP = .FALSE.
         status = FLINT_SUCCESS        
         
-        ! Copy frequently needed data on the stack
         pDiffEqSys => me%pDiffEqSys
-        n = me%pDiffEqSys%n
-        m = me%pDiffEqSys%m
-        p = me%p
-        pstar = me%pstar
-        q = me%q       
-        MaxSteps = me%MaxSteps
         hmax = me%MaxStepSize
-        StepSzParams = me%StepSzParams        
-        method = me%method
-        IsScalarTol = me%IsScalarTol
-        IsFSALMethod = me%IsFSALMethod
         InterpOn = me%InterpOn
         EventsOn = me%EventsOn
-        s = me%s
-        sint = me%sint
         nInterpStates = size(me%InterpStates)
+        StepSzParams = me%StepSzParams        
         StiffTestSteps = STIFFTEST_STEPS
         
         ! Sign of the step: negative for backward integration
@@ -140,9 +125,9 @@ submodule (ERK) ERKIntegrate
         if (IntStepsNeeded) then
             if (present(Xint) .AND. present(Yint)) then
                 ! allocate 1 more than max steps to accommodate the initial condition
-                allocate(Xint(MaxSteps+1), stat=stat)
+                allocate(Xint(me%MaxSteps+1), stat=stat)
                 if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
-                allocate(Yint(pDiffEqSys%n,MaxSteps+1), stat=stat)
+                allocate(Yint(pDiffEqSys%n,me%MaxSteps+1), stat=stat)
                 if (stat /= 0)  status = FLINT_ERROR_MEMALLOC
             else
                 ! With IntStepsNeeded, Xint and Yint must be provided
@@ -172,7 +157,7 @@ submodule (ERK) ERKIntegrate
             ! If size of Xint is less than the max size, then it means user is calling
             ! Intgerate again without doing Init first, so reallocate the memory
             if (allocated(me%Xint)) then
-                if (size(me%Xint) < MaxSteps+1) then 
+                if (size(me%Xint) < me%MaxSteps+1) then 
                     deallocate(me%Xint, stat = status)
                     deallocate(me%Bip, stat = status)
                     allocate(me%Xint(me%MaxSteps+1), stat=status)
@@ -214,10 +199,10 @@ submodule (ERK) ERKIntegrate
         ! Initialize the counters to prepare for the main integration loop
         X = X0
         Y1 = Y0
-        TotalFCalls = 0
-        TotalSteps = 0
-        AcceptedSteps = 0
-        RejectedSteps = 0
+        me%FCalls = 0
+        me%TotalSteps = 0
+        me%AcceptedSteps = 0
+        me%RejectedSteps = 0
         StiffThreshold = 0
         NonStiffThreshold = 0
         status = FLINT_SUCCESS
@@ -233,12 +218,12 @@ submodule (ERK) ERKIntegrate
 
         ! Compute the derivative and scale factor at the initial condition
         F0 = pDiffEqSys%F(X, Y1, params)
-        TotalFCalls = TotalFCalls + 1
+        me%FCalls = me%FCalls + 1
         
         !! \remark Scale factor is computed using
         !! \f[ SC_i = atol_i + rtol_i |Y_{i}| \quad i=1..n,\f]
         !! where \f$|Y|\f$ is the absolute value of the provided vector
-        if (.NOT. IsScalarTol) then
+        if (.NOT. me%IsScalarTol) then
             Sc0 = me%ATol + me%RTol*abs(Y1)
         else
             Sc0 = me%ATol(1) + me%RTol(1)*abs(Y1)
@@ -249,8 +234,8 @@ submodule (ERK) ERKIntegrate
 
         ! The initial step size: compute if user has not provided a non-zero value
         if (StepSz == 0.0_WP) then
-            call StepSz0Hairer(h, p, n, X, Y1, F0, Sc0, hSign, hmax, FCalls, pDiffEqSys, params)
-            TotalFCalls = TotalFCalls + Fcalls
+            call StepSz0Hairer(h, me%p, pDiffEqSys%n, X, Y1, F0, Sc0, hSign, hmax, FCalls, pDiffEqSys, params)
+            me%FCalls = me%FCalls + Fcalls
         else
             h = StepSz
         end if
@@ -272,7 +257,7 @@ submodule (ERK) ERKIntegrate
         ! Main loop for computing the steps
 
         do while (status == FLINT_SUCCESS .AND. (.NOT. LAST_STEP)  &
-                                .AND. (TotalSteps < MaxSteps))
+                                .AND. (me%TotalSteps < me%MaxSteps))
         
             ! if we are only slightly away from the final state
             ! then adjust to step size to finish the integration
@@ -285,8 +270,8 @@ submodule (ERK) ERKIntegrate
             call me%StepInt(X, Y1, h, Y2, Yint12, FCalls, (.NOT. ConstStepSz), Err, params)
 
             ! update steps taken and function calls made
-            TotalSteps = TotalSteps + 1                
-            TotalFCalls = TotalFCalls + FCalls                
+            me%TotalSteps = me%TotalSteps + 1                
+            me%FCalls = me%FCalls + FCalls                
             
             ! check error to see if the step needs to be accepted or rejected
             ! For constant step size, Err must be set to 0 by stepint function
@@ -294,10 +279,10 @@ submodule (ERK) ERKIntegrate
             if (Err <= 1.0_WP) then
 
                 ! step is accepted
-                AcceptedSteps = AcceptedSteps + 1
+                me%AcceptedSteps = me%AcceptedSteps + 1
                 
                 ! save the first accepted step-size
-                if (AcceptedSteps == 1) me%h0 = h
+                if (me%AcceptedSteps == 1) me%h0 = h
 
                 ! do we need stiffness detection?
                 if (StiffnessTest == 1 .OR. StiffnessTest == 2) then
@@ -329,7 +314,7 @@ submodule (ERK) ERKIntegrate
                     ! First check for events sign change at the step boundaries
                     EventNewY = Y2
                     call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, EV1(1,:), EventDir)
-                    do EventId = 1,m
+                    do EventId = 1,pDiffEqSys%m
                         call DetectEvent(EventId, EV0(1,EventId), EV1(1,EventId), EventsDetected(EventId))
                     end do
 
@@ -345,14 +330,14 @@ submodule (ERK) ERKIntegrate
                         ! For computing solution between the steps
                         if (.NOT. BipComputed) then
                             call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
-                            TotalFCalls = TotalFCalls + FCalls
+                            me%FCalls = me%FCalls + FCalls
                             BipComputed = .TRUE.
                         end if
 
                         ! Check for sign changes one by one for these events
-                        do EventId = 1, m
+                        do EventId = 1, pDiffEqSys%m
                         block
-                            real(WP), dimension(m) :: EventV0, EventV1, EventVh
+                            real(WP), dimension(pDiffEqSys%m) :: EventV0, EventV1, EventVh
                             real(WP) :: Eventh
                             logical :: EvStepSzDetected, LastStepSzEvent
                         
@@ -378,7 +363,7 @@ submodule (ERK) ERKIntegrate
                                 do while (EventX1 <= (X+h))
                                     if (EventX1 /= (X+h)) then
                                         ! interpolate solution
-                                        EventNewY = InterpY(n, EventX1, X, h, me%pstar, Bip)
+                                        EventNewY = InterpY(pDiffEqSys%n, EventX1, X, h, me%pstar, Bip)
                                         ! evaluate this specific event function
                                         call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, &
                                                             EventV1, EventDir)
@@ -422,14 +407,14 @@ submodule (ERK) ERKIntegrate
                     if (any(EventsDetected)) then
                     block
                         
-                        real(WP), dimension(MAXNUMSTEPSZEVENTS,m) :: EXm
-                        real(WP), dimension(n) :: EYm
+                        real(WP), dimension(MAXNUMSTEPSZEVENTS,pDiffEqSys%m) :: EXm
+                        real(WP), dimension(pDiffEqSys%n) :: EYm
                         integer :: StepEvId, rootiter, rooterror, nEvents
                         integer, dimension(1) :: MinEvXIndex
 
                         ! Locate the events first
                         
-                        do EventId = 1, m
+                        do EventId = 1, pDiffEqSys%m
                             do StepEvId = 1, nStepSzEvents(EventId)
                                 if (EventsDetected(EventId)) then
 
@@ -446,7 +431,7 @@ submodule (ERK) ERKIntegrate
                                         ! root-finding is enabled, so locate the event exactly
                                         if (.NOT. BipComputed) then
                                             call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
-                                            TotalFCalls = TotalFCalls + FCalls
+                                            me%FCalls = me%FCalls + FCalls
                                             BipComputed = .TRUE.
                                         end if
 
@@ -563,13 +548,12 @@ submodule (ERK) ERKIntegrate
                     ! then we must compute interpolation coefficients again.
                     if (.NOT. BipComputed) then
                         call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
-                        TotalFCalls = TotalFCalls + FCalls
+                        me%FCalls = me%FCalls + FCalls
                         BipComputed = .TRUE.
                     end if
                     ! store the solution internally at the natural step size
-                    me%Xint(AcceptedSteps + 1) = X + h
-                    !me%Yint(:,AcceptedSteps + 1) = Y2
-                    me%Bip(:,:,AcceptedSteps) = Bip
+                    me%Xint(me%AcceptedSteps + 1) = X + h
+                    me%Bip(:,:,me%AcceptedSteps) = Bip
                 end if
 
                 
@@ -581,18 +565,18 @@ submodule (ERK) ERKIntegrate
                     select case (IAND(EventAction, b'01111111')) 
                     case(FLINT_EVENTACTION_RESTARTINT)
                         me%k(:,1) = pDiffEqSys%F(X + h, Y2, params)
-                        TotalFCalls = TotalFCalls + 1                
+                        me%FCalls = me%FCalls + 1                
                     case(FLINT_EVENTACTION_CHANGESOLY)
                         Y2 = EventNewY
                         me%k(:,1) = pDiffEqSys%F(X + h, Y2, params)
-                        TotalFCalls = TotalFCalls + 1                
+                        me%FCalls = me%FCalls + 1                
                     end select
                 end if
 
                 ! return the solution at integrator's natural step size
                 if (IntStepsNeeded) then
-                    Xint(AcceptedSteps + 1) = X + h
-                    Yint(:,AcceptedSteps + 1) = Y2
+                    Xint(me%AcceptedSteps + 1) = X + h
+                    Yint(:,me%AcceptedSteps + 1) = Y2
                 end if
 
                 ! get ready for the next iteration
@@ -601,7 +585,7 @@ submodule (ERK) ERKIntegrate
 
                 ! compute the new step size now
                 if (.NOT. ConstStepSz) then
-                    hnew = StepSzHairer(h, .FALSE., q, Err, StepSzParams)
+                    hnew = StepSzHairer(h, .FALSE., me%q, Err, StepSzParams)
                     ! make sure hnew is not greater than hmax
                     if (abs(hnew) > hmax) hnew = hsign*hmax
                     ! if the last step was rejected, then dont increase step size
@@ -617,10 +601,10 @@ submodule (ERK) ERKIntegrate
                 ! step is rejected, now what
                 
                 ! increment the reject step counter, ignore the initial step rejections
-                if (AcceptedSteps >= 1) RejectedSteps = RejectedSteps + 1
+                if (me%AcceptedSteps >= 1) me%RejectedSteps = me%RejectedSteps + 1
                 
                 ! compute the new step size now
-                hnew = StepSzHairer(h, .TRUE., q, Err, StepSzParams)
+                hnew = StepSzHairer(h, .TRUE., me%q, Err, StepSzParams)
 
                 ! Make note of your rejection. It is used in the next iteration
                 ! for computing the new step size.
@@ -652,11 +636,11 @@ submodule (ERK) ERKIntegrate
                 real(WP), allocatable, dimension(:) :: Xarr            
                 real(WP), allocatable, dimension(:,:) :: Yarr       
             
-                allocate(Xarr(AcceptedSteps + 1))
-                allocate(Yarr(n,AcceptedSteps + 1))
+                allocate(Xarr(me%AcceptedSteps + 1))
+                allocate(Yarr(pDiffEqSys%n,me%AcceptedSteps + 1))
             
-                Xarr = Xint(1:AcceptedSteps + 1)
-                Yarr = Yint(:,1:AcceptedSteps + 1)
+                Xarr = Xint(1:me%AcceptedSteps + 1)
+                Yarr = Yint(:,1:me%AcceptedSteps + 1)
             
                 call move_alloc(from=Xarr, to=Xint)
                 call move_alloc(from=Yarr, to=Yint)
@@ -671,13 +655,11 @@ submodule (ERK) ERKIntegrate
                 !real(WP), allocatable, dimension(:,:) :: Yarr       
                 real(WP), allocatable, dimension(:,:,:) :: Biparr
                 
-                allocate(Xarr(AcceptedSteps + 1))
-                !allocate(Yarr(n,AcceptedSteps + 1))
-                allocate(Biparr(nInterpStates,0:me%pstar,AcceptedSteps))
+                allocate(Xarr(me%AcceptedSteps + 1))
+                allocate(Biparr(nInterpStates,0:me%pstar,me%AcceptedSteps))
             
-                Xarr = me%Xint(1:AcceptedSteps + 1)
-                !Yarr = me%Yint(:,1:AcceptedSteps + 1)
-                Biparr = me%Bip(:,:,1:AcceptedSteps)
+                Xarr = me%Xint(1:me%AcceptedSteps + 1)
+                Biparr = me%Bip(:,:,1:me%AcceptedSteps)
                 
                 call move_alloc(from=Xarr, to=me%Xint)
                 !call move_alloc(from=Yarr, to=me%Yint)
@@ -687,14 +669,14 @@ submodule (ERK) ERKIntegrate
 
         ! Prepare event output data
         if (EventsOn .AND. allocated(EventData)) then                
-            EventStates = reshape(EventData, [n+2, int(size(EventData)/(n+2))])
+            EventStates = reshape(EventData, [pDiffEqSys%n+2, int(size(EventData)/(pDiffEqSys%n+2))])
         end if
 
         if (LAST_STEP .AND. status == FLINT_SUCCESS) then
             ! we finished like we should
         elseif (EventsOn .AND. LAST_STEP .AND. status == FLINT_EVENT_TERM) then
             ! One of the terminal event has triggered, do nothing
-        else if (TotalSteps >= MaxSteps .AND. status == FLINT_SUCCESS) then
+        else if (me%TotalSteps >= me%MaxSteps .AND. status == FLINT_SUCCESS) then
             ! maximum steps reached
             status = FLINT_ERROR_MAXSTEPS
         else if (status == FLINT_ERROR_STEPSZ_TOOSMALL) then
@@ -715,10 +697,6 @@ submodule (ERK) ERKIntegrate
         me%Xf = Xf
         me%hf = StepSz
         me%Yf = Yf
-        me%AcceptedSteps = AcceptedSteps
-        me%RejectedSteps = RejectedSteps
-        me%TotalSteps = TotalSteps
-        me%FCalls = TotalFCalls                
         me%status = status
             
     contains
@@ -762,9 +740,9 @@ submodule (ERK) ERKIntegrate
         real(WP), intent(in) :: xx !< independent variable
         real(WP) :: gg
         
-        real(WP), dimension(n) :: ff
-        real(WP), dimension(m) :: eval
-        integer, dimension(m) :: EvalEvent, edir
+        real(WP), dimension(pDiffEqSys%n) :: ff
+        real(WP), dimension(pDiffEqSys%m) :: eval
+        integer, dimension(pDiffEqSys%m) :: EvalEvent, edir
         
         ! interpolate solution
         ff = InterpY(nInterpStates, xx, X, h, me%pstar, Bip)
@@ -788,8 +766,8 @@ submodule (ERK) ERKIntegrate
         IsProblemStiff = .FALSE.
         hLamb = 0.0_WP
         
-        if (mod(AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
-            StiffN = norm2(me%k(:,1) - me%k(:,sint-1))
+        if (mod(me%AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
+            StiffN = norm2(me%k(:,1) - me%k(:,me%sint-1))
             StiffD = norm2(Y2 - Yint12)
 
             if (StiffD > 0.0_WP) hLamb = abs(h)*StiffN/StiffD

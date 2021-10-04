@@ -36,7 +36,7 @@ submodule (ERK) ERKInterp
         logical, intent(in), optional :: SaveInterpCoeffs
 
         logical :: DeallocMem
-        integer :: n, ctr, X0loc, X0start
+        integer :: n, X0loc, X0start
         real(WP) :: h, X0
         real(WP) :: hSign
         
@@ -81,7 +81,7 @@ submodule (ERK) ERKInterp
         ! Main Interpolation loop
         X0start = 1
         
-        do concurrent (ctr = 1:n)
+        do concurrent (integer:: ctr = 1:n)
             
             ! Find X0loc s.t. Xarr(ctr) belongs to ( Xint(X0loc-1), Xint(X0loc) ]
             do while (X0start <= me%AcceptedSteps)

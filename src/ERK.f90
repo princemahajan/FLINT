@@ -84,10 +84,10 @@ module ERK
         ! Butcher Tableau coefficients of the chosen method
         integer :: s        !< Total number of stages
         integer :: sint     !< Number of Integration stages (including the FSAL stage)
-        real(WP), dimension(ERK_MAX_A) :: a             !< a_ij
-        real(WP), dimension(1:ERK_MAXSTAGES) :: b       !< b_i
-        real(WP), dimension(2:ERK_MAXSTAGES) :: c       !< c_i
-        real(WP), dimension(1:ERK_MAXSTAGES) :: e       !< e_i        
+        ! real(WP), dimension(ERK_MAX_A) :: a             !< a_ij
+        ! real(WP), dimension(1:ERK_MAXSTAGES) :: b       !< b_i
+        ! real(WP), dimension(2:ERK_MAXSTAGES) :: c       !< c_i
+        ! real(WP), dimension(1:ERK_MAXSTAGES) :: e       !< e_i        
 
         ! k values for each each stage, used in integration step routines
         real(WP), dimension(:, :), allocatable :: k

@@ -53,7 +53,7 @@ add_library(${FLINTBIN} STATIC ${FLINT_SRC})
 target_include_directories(${FLINTBIN} INTERFACE ${FLINT_INSTALL_LIB_DIR})
 
 # The test executable 
-set(TestFLINT_SRC src/tests/test_CR3BP.f90)
+set(TestFLINT_SRC tests/test_CR3BP.f90)
 set(TestFLINTBIN TestFLINT_CR3BP)
 add_executable(${TestFLINTBIN} ${TestFLINT_SRC})
 
@@ -61,7 +61,7 @@ add_executable(${TestFLINTBIN} ${TestFLINT_SRC})
 target_link_libraries(${TestFLINTBIN} ${FLINTBIN})
 
 # The test executable for Lorenz diffeq
-set(TestFLINT_Lorenz_SRC src/tests/test_Lorenz.f90)
+set(TestFLINT_Lorenz_SRC tests/test_Lorenz.f90)
 set(TestFLINT_LorenzBIN TestFLINT_Lorenz)
 add_executable(${TestFLINT_LorenzBIN} ${TestFLINT_Lorenz_SRC})
 
@@ -102,6 +102,20 @@ target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
 
 # Generate auto-dispatch code paths for better optimization if available 
 set(COption "/QxHost" "-xHost")
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
+target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
+
+# # optimization suggestions from compiler (doesn't create excecutables)
+# set(COption "/Qguide" "-guide")
+# GetPlatformCompilerFlag("${COption}" FALSE Fortran)
+# target_compile_options(${FLINTBIN} PRIVATE ${_Flag}>)
+
+# enable changing of the memory lauyut
+set(COption "/Qpad" "-pad")
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
+target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
+
+set(COption "/warn:all" "-warn all")
 GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE ${_Flag})
 
@@ -155,6 +169,10 @@ set(COption "/Qparallel" "-parallel")
 GetPlatformCompilerFlag("${COption}" FALSE Fortran)
 target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Release>:${_Flag}>)
 
+# Enable multi-file optimization
+set(COption "/Qipo" "-ipo")
+GetPlatformCompilerFlag("${COption}" FALSE Fortran)
+target_compile_options(${FLINTBIN} PRIVATE $<$<CONFIG:Release>:${_Flag}>)
 
 
 ############################

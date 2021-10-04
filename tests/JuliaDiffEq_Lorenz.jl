@@ -24,10 +24,10 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, DenseOn, Runs, p
 
     rtime = @elapsed for i in 1:Runs        
         # randomsize initial conditions
-        X0new[1] = X0new[1] + 0.000000000001*X0new[1].*rand()
+        X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
     
-        # # Define ODE problem
-        # prob = ODEProblem(ODE, X0new, tspan, par);                
+        # Define ODE problem
+        prob = ODEProblem(ODE, X0new, tspan, par);                
 
         #GC.gc()
         sol = solve(prob, OdeMethod,reltol=rtol,abstol=atol, dense=DenseOn)

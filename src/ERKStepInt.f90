@@ -98,7 +98,7 @@ submodule (ERK) ERKStepInt
         case (ERK_DOP853)
             call DOP853_IntpCoeff(me%pDiffEqSys, X0, Y0, h, Y1, me%InterpStates, me%k, Bip, FCalls, params)
         case (ERK_DOP54)
-            call DOP54_IntpCoeff(me%pDiffEqSys, X0, Y0, h, Y1, me%InterpStates, me%k, Bip, FCalls, params)
+            call DOP54_IntpCoeff(me%pDiffEqSys%n, Y0, h, Y1, me%InterpStates, me%k, Bip, FCalls)
         case (ERK_VERNER65E)
             call IntpCoeff(me%pDiffEqSys, X0, Y0, h, me%InterpStates, Verner65E_sint, &
                     Verner65E_s, Verner65E_a, Verner65E_c(Verner65E_sint+1:Verner65E_s), Verner65E_d, &
@@ -118,7 +118,7 @@ submodule (ERK) ERKStepInt
     !> It advances integrator by 1 step by computing intermediate stages
     subroutine stepint(pDiffEqSys, X0, Y0, h, IsFSALMethod, sint, k, a, b, c, Y1, &
                         Yint12, FCalls, Err, IsScalarTol, RTol, ATol, e, params)
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
+        class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(in) :: h
@@ -238,7 +238,7 @@ submodule (ERK) ERKStepInt
     
     subroutine IntpCoeff(pDiffEqSys, X0, Y0, h, InterpStates, sint, s, a, c, d, &
                                 dinz, pstar, k, IpCoeff, FCalls, params)
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
+        class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(in) :: h
@@ -255,7 +255,7 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: Fcalls
         real(WP), dimension(:), intent(in), optional :: params
         
-        integer :: i, j
+        integer :: i
         
         ! Compute extra stages needed for interpolation
     
@@ -273,7 +273,7 @@ submodule (ERK) ERKStepInt
             ! call gemv(me%k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
             ! aijkj = matmul(me%k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
             aijkj = 0.0_WP
-            do concurrent (j = 1:(i-1))
+            do concurrent (integer:: j = 1:(i-1))
                 aijkj = aijkj + k(:,j)*a(astart + j)
             end do
             
@@ -290,7 +290,7 @@ submodule (ERK) ERKStepInt
         !! where \f$ Bip(i) = d(i,1)*k_1 + d(i,2)*k_2 + ... + d(i,s)*k_s \f$.
         
         IpCoeff(:,0) = Y0(InterpStates)
-        do concurrent (j = 1:pstar)
+        do concurrent (integer:: j = 1:pstar)
             block
                 integer :: istage
                 real(WP), dimension(size(InterpStates)) :: cont
@@ -314,7 +314,7 @@ submodule (ERK) ERKStepInt
     !> It advances integrator by 1 step by computing stages
     subroutine DOP853_stepint(pDiffEqSys, X0, Y0, h, k, Y1, Yint12, FCalls, Err, &
                                     IsScalarTol, RTol, ATol, params)
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
+        class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(in) :: h
@@ -327,7 +327,6 @@ submodule (ERK) ERKStepInt
         real(WP), dimension(:), intent(in), optional :: params
                 
         real(WP), dimension(size(Y0)) :: Yint, aijkj, Sc
-        integer :: i
         logical EstimateErr        
         real(WP) :: DenomErr, Err3
         
@@ -457,7 +456,7 @@ submodule (ERK) ERKStepInt
 
     
     subroutine DOP853_IntpCoeff(pDiffEqSys, X0, Y0, h, Y1, InterpStates, k, IntpCoeff, Fcalls, params)
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
+        class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(in) :: h
@@ -547,7 +546,7 @@ submodule (ERK) ERKStepInt
     !> It advances integrator by 1 step by computing stages
     subroutine DOP54_stepint(pDiffEqSys, X0, Y0, h, k, Y1, Yint12, FCalls, Err, &
                                     IsScalarTol, RTol, ATol, params) 
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
+        class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), intent(in) :: h
@@ -631,19 +630,16 @@ submodule (ERK) ERKStepInt
     end subroutine DOP54_stepint
     
     
-    subroutine DOP54_IntpCoeff(pDiffEqSys, X0, Y0, h, Y1, InterpStates, k, IntpCoeff, FCalls, params)
-        class(DiffEqSys), intent(in)  :: pDiffEqSys
-        real(WP), intent(in) :: X0
-        real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
+    subroutine DOP54_IntpCoeff(n, Y0, h, Y1, InterpStates, k, IntpCoeff, FCalls)
+        integer, intent(inout) :: n
+        real(WP), dimension(n), intent(in) :: Y0
         real(WP), intent(in) :: h
         real(WP), dimension(size(Y0)), intent(in) :: Y1
         integer, dimension(:), intent(in) :: InterpStates
         real(WP), dimension(size(Y0),1:DOP54_s), intent(inout) :: k
         real(WP), dimension(size(InterpStates),0:4), intent(out) :: IntpCoeff
         integer, intent(out) :: Fcalls
-        real(WP), dimension(:), intent(in), optional :: params
         
-        real(WP), dimension(size(Y0)) :: Yint
         real(WP), dimension(size(InterpStates)) :: cont0, cont1, cont2, cont3, cont4
         
         FCalls = 0

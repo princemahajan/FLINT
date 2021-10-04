@@ -65,7 +65,7 @@ module StepSize
                                                        !!on the forward or backward integration, respectively
         real(WP), intent(in)                  :: hMax  !< Maximum allowed step size 
         integer, intent(out)                  :: FCalls !< Number of Calls that this routine makes to DiffEq function "F"
-        class(DiffEqSys), pointer, intent(in) :: pDiffEqSys
+        class(DiffEqSys), pointer, intent(inout) :: pDiffEqSys
         real(WP), dimension(:), intent(in), optional :: Params !< Real parameter array to be passed to DEFunc
         
         real(WP) :: d0, d1, d2, dMax, h0, h1
@@ -86,7 +86,7 @@ module StepSize
         h0 = hSign*min(h0, hMax)
         
         ! Explicit Euler step
-        F1 = pDiffEqSys%F((X0 + h0), (Y0 + h0*F0), Params)
+        F1 = pDiffEqSys%F(X0 + h0, Y0 + h0*F0, Params)
         
         ! 2nd derivative approximation
         d2 = norm2((F1 - F0)/Sc)/h0
