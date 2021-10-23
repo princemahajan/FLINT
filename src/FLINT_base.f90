@@ -213,13 +213,15 @@ module FLINT_base
     !! + n must be set to the number of the differential equations.
     !! + m must be set equal to the number of events, if events are used.
     !! + 'TBD' p must be set to the number of the parameters for sensitivity analysis
+    !! + G is a pointer to the event function that must be associated with the user-provided
+    !!   event function if events are enabled.
     type, abstract, public :: DiffEqSys
         integer :: n = 1
         integer :: m = 1
         integer :: p = 0
+        procedure(EventFunc), pointer, pass :: G => null()
     contains
         procedure(DEFunc), deferred :: F
-        procedure(EventFunc), deferred :: G
     end type DiffEqSys
    
     
@@ -245,8 +247,6 @@ module FLINT_base
         
         end function DEFunc
 
-        
-        
         !> Interface for a user-supplied procedure for computing events values during 
         !! the integration. It is also called after an event is detected in order for 
         !! the user to specify the event actions to be taken by the event handler. Note

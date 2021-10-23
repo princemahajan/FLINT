@@ -3,20 +3,20 @@
  A. Internal Step Size
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
   DOP54            3.219   0.224E+01  -0.587E-10       26587        4390          49
-  DOP853           1.172   0.224E+01   0.285E-10       11893         680         154
-  Verner65E        3.688   0.224E+01  -0.684E-11       22005        2417          36
-  Verner98R        1.938   0.224E+01  -0.125E-11       12010         503          97
+  DOP853           1.188   0.224E+01   0.285E-10       11893         680         154
+  Verner65E        3.641   0.224E+01  -0.684E-11       22005        2417          36
+  Verner98R        1.891   0.224E+01  -0.125E-11       12010         503          97
  X-axis (Y1) and Y-axis (Y2) crossing events
  Event Index           X          Y1          Y2          Y3
            2 0.398849E+00 0.748492E+00-0.281832E-12 0.000000E+00
  B. Interpolated Grid
       Method     Time(s) Closing Err  Jacobi Err      FCalls    Accepted    Rejected
-  DOP54            4.609   0.224E+01  -0.587E-10       26587        4390          49
-  DOP853           2.109   0.224E+01   0.285E-10       11896         680         154
+  DOP54            4.594   0.224E+01  -0.587E-10       26587        4390          49
+  DOP853           2.141   0.224E+01   0.285E-10       11896         680         154
   Verner65E        4.766   0.224E+01  -0.684E-11       22007        2417          36
-  Verner98R        2.953   0.224E+01  -0.125E-11       12020         503          97
+  Verner98R        3.781   0.224E+01  -0.125E-11       12020         503          97
  X-axis (Y1) and Y-axis (Y2) crossing events
  Event Index           X          Y1          Y2          Y3
            2 0.398849E+00 0.748492E+00-0.281832E-12 0.000000E+00
   
-    10000000 Func calls:       281.25   ms
+    10000000 Func calls:       312.50   ms

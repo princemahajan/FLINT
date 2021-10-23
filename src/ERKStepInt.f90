@@ -125,7 +125,7 @@ submodule (ERK) ERKStepInt
         logical, intent(in) :: IsFSALMethod
         integer, intent(in) :: sint
         real(WP), dimension(size(Y0),1:sint), intent(inout) :: k
-        real(WP), dimension(:), intent(in) :: a
+        real(WP), dimension(:), contiguous, intent(in) :: a
         real(WP), dimension(1:sint), intent(in) :: b
         real(WP), dimension(2:sint), intent(in) :: c
         real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
@@ -162,7 +162,7 @@ submodule (ERK) ERKStepInt
             ! MKL's gemv. However, do loop is faster than both but 
             ! but still slower than hard-coded computations
             ! call gemv(k(:,1:(i-1)), me%a((astart+1):(i-1)), aijkj)
-            !aijkj = matmul(k(:,1:(i-1)), me%a((astart+1):(astart+i-1)))
+            ! aijkj = matmul(k(:,1:(i-1)), a((astart+1):(astart+i-1)))
             aijkj = 0.0_WP
             do j = 1,(i-1)
                 aijkj = aijkj + k(:,j)*a(astart + j)
@@ -245,10 +245,10 @@ submodule (ERK) ERKStepInt
         !real(WP), dimension(size(Y0)), intent(in) :: Y1
         integer, dimension(:), intent(in) :: InterpStates
         integer, intent(in) :: sint, s
-        real(WP), dimension(:), intent(in) :: a
+        real(WP), dimension(:), contiguous, intent(in) :: a
         real(WP), dimension(sint+1:s), intent(in) :: c
-        real(WP), dimension(:,:), intent(in) :: d
-        integer, dimension(:), intent(in) :: dinz
+        real(WP), dimension(:,:), contiguous, intent(in) :: d
+        integer, dimension(:), contiguous, intent(in) :: dinz
         integer, intent(in) :: pstar
         real(WP), dimension(size(Y0),1:s), intent(inout) :: k
         real(WP), dimension(size(InterpStates),0:pstar), intent(out) :: IpCoeff

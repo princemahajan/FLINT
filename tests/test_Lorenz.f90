@@ -38,7 +38,6 @@ module LorenzDiffEq
         real(WP) :: beta = 8.0_WP/3.0_WP
     contains
         procedure :: F => LorenzDE
-        procedure :: G => SampleEvent
     end type LorenzSys
     
     contains
@@ -57,17 +56,6 @@ module LorenzDiffEq
         LorenzDE(3) = Y(1)*Y(2) - me%beta*Y(3)
     end function LorenzDE
         
-    subroutine SampleEvent(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)            
-        class(LorenzSys), intent(inout) :: me !< Differential Equation object            
-        real(WP), intent(in) :: X
-        real(WP), dimension(:), intent(inout) :: Y
-        integer, dimension(:), intent(in) :: EvalEvents
-        real(WP), dimension(:), intent(out) :: Value
-        integer, dimension(:), intent(out) :: Direction
-        integer, intent(in), optional :: LocEvent
-        integer(kind(FLINT_EVENTACTION_CONTINUE)), intent(out), optional :: LocEventAction
-    end subroutine SampleEvent
-    
 end module LorenzDiffEq
 
 
@@ -136,6 +124,7 @@ end module LorenzDiffEq
     
     LorenzObj%n = 3
     LorenzObj%m = 0
+    ! LorenzObj%G => SampleEvent
     
     stepsz0 = 0.0E-2_WP    ! let FLINT compute the initial step-size    
     stifftestval = 1*0  ! check for stiffness and stop integration if stiff

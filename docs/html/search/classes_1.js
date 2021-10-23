@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['defunc',['DEFunc',['../interfaceflint__base_1_1_d_e_func.html',1,'flint_base']]],
-  ['diffeqsys',['diffeqsys',['../structflint__base_1_1diffeqsys.html',1,'flint_base']]]
+  ['erk_5fclass_0',['erk_class',['../structerk_1_1erk__class.html',1,'erk']]],
+  ['eventfunc_1',['EventFunc',['../interfaceflint__base_1_1_event_func.html',1,'flint_base']]]
 ];

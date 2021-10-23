@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['defunc',['defunc',['../interfaceflint__base_1_1_d_e_func.html#a02193474b20d16ce3e5bf718a633e674',1,'flint_base::DEFunc']]]
+  ['erk_5fdestroy_0',['erk_destroy',['../structerk_1_1erk__class.html#afbacb4804518decfceaee81659e7a343',1,'erk::erk_class']]],
+  ['eventfunc_1',['eventfunc',['../interfaceflint__base_1_1_event_func.html#ae80e62d15499fdca7715398706e5cee4',1,'flint_base::EventFunc']]]
 ];

@@ -1,8 +1,12 @@
 var searchData=
 [
-  ['r1',['r1',['../namespaceplots.html#a13e55790095794695243cf14b568b73c',1,'plots']]],
-  ['r2',['r2',['../namespaceplots.html#a11507de7facbe14c5e49dffbc0ff5b02',1,'plots']]],
-  ['r3',['r3',['../namespaceplots.html#ad32398a27f577fc438aa528334eabaf8',1,'plots']]],
-  ['rejectedsteps',['rejectedsteps',['../structflint__base_1_1flint__class.html#ab06ba53f7f20f1165221d877c334aa7b',1,'flint_base::flint_class']]],
-  ['rtol',['rtol',['../structflint__base_1_1flint__class.html#a93b559736fb9dc868a0586bd5fbb0635',1,'flint_base::flint_class']]]
+  ['s_0',['s',['../structerk_1_1erk__class.html#ac7fb4135bc2ffb07d67631aa61cece1c',1,'erk::erk_class']]],
+  ['sf_1',['sf',['../namespacestepsize.html#a98f437ebfe99a2602b64cc6d2e9c5991',1,'stepsize']]],
+  ['sfmax_2',['sfmax',['../namespacestepsize.html#a31c7482db403647b0e8818e25e9ba85c',1,'stepsize']]],
+  ['sfmin_3',['sfmin',['../namespacestepsize.html#ac715a1cda19131909d7869f2eaa5d4d6',1,'stepsize']]],
+  ['single_4',['single',['../namespaceflintutils.html#afa8704bd59c53dc29b9f523515aa4df1',1,'flintutils']]],
+  ['sint_5',['sint',['../structerk_1_1erk__class.html#ac4ccdd537e9105cd1dd1c93bac142838',1,'erk::erk_class']]],
+  ['sp_6',['sp',['../namespaceflintutils.html#a4d9a6c6d13c1bc3b770b69c842647645',1,'flintutils']]],
+  ['status_7',['status',['../structflint__base_1_1flint__class.html#a695e0f29e9142a7461428cad527c9067',1,'flint_base::flint_class']]],
+  ['stepszparams_8',['stepszparams',['../structflint__base_1_1flint__class.html#a239f46a667fa180a7e3df397de28738a',1,'flint_base::flint_class']]]
 ];

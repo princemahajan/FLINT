@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['label',['label',['../namespaceplots.html#a45076d300d6057c2f0f4378f517113a0',1,'plots']]]
+  ['n_0',['n',['../structflint__base_1_1diffeqsys.html#ae008be4bfbb810e004ff979687f90cfd',1,'flint_base::diffeqsys']]]
 ];

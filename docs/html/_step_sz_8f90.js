@@ -1,8 +1,7 @@
 var _step_sz_8f90 =
 [
     [ "stepsz0hairer", "_step_sz_8f90.html#a7a7d29b0b69f0c4d0015684e9b3b869c", null ],
-    [ "stepszhairer", "_step_sz_8f90.html#a639a331610c060a9d6b7933866790ff7", null ],
-    [ "beta", "_step_sz_8f90.html#a56f94f3105df30ad222f10df41a3aba0", null ],
+    [ "stepszhairer", "_step_sz_8f90.html#ace8f8885fde54644bdab9ece497a6003", null ],
     [ "hbyhoptold", "_step_sz_8f90.html#a2e568931184615ceeb08a8bb65d90d81", null ],
     [ "sf", "_step_sz_8f90.html#a98f437ebfe99a2602b64cc6d2e9c5991", null ],
     [ "sfmax", "_step_sz_8f90.html#a31c7482db403647b0e8818e25e9ba85c", null ],

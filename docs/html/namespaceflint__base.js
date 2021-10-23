@@ -7,5 +7,7 @@ var namespaceflint__base =
     [ "Info", "interfaceflint__base_1_1_info.html", "interfaceflint__base_1_1_info" ],
     [ "Init", "interfaceflint__base_1_1_init.html", "interfaceflint__base_1_1_init" ],
     [ "Integrate", "interfaceflint__base_1_1_integrate.html", "interfaceflint__base_1_1_integrate" ],
-    [ "Interpolate", "interfaceflint__base_1_1_interpolate.html", "interfaceflint__base_1_1_interpolate" ]
+    [ "Interpolate", "interfaceflint__base_1_1_interpolate.html", "interfaceflint__base_1_1_interpolate" ],
+    [ "flint_errorstrings", "namespaceflint__base.html#a28267823b60e942cf203e62644a7ff6b", null ],
+    [ "int_maxsteps", "namespaceflint__base.html#a15135f078159b83af29d07495cb6d1ef", null ]
 ];

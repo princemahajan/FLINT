@@ -135,6 +135,10 @@
         if (present(EventsOn)) me%EventsOn = EventsOn
         
         if (me%EventsOn) then
+
+            ! check if user has supplied the event function
+            if (.NOT. associated(me%pDiffEqSys%G)) me%status = FLINT_ERROR_EVENTPARAMS                
+
             ! For events, we need to interpolate all the states
             me%InterpStates = [integer :: (doI,doI=1,me%pDiffEqSys%n)]
 
@@ -409,3 +413,4 @@
     end subroutine erk_destroy    
     
 end submodule ERKInit
+

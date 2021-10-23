@@ -65,7 +65,7 @@ module StepSize
                                                        !!on the forward or backward integration, respectively
         real(WP), intent(in)                  :: hMax  !< Maximum allowed step size 
         integer, intent(out)                  :: FCalls !< Number of Calls that this routine makes to DiffEq function "F"
-        class(DiffEqSys), pointer, intent(inout) :: pDiffEqSys
+        class(DiffEqSys), pointer, intent(inout) :: pDiffEqSys !< DiffEq system
         real(WP), dimension(:), intent(in), optional :: Params !< Real parameter array to be passed to DEFunc
         
         real(WP) :: d0, d1, d2, dMax, h0, h1
@@ -127,7 +127,7 @@ module StepSize
         logical, intent(in)                   :: IsLastStepRejected !< If true then the step size is decreased else increased.
         integer, intent(in)                   :: q     !< q = min(p,phat) but Hairer uses q=8 in DOP853.
         real(WP), intent(in)                  :: e     !< Error norm
-        real(WP), dimension(6), intent(inout) :: StepSzParams        
+        real(WP), dimension(6), intent(inout) :: StepSzParams !< Contains safety factor and Lund stabilization related parameters       
         
         real(WP) :: StepSzHairer
         

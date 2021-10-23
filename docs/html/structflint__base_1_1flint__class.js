@@ -25,7 +25,7 @@ var structflint__base_1_1flint__class =
     [ "rejectedsteps", "structflint__base_1_1flint__class.html#ab06ba53f7f20f1165221d877c334aa7b", null ],
     [ "rtol", "structflint__base_1_1flint__class.html#a93b559736fb9dc868a0586bd5fbb0635", null ],
     [ "status", "structflint__base_1_1flint__class.html#a695e0f29e9142a7461428cad527c9067", null ],
-    [ "stepszparams", "structflint__base_1_1flint__class.html#ab1ff87b2ee03ce03cc1c67f45bb1e68b", null ],
+    [ "stepszparams", "structflint__base_1_1flint__class.html#a239f46a667fa180a7e3df397de28738a", null ],
     [ "totalsteps", "structflint__base_1_1flint__class.html#a7fd5b7255b287fece2061558c11c7213", null ],
     [ "x0", "structflint__base_1_1flint__class.html#aab25635650fd7dc9aacf176d0b6d9522", null ],
     [ "xf", "structflint__base_1_1flint__class.html#ab4e64e385d1ca63d3bd1cecdd6e2030c", null ],

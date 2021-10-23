@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['f',['f',['../structflint__base_1_1diffeqsys.html#a74933fde9ac2f1aadbac701591a56cd2',1,'flint_base::diffeqsys::f()'],['../structmydiffeq_1_1tbsys.html#aa420404f16f1f04d14d66696c659bbcb',1,'mydiffeq::tbsys::f()'],['../structmydiffeq_1_1cr3bpsys.html#ad97be89a0a027d55eaa04bb3499a3781',1,'mydiffeq::cr3bpsys::f()']]],
-  ['func',['func',['../interfaceflintutils_1_1func.html#a550cd22d32bbf293bcf568740f2fbd23',1,'flintutils::func']]]
+  ['info_0',['info',['../structerk_1_1erk__class.html#a63eac89544e47e598205eb76a7f2246d',1,'erk::erk_class::info()'],['../structflint__base_1_1flint__class.html#af02a0a814e58529737528cb3c1495d60',1,'flint_base::flint_class::info()'],['../interfaceflint__base_1_1_info.html#a4e9ebc5f729f023622e96334f216ded8',1,'flint_base::Info::info()']]],
+  ['init_1',['init',['../structerk_1_1erk__class.html#ad53547d468bc0c78d4360550ebc60c5b',1,'erk::erk_class::init()'],['../structflint__base_1_1flint__class.html#a4c67629d5278fde462812097706eae21',1,'flint_base::flint_class::init()'],['../interfaceflint__base_1_1_init.html#a0b6b20abfc070cb1c0a1417459297914',1,'flint_base::Init::init()']]],
+  ['integrate_2',['integrate',['../structerk_1_1erk__class.html#a1eba3889a1fa9fae257157f9681e3ae0',1,'erk::erk_class::integrate()'],['../structflint__base_1_1flint__class.html#af08131b23ea54685a33f7d017b96841d',1,'flint_base::flint_class::integrate()'],['../interfaceflint__base_1_1_integrate.html#a0c3de9e475fa7782b2e26f53e80b3bf2',1,'flint_base::Integrate::integrate()']]],
+  ['interpolate_3',['interpolate',['../structerk_1_1erk__class.html#a9d0c1db88b6dea53d4bb1c4130694af2',1,'erk::erk_class::interpolate()'],['../structflint__base_1_1flint__class.html#afe07052b20b0f8596e73a1477ecfcc02',1,'flint_base::flint_class::interpolate()'],['../interfaceflint__base_1_1_interpolate.html#a1f08ef9d043a4ff62ca9ebdbb04ffdbe',1,'flint_base::Interpolate::interpolate()']]]
 ];

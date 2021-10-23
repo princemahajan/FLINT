@@ -1,31 +1,5 @@
 var searchData=
 [
-  ['verner65e_5fa',['verner65e_a',['../namespacebutchertableaus.html#a382c2277a5282d698869ef86cff74d67',1,'butchertableaus']]],
-  ['verner65e_5fb',['verner65e_b',['../namespacebutchertableaus.html#a36936c8da2ff8e3dc3dd98444734e748',1,'butchertableaus']]],
-  ['verner65e_5fbh',['verner65e_bh',['../namespacebutchertableaus.html#ae9e7dfe7a73452c980b376b2889ef7ed',1,'butchertableaus']]],
-  ['verner65e_5fc',['verner65e_c',['../namespacebutchertableaus.html#aef6565ff15ba47772641388a38bd7a06',1,'butchertableaus']]],
-  ['verner65e_5fd',['verner65e_d',['../namespacebutchertableaus.html#ab1967d4c5f5c960016a99de58c09d9aa',1,'butchertableaus']]],
-  ['verner65e_5fdi_5fnz',['verner65e_di_nz',['../namespacebutchertableaus.html#a76121c7ecfe5b8ca2761843d7e911f44',1,'butchertableaus']]],
-  ['verner65e_5fe',['verner65e_e',['../namespacebutchertableaus.html#aecadb8554425fba5fd5a12096b52daad',1,'butchertableaus']]],
-  ['verner65e_5ffsal',['verner65e_fsal',['../namespacebutchertableaus.html#ad47c29dd6ffacc8071c1b64ef05eaffd',1,'butchertableaus']]],
-  ['verner65e_5fp',['verner65e_p',['../namespacebutchertableaus.html#a59303232745833d79e79214c29a38e4e',1,'butchertableaus']]],
-  ['verner65e_5fphat',['verner65e_phat',['../namespacebutchertableaus.html#a46592b398f4c9e6aef57ecbcb39b1d88',1,'butchertableaus']]],
-  ['verner65e_5fpstar',['verner65e_pstar',['../namespacebutchertableaus.html#a2c3df059353542b339c93c27036b0895',1,'butchertableaus']]],
-  ['verner65e_5fq',['verner65e_q',['../namespacebutchertableaus.html#afc45a5e1947ddfe6c04cdd56a530caaa',1,'butchertableaus']]],
-  ['verner65e_5fs',['verner65e_s',['../namespacebutchertableaus.html#ae3d2e757f116abfc39b1aea29bdde56d',1,'butchertableaus']]],
-  ['verner65e_5fsint',['verner65e_sint',['../namespacebutchertableaus.html#a6f525328573cadc3391e1ea45232ec6b',1,'butchertableaus']]],
-  ['verner98r_5fa',['verner98r_a',['../namespacebutchertableaus.html#a53e4684189058a08753c50d73a25a14a',1,'butchertableaus']]],
-  ['verner98r_5fb',['verner98r_b',['../namespacebutchertableaus.html#ae87395d3adce16d518f1910e256d1abf',1,'butchertableaus']]],
-  ['verner98r_5fbh',['verner98r_bh',['../namespacebutchertableaus.html#a9a3e529b1fcb113a0d1d6a20938b4110',1,'butchertableaus']]],
-  ['verner98r_5fc',['verner98r_c',['../namespacebutchertableaus.html#a516a5fd024d8a4cd960d054a3b69a554',1,'butchertableaus']]],
-  ['verner98r_5fd',['verner98r_d',['../namespacebutchertableaus.html#a37a22c2a55937bb32c6619aece6bea04',1,'butchertableaus']]],
-  ['verner98r_5fdi_5fnz',['verner98r_di_nz',['../namespacebutchertableaus.html#a426aeb7dbcb202ffdbfe4e2310ca8150',1,'butchertableaus']]],
-  ['verner98r_5fe',['verner98r_e',['../namespacebutchertableaus.html#add24c364294a15050b4ae7d69f3e76a1',1,'butchertableaus']]],
-  ['verner98r_5ffsal',['verner98r_fsal',['../namespacebutchertableaus.html#ad8ce92826498a65a6d0f57d76eb5addc',1,'butchertableaus']]],
-  ['verner98r_5fp',['verner98r_p',['../namespacebutchertableaus.html#ac9e67b08b6ce0bb10afc3a3b34da7dd2',1,'butchertableaus']]],
-  ['verner98r_5fphat',['verner98r_phat',['../namespacebutchertableaus.html#a1d9d4b0281d4308ea6a1d63cffec8f4f',1,'butchertableaus']]],
-  ['verner98r_5fpstar',['verner98r_pstar',['../namespacebutchertableaus.html#a993f0a93bd890a53a390a8fde99a32c7',1,'butchertableaus']]],
-  ['verner98r_5fq',['verner98r_q',['../namespacebutchertableaus.html#a5a424aa60bf806df494d6bca47817fb6',1,'butchertableaus']]],
-  ['verner98r_5fs',['verner98r_s',['../namespacebutchertableaus.html#a62b5f893174f6c2d401fb533ad90712e',1,'butchertableaus']]],
-  ['verner98r_5fsint',['verner98r_sint',['../namespacebutchertableaus.html#a0b173df39e77508ec3a11c205c6b9d10',1,'butchertableaus']]]
+  ['y0_0',['y0',['../structflint__base_1_1flint__class.html#ac11d27b51482fbaabe17ba2d027bca12',1,'flint_base::flint_class']]],
+  ['yf_1',['yf',['../structflint__base_1_1flint__class.html#a8af0d3b31a47d0da4e0459e53e528f03',1,'flint_base::flint_class']]]
 ];

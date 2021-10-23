@@ -39,7 +39,7 @@ module MyDiffEq
         real(WP) :: GM = 398600.436233_wp
     contains
         procedure :: F => TwoBodyDE
-        procedure :: G => SampleEventTB
+        ! procedure :: G => SampleEventTB
     end type TBSys
     
     type, extends(DiffEqSys) :: CR3BPSys
@@ -47,17 +47,8 @@ module MyDiffEq
         real(WP) :: GM = 0.0_wp
     contains
         procedure :: F => CR3BPDE
-        procedure :: G => SampleEventCR3BP
     end type CR3BPSys
     
-    !type, extends(ddeabm_with_event_class) :: CR3BPSys_ddeabm
-    !    real(WP) :: mu = mu         
-    !    integer :: FEvals = 0       
-    !    logical :: First = .TRUE. 
-    !end type CR3BPSys_ddeabm
-
-
-
     contains
     
     function TwoBodyDE(me, X, Y, Params)
@@ -103,48 +94,10 @@ module MyDiffEq
         CR3BPDE = CR3BP_DiffEq(X, Y, me%mu)
     end function CR3BPDE    
     
-    !subroutine CR3BPDE_DDEABM(me, X, Y, Ydot)    
-    !    intrinsic :: size
-    !    class(ddeabm_class), intent(inout) :: me !< Differential Equation object
-    !    real(WP), intent(in) :: X
-    !    real(WP), intent(in), dimension(:) :: Y
-    !    real(WP), intent(out), dimension(:) :: Ydot
-    !
-    !    select type (me)
-    !    class is (CR3BPSys_ddeabm)
-    !        Ydot = CR3BP_DiffEq(X, Y, me%mu)
-    !    end select
-    !end subroutine CR3BPDE_DDEABM    
-    !
-
-    
-    subroutine SampleEventTB(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
-            
-        implicit none
-        class(TBSys), intent(inout) :: me !< Differential Equation object            
-        real(WP), intent(in) :: X
-        real(WP), dimension(:), intent(inout) :: Y
-        integer, dimension(:), intent(in) :: EvalEvents
-        real(WP), dimension(:), intent(out) :: Value
-        integer, dimension(:), intent(out) :: Direction
-        integer, intent(in), optional :: LocEvent
-        integer(kind(FLINT_EVENTACTION_CONTINUE)), intent(out), optional :: LocEventAction
-    
-        if (EvalEvents(1)==1) Value(1) = norm2(Y(1:3)) - 20000.0
-        
-        if (EvalEvents(2)==1) Value(2) = 1 !Y(3)
-        
-        Direction = [0,0]
-        
-        if (present(LocEvent)) LocEventAction = FLINT_EVENTACTION_CONTINUE
-        
-    end subroutine SampleEventTB      
-    
-
     subroutine SampleEventCR3BP(me, X, Y, EvalEvents, Value, Direction, LocEvent, LocEventAction)
             
         implicit none
-        class(CR3BPSys), intent(inout) :: me !< Differential Equation object            
+        class(DiffEqSys), intent(inout) :: me !< Differential Equation object            
         real(WP), intent(in) :: X
         real(WP), dimension(:), intent(inout) :: Y
         integer, dimension(:), intent(in) :: EvalEvents
@@ -385,6 +338,7 @@ end module MyDiffEq
     CR3BPDEObject%mu = Emmu    
     CR3BPDEObject%n = 6
     CR3BPDEObject%m = 3
+    CR3BPDEObject%G => SampleEventCR3BP
 
     
     ! arrays for interpolated data

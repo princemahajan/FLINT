@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['cr3bpsys',['cr3bpsys',['../structmydiffeq_1_1cr3bpsys.html',1,'mydiffeq']]]
+  ['defunc_0',['DEFunc',['../interfaceflint__base_1_1_d_e_func.html',1,'flint_base']]],
+  ['diffeqsys_1',['diffeqsys',['../structflint__base_1_1diffeqsys.html',1,'flint_base']]]
 ];

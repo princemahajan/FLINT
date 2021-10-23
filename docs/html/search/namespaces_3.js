@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['mydiffeq',['mydiffeq',['../namespacemydiffeq.html',1,'']]]
+  ['stepsize_0',['stepsize',['../namespacestepsize.html',1,'']]]
 ];

@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['gm',['gm',['../structmydiffeq_1_1tbsys.html#ac42bc48f820349f0d01a7d96c8e0fcf8',1,'mydiffeq::tbsys::gm()'],['../structmydiffeq_1_1cr3bpsys.html#ab16334f491396b0f3631f15f02a4c731',1,'mydiffeq::cr3bpsys::gm()']]]
+  ['g_0',['g',['../structflint__base_1_1diffeqsys.html#ae7023d326fe3d2a4df16a2c6e96e2628',1,'flint_base::diffeqsys']]]
 ];

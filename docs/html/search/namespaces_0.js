@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['butchertableaus',['butchertableaus',['../namespacebutchertableaus.html',1,'']]]
+  ['butchertableaus_0',['butchertableaus',['../namespacebutchertableaus.html',1,'']]]
 ];
