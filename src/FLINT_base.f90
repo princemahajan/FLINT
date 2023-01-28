@@ -73,7 +73,7 @@ module FLINT_base
                             'Incorrect interpolation states',                   &
                             'Incorrect interpolation array provided',           &
                             'Interpolation is not enabled',                     &
-                            'Init is required',                            		&
+                            'Init is required',                                 &
                             'Incorrect event-related parameters ',              &
                             'Event root finding failed',                        &
                             'Incorrect step size for the non-adaptive option'   &
@@ -394,8 +394,8 @@ module FLINT_base
         !> Interface for the main Integrate method. It must be called after initialization and
         !! can be called multiple times with different IC and options without calling the init
         !! routine first every time.
-        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, &
-                                EventMask, EventStates, StiffTest, params)
+        subroutine Integrate(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, StepAdvance, IntStepsOn, &
+                                Xint, Yint, EventMask, EventStates, StiffTest, params)
 
             import :: FLINT_class, WP
         
@@ -417,6 +417,10 @@ module FLINT_base
             !! must take into account the sign of the step otherwise FLINT will return an error. 
             !! By default, this option is set to False.
             logical, intent(in), optional :: UseConstStepSz            
+
+            !> If true, FLINT will only advance the integration by one step and return. By default,
+            !! this option is set to False.
+            logical, intent(in), optional :: StepAdvance
 
             !> If true, then FLINT will return the solution at the integrator's natural step size.
             logical, intent(in), optional :: IntStepsOn

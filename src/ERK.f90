@@ -144,8 +144,8 @@ module ERK
     end subroutine erk_init
 
     
-    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, IntStepsOn, Xint, Yint, &
-                                EventMask, EventStates, StiffTest, params)
+    module subroutine erk_int(me, X0, Y0, Xf, Yf, StepSz, UseConstStepSz, StepAdvance, IntStepsOn, &
+                                Xint, Yint, EventMask, EventStates, StiffTest, params)
     
         implicit none
         
@@ -156,7 +156,8 @@ module ERK
         real(WP), intent(inout) :: Xf            
         real(WP), dimension(size(Y0)), intent(out) :: Yf
         real(WP), intent(inout) :: StepSz
-        logical, intent(in), optional :: UseConstStepSz            
+        logical, intent(in), optional :: UseConstStepSz 
+        logical, intent(in), optional :: StepAdvance
         logical, intent(in), optional :: IntStepsOn
         real(WP), allocatable, dimension(:), intent(out), optional :: Xint            
         real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint

@@ -19,5 +19,5 @@ library = true
 
 [[test]]
 name = "test"
-source-dir = "src/tests"
-main = "test.f90"
+source-dir = "tests"
+main = "test_Lorenz.f90"
