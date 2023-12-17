@@ -421,6 +421,7 @@ real(WP), parameter :: DOP853_a(1:*) = [ &
 !> Coefficients for 7th-order interpolation
 
 !> Non-zero coefficients for non-zero stages
+integer :: i
 integer, parameter :: DOP853_di_NZ(*) = [1,(i,i=6,16)]
 integer, parameter :: DOP853_dj_NZ(*) = [4,5,6,7]
 

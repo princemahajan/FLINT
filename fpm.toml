@@ -18,6 +18,11 @@ source-dir = "src"
 library = true
 
 [[test]]
-name = "test"
-source-dir = "src/tests"
-main = "test.f90"
+name = "test_Lorenz"
+source-dir = "tests"
+main = "test_Lorenz.f90"
+
+[[test]]
+name = "test_CR3BP"
+source-dir = "tests"
+main = "test_CR3BP.f90"

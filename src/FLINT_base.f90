@@ -316,7 +316,7 @@ module FLINT_base
         subroutine Init(me, DE, MaxSteps, Method, ATOl, RTol, InterpOn, InterpStates, &
             MinStepSize, MaxStepSize, StepSzParams, EventsOn, EventStepSz, EventOptions, EventTol)
 
-            import :: FLINT_class, DiffEqSys, WP
+            import :: FLINT_class, DiffEqSys, WP, FLINT_EVENTOPTION_ROOTFINDING
         
             class(FLINT_class), intent(inout) :: me !< Object
             
@@ -500,7 +500,7 @@ module FLINT_base
         subroutine Info(me, LastStatus, StatusMsg, nSteps, nAccept, nReject, nFCalls, &
                                 InterpReady, h0, X0, Y0, hf, Xf, Yf)
 
-            import :: FLINT_class, WP
+            import :: FLINT_class, WP, FLINT_SUCCESS
         
             class(FLINT_class), intent(inout) :: me !< Object of class type FLINT
             

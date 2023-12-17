@@ -290,7 +290,7 @@
             ! check if dense output states are specified, else use all
             ! If events are enabled, we save the coefficients for dense output 
             ! for all states by default
-            if (present(InterpStates) .AND. (.Not. EventsOn)) then
+            if (present(InterpStates) .AND. (.Not. me%EventsOn)) then
                 ! check for valid components
                 if (size(InterpStates) < 1 .OR. size(InterpStates) > me%pDiffEqSys%n &
                     .OR. any(InterpStates < 1) .OR. any(InterpStates > me%pDiffEqSys%n)) then
