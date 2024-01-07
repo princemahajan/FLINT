@@ -1,0 +1,18 @@
+\_form#0:$ q $
+\_form#1:$q = {min}(p, \hat{p})$
+\_form#2:$ p $
+\_form#3:$ \hat{p} $
+\_form#4:$0\,<\,\theta = (u_{desired} - x_0)/h\,<\,1$
+\_form#5:\[ u_{desired}(\theta) = Y0 + Bip(1)*\theta + Bip(2)*\theta^2 + ...+ Bip(8)*\theta^8 \]
+\_form#6:$ Bip(i) = d(i,1)*k_1 + d(i,2)*k_2 + ... + d(i,s)*k_s $
+\_form#7:\[ u_{desired}(\theta) = Bip(0) + Bip(1)*\theta + Bip(2)*\theta^2 + ...+ Bip(7)*\theta^7 \]
+\_form#8:\[ SC_i = atol_i + rtol_i |Y_{i}| \quad i=1..n,\]
+\_form#9:$|Y|$
+\_form#10:\[ h_1^{p+1} max(d1, d2) = 0.01 \]
+\_form#11:$p$
+\_form#12:$p+1$
+\_form#13:$h_1$
+\_form#14:$p=8$
+\_form#15:\[  err = C h^{(q+1)}  \]
+\_form#16:\[ 1 = C h_{opt}^{q+1} \]
+\_form#17:\[ SF_{min} <= SF\, h_{new}/h_{old} <= SF_{max}  \]
