@@ -52,7 +52,15 @@ file(GLOB FLINT_SRC src/*.f90)
 add_library(${FLINTBIN} STATIC ${FLINT_SRC})
 target_include_directories(${FLINTBIN} INTERFACE ${FLINT_INSTALL_LIB_DIR})
 
-# The test executable 
+# The test executable for Work precision tests 
+set(TestFLINT_WP_SRC tests/test_WP.f90)
+set(TestFLINT_WPBIN TestFLINT_WP)
+add_executable(${TestFLINT_WPBIN} ${TestFLINT_WP_SRC})
+
+# link
+target_link_libraries(${TestFLINT_WPBIN} ${FLINTBIN})
+
+# The test executable for CR3BP test
 set(TestFLINT_SRC tests/test_CR3BP.f90)
 set(TestFLINTBIN TestFLINT_CR3BP)
 add_executable(${TestFLINTBIN} ${TestFLINT_SRC})
@@ -68,6 +76,13 @@ add_executable(${TestFLINT_LorenzBIN} ${TestFLINT_Lorenz_SRC})
 # link
 target_link_libraries(${TestFLINT_LorenzBIN} ${FLINTBIN})
 
+# The test executable for TBP test
+set(TestFLINT_SRC tests/test_TBP.f90)
+set(TestFLINTBIN TestFLINT_TBP)
+add_executable(${TestFLINTBIN} ${TestFLINT_SRC})
+
+# link
+target_link_libraries(${TestFLINTBIN} ${FLINTBIN})
 
 ###########################
 # Compile Options for FLINT

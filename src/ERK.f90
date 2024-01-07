@@ -222,10 +222,11 @@ module ERK
     
 
 
-    module subroutine erk_stepint(me, X0, Y0, h, Y1, Yint12, FCalls, EstimateErr, Err, params)
+    module subroutine erk_stepint(me, X0, Y0, F0, h, Y1, Yint12, FCalls, EstimateErr, Err, params)
         class(ERK_class), intent(inout) :: me
         real(WP), intent(in) :: X0
         real(WP), dimension(me%pDiffEqSys%n), intent(in) :: Y0
+        real(WP), dimension(me%pDiffEqSys%n), intent(inout) :: F0
         real(WP), intent(in) :: h
         real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
         integer, intent(out) :: FCalls

@@ -420,8 +420,12 @@ real(WP), parameter :: DOP853_a(1:*) = [ &
 
 !> Coefficients for 7th-order interpolation
 
+! TBD: this explicit definition is workaround as gfortran is 
+! giving error for including type-spec in array constructor
+integer :: i 
+
 !> Non-zero coefficients for non-zero stages
-integer, parameter :: DOP853_di_NZ(*) = [1,(i,integer:: i=6,16)]
+integer, parameter :: DOP853_di_NZ(*) = [ 1, (i, i=6,16)]
 integer, parameter :: DOP853_dj_NZ(*) = [4,5,6,7]
 
 !> dij, where i = 1 to s, j = 1 to pstar for a generic method
@@ -824,7 +828,7 @@ Verner98R_b(1:16), &
 !> Coefficients for 8th-order interpolation
 
 !> Non-zero coefficients for non-zero stages
-integer, parameter :: Verner98R_di_NZ(*) = [1,(i, integer:: i=8,15),(i, integer:: i=17,21)]
+integer, parameter :: Verner98R_di_NZ(*) = [1,(i, i=8,15),(i, i=17,21)]
     
 !> dij, where i = 1 to s, j = 1 to pstar for a generic method
 real(WP), parameter :: Verner98R_d(*,1:*) = reshape(&
@@ -1084,7 +1088,7 @@ real(WP), parameter :: Verner65E_a(1:*) = [ &
 !> Coefficients for 5th-order interpolation
 
 !> Non-zero coefficients for non-zero stages
-integer, parameter :: Verner65E_di_NZ(*) = [1,(i, integer:: i=4,10)]
+integer, parameter :: Verner65E_di_NZ(*) = [1,(i, i=4,10)]
     
 !> dij, where i = 1 to s, j = 1 to pstar for a generic method
 real(WP), parameter :: Verner65E_d(*,1:*) = reshape(&

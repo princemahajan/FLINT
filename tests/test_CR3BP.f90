@@ -21,7 +21,7 @@
 !
 !############################################################################################    
 
-module MyDiffEq
+module CR3BPDiffEq
 
     use FLINT
     !use ddeabm_module
@@ -203,13 +203,13 @@ module MyDiffEq
         
         r1 = sqrt((X(1) + mu)**2 + X(2)**2 + X(3)**2)
         r2 = sqrt((X(1) - 1.0 + mu)**2 + X(2)**2+X(3)**2)
-        Omega = 1.0_WP/2.0_WP*sum(X(1:3)**2) + (1.0-mu)/r1 + mu/r2
+        Omega = 1.0_WP/2.0_WP*sum(X(1:2)**2) + (1.0-mu)/r1 + mu/r2
         ! Jacobian's Constant
         JacobiC = sum(X(4:6)**2)/2.0_WP - Omega
     end function JacobiC
 
     
-end module MyDiffEq
+end module CR3BPDiffEq
 
 
 
@@ -219,7 +219,7 @@ end module MyDiffEq
     
     use iso_fortran_env, only: output_unit
     use FLINT
-    use MyDiffEq
+    use CR3BPDiffEq
       
     implicit none
 

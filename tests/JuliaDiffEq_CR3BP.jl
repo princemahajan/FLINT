@@ -43,7 +43,7 @@ function JacobiConstant(odesol, (mu))
     V = [sqrt(sum((Xdot.^2)[:,i])) for i = 1:n]
 
     # pseudo-potential
-    Omega = 1/2*(R.^2) .+ (1-mu)./r1 .+ mu./r2
+    Omega = 1/2*sum(R[1:2].^2) .+ (1-mu)./r1 .+ mu./r2
     
     # Jacobi's Constant
     C = (V.^2)/2 .- Omega
@@ -161,11 +161,12 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, FinalState, IOM,
 
     rtime = @elapsed for i in 1:Runs
         # randomsize initial conditions
-        X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
-        
+        # X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
+        X0r = setindex(X0new, X0new[1] + 0.000000000001*X0new[1].*rand(), 1)
+
         # Define ODE problem
         # prob = ODEProblem(ODE, X0new, tspan, par);                
-        prob = remake(prob; u0 = X0new);                
+        prob = remake(prob; u0 = X0r);                
         
         #GC.gc()
         sol = FireODE(atol, rtol, OdeMethod, prob, DenseOn, cb)
@@ -217,7 +218,7 @@ function main_CR3BP()
     tspan = [t0, tf];
 
     # X0 = [R0;V0]
-    X0 = MVector{6,Float64}([0.994,0,0,0,parse(Float64,"-2.00158510637908252240537862224"),0.0])
+    X0 = SVector{6,Float64}([0.994,0,0,0,parse(Float64,"-2.00158510637908252240537862224"),0.0])
 
     #op1 = ODEProblem(cr3bpeom,X0,tspan);
 

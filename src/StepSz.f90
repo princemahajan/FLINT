@@ -33,7 +33,7 @@ module StepSize
     
     !> Minimum safety factor, so we dont decrease the step size too fast
     real(WP), parameter :: SFMIN = 0.333_WP
-    
+        
     !> Maximum safety factor, so we dont increase the step size too fast    
     real(WP), parameter :: SFMAX = 6.0_WP
     
@@ -69,7 +69,7 @@ module StepSize
         real(WP), dimension(:), intent(in), optional :: Params !< Real parameter array to be passed to DEFunc
         
         real(WP) :: d0, d1, d2, dMax, h0, h1
-        real(WP), dimension(n) :: F1
+        real(WP), dimension(n) :: F1, YhF0
         
         ! Algorithm starts here
         
@@ -86,7 +86,8 @@ module StepSize
         h0 = hSign*min(h0, hMax)
         
         ! Explicit Euler step
-        F1 = pDiffEqSys%F(X0 + h0, Y0 + h0*F0, Params)
+        YhF0 = Y0 + h0*F0
+        F1 = pDiffEqSys%F(X0 + h0, YhF0, Params)
         
         ! 2nd derivative approximation
         d2 = norm2((F1 - F0)/Sc)/h0
@@ -146,7 +147,7 @@ module StepSize
         !> \remark Optimal step computed using the equations:
         !! \f[  err = C h^{(q+1)}  \f]
         !! \f[ 1 = C h_{opt}^{q+1} \f]
-        hbyhopt = e**(1.0_WP/(q+1.0_WP) - beta*beta_mult)
+        hbyhopt = e**(1.0_WP/(q+1.0_WP) - beta*beta_mult)        
         
         if (IsLastStepRejected .EQV. .FALSE.) then
             

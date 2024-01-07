@@ -110,7 +110,6 @@ submodule (ERK) ERKInterp
             X0start = X0loc      
         end do
 
-        
         ! job done, deallocate memory
         if (DeallocMem .EQV. .TRUE.) then
             deallocate(me%Xint)

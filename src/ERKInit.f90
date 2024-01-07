@@ -132,8 +132,9 @@
         ! Event related parameters start from here
 
         ! By default, event detection will be disabled
+        me%EventsOn = .FALSE.
         if (present(EventsOn)) me%EventsOn = EventsOn
-        
+
         if (me%EventsOn) then
 
             ! check if user has supplied the event function
@@ -287,10 +288,12 @@
         !! steps allowed to take. This is to avoid heap allocation during Intgerate.
 
         if (me%InterpOn) then
+            
             ! check if dense output states are specified, else use all
             ! If events are enabled, we save the coefficients for dense output 
             ! for all states by default
-            if (present(InterpStates) .AND. (.Not. EventsOn)) then
+
+            if (present(InterpStates) .AND. (.Not. me%EventsOn)) then
                 ! check for valid components
                 if (size(InterpStates) < 1 .OR. size(InterpStates) > me%pDiffEqSys%n &
                     .OR. any(InterpStates < 1) .OR. any(InterpStates > me%pDiffEqSys%n)) then

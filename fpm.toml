@@ -1,10 +1,10 @@
 name = "FLINT"
 author = "Bharat Mahajan"
-copyright  = "Copyright 2021 Bharat Mahajan"
+copyright  = "Copyright 2024 Bharat Mahajan"
 license = "Apache-2.0"
 description = "Fortran Library for numerical INTegration of differential equations"
 homepage = "https://github.com/princemahajan/FLINT"
-keywords = ["ode", "runge-kutta"]
+keywords = ["ode", "runge-kutta", "ode-events"]
 
 [build]
 auto-executables = false
@@ -18,6 +18,11 @@ source-dir = "src"
 library = true
 
 [[test]]
+name = "test_WP"
+source-dir = "tests"
+main = "test_WP.f90"
+
+[[test]]
 name = "test_CR3BP"
 source-dir = "tests"
 main = "test_CR3BP.f90"
@@ -26,3 +31,18 @@ main = "test_CR3BP.f90"
 name = "test_Lorenz"
 source-dir = "tests"
 main = "test_Lorenz.f90"
+
+[[test]]
+name = "test_TBP"
+source-dir = "tests"
+main = "test_TBP.f90"
+
+#[dev-dependencies]
+#rklib = { git="https://github.com/jacobwilliams/rklib.git" }
+#rklib = { path = "..\\rklib" }
+
+#[[test]]
+#name = "comp_TBP_rklib"
+#source-dir = "tests"
+#main = "comp_TBP_rklib.f90"
+

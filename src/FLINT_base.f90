@@ -216,7 +216,7 @@ module FLINT_base
     !! + G is a pointer to the event function that must be associated with the user-provided
     !!   event function if events are enabled.
     type, abstract, public :: DiffEqSys
-        integer :: n = 1
+        integer :: n = 6
         integer :: m = 1
         integer :: p = 0
         procedure(EventFunc), pointer, pass :: G => null()
@@ -316,7 +316,7 @@ module FLINT_base
         subroutine Init(me, DE, MaxSteps, Method, ATOl, RTol, InterpOn, InterpStates, &
             MinStepSize, MaxStepSize, StepSzParams, EventsOn, EventStepSz, EventOptions, EventTol)
 
-            import :: FLINT_class, DiffEqSys, WP
+            import :: FLINT_class, DiffEqSys, WP, FLINT_EVENTOPTION_ROOTFINDING
         
             class(FLINT_class), intent(inout) :: me !< Object
             
@@ -358,13 +358,14 @@ module FLINT_base
             real(WP), intent(in), optional :: MinStepSize, MaxStepSize
             
             !> Step-size computation specific parameters. User can specify these for a 
-            !! soecific step-size computation method, otherwise defaults are used.
+            !! specific step-size computation method, otherwise defaults are used.
             !! For Hairer's DOPRI5/DOP853 codes:
             !! + StepSzParams(1): Safety-factor 
             !! + StepSzParams(2): Minimum safety-factor
             !! + StepSzParams(3): Maximum safety-factor
             !! + StepSzParams(4): Lund Stabilization parameter beta
-            !! + StepSzParams(1): Lund Stabilization parameter beta multiplier
+            !! + StepSzParams(5): Lund Stabilization parameter beta multiplier
+            !! + StepSzParams(6): Lund Stabilization PI control term initial value
             real(WP), dimension(6), intent(in), optional :: StepSzParams
             
             logical, intent(in), optional :: EventsOn !< Set true for events detection
@@ -437,7 +438,7 @@ module FLINT_base
             !! solution at the location of the event, the new solution will be returned in Yint.
             real(WP), allocatable, dimension(:,:), intent(out), optional :: Yint
 
-            !> If EventMask(i)=false, then the event "i" will not be detected.
+            !> If EventMask(i)=false, then the event "i" will Not be detected. Default is true.
             !! If all the events are masked, then the event detection will be turned off.
             logical, dimension(me%pDiffEqSys%m), intent(in), optional :: EventMask
             
@@ -504,7 +505,7 @@ module FLINT_base
         subroutine Info(me, LastStatus, StatusMsg, nSteps, nAccept, nReject, nFCalls, &
                                 InterpReady, h0, X0, Y0, hf, Xf, Yf)
 
-            import :: FLINT_class, WP
+            import :: FLINT_class, WP, FLINT_SUCCESS
         
             class(FLINT_class), intent(inout) :: me !< Object of class type FLINT
             

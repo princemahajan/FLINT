@@ -57,7 +57,7 @@ submodule (ERK) ERKIntegrate
         real(WP), dimension(6) :: StepSzParams        
 
         real(WP) :: h, hSign, hnew, hmax, X, Err, LastStepSzFac
-        real(WP), dimension(me%pDiffEqSys%n) :: Y1, Y2, F0, Sc0, Yint12
+        real(WP), dimension(me%pDiffEqSys%n) :: Y, Y1, F0, Sc0, Yint12
 
         integer :: FCalls, nInterpStates
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
@@ -109,11 +109,9 @@ submodule (ERK) ERKIntegrate
             LastStepSzFac = LASTSTEP_EXPFAC
         end if
 
-
-        ! Take only 1 step if StepOnce is True
+        ! The default choice is to integrate to the final time unless this is set true
         StepOnce = .FALSE.
         if (present(StepAdvance)) StepOnce = StepAdvance
-
 
         ! If Interpolation is OFF and solution at integrator steps is needed,
         ! then allocate the storage for steps that will be returned to the user. 
@@ -204,7 +202,7 @@ submodule (ERK) ERKIntegrate
 
         ! Initialize the counters to prepare for the main integration loop
         X = X0
-        Y1 = Y0
+        Y = Y0
         me%FCalls = 0
         me%TotalSteps = 0
         me%AcceptedSteps = 0
@@ -217,22 +215,22 @@ submodule (ERK) ERKIntegrate
         ! events between X0 and the first integrated state
         if (EventsOn) then
             EventX0 = X
-            EventNewY = Y1
+            EventNewY = Y
             EvalEvents = 1
             call pDiffEqSys%G(EventX0, EventNewY, EvalEvents, EV0(1,:), EventDir)
         end if
 
         ! Compute the derivative and scale factor at the initial condition
-        F0 = pDiffEqSys%F(X, Y1, params)
+        F0 = pDiffEqSys%F(X, Y, params)
         me%FCalls = me%FCalls + 1
-        
+
         !! \remark Scale factor is computed using
         !! \f[ SC_i = atol_i + rtol_i |Y_{i}| \quad i=1..n,\f]
         !! where \f$|Y|\f$ is the absolute value of the provided vector
         if (.NOT. me%IsScalarTol) then
-            Sc0 = me%ATol + me%RTol*abs(Y1)
+            Sc0 = me%ATol + me%RTol*abs(Y)
         else
-            Sc0 = me%ATol(1) + me%RTol(1)*abs(Y1)
+            Sc0 = me%ATol(1) + me%RTol(1)*abs(Y)
         end if        
         
         ! Select the max step size if not provided by the user
@@ -240,22 +238,22 @@ submodule (ERK) ERKIntegrate
 
         ! The initial step size: compute if user has not provided a non-zero value
         if (StepSz == 0.0_WP) then
-            call StepSz0Hairer(h, me%p, pDiffEqSys%n, X, Y1, F0, Sc0, hSign, hmax, FCalls, pDiffEqSys, params)
+            call StepSz0Hairer(h, me%p, pDiffEqSys%n, X, Y, F0, Sc0, hSign, hmax, FCalls, pDiffEqSys, params)
             me%FCalls = me%FCalls + Fcalls
         else
             h = StepSz
         end if
 
-        ! save the initial condition and the initial derivative 
+        ! save the initial conditions
         me%X0 = X
-        me%Y0 = Y1
-        me%k(:,1) = F0
+        me%Y0 = Y
+        ! me%k(:,1) = F0
 
         ! copy the initial condition as the first state
 
         if (IntStepsNeeded) then
             Xint(1) = X
-            Yint(:,1) = Y1
+            Yint(:,1) = Y
         end if
 
         if (InterpOn) me%Xint(1) = X
@@ -273,7 +271,7 @@ submodule (ERK) ERKIntegrate
             end if
 
             ! Advance one step using the chosen method
-            call me%StepInt(X, Y1, h, Y2, Yint12, FCalls, (.NOT. ConstStepSz), Err, params)
+            call me%StepInt(X, Y, F0, h, Y1, Yint12, FCalls, (.NOT. ConstStepSz), Err, params)
 
             ! update steps taken and function calls made
             me%TotalSteps = me%TotalSteps + 1                
@@ -287,270 +285,270 @@ submodule (ERK) ERKIntegrate
                 ! step is accepted
                 me%AcceptedSteps = me%AcceptedSteps + 1
 
+                ! this is the last step if user wants only 1 step taken
+                if (StepOnce) LAST_STEP = .TRUE.
+
                 ! reset the flag for computing interpolation coefficients
                 BipComputed = .FALSE.
 
-                if (.NOT. StepOnce) then
+                ! TBD: what is its use?
+                ! save the first accepted step-size
+                ! if (me%AcceptedSteps == 1) me%h0 = h
 
-                    ! TBD: what is its use?
-                    ! save the first accepted step-size
-                    ! if (me%AcceptedSteps == 1) me%h0 = h
-
-                    ! do we need stiffness detection?
-                    if (StiffnessTest == 1 .OR. StiffnessTest == 2) then
-                        call CheckStiffness(IsProblemStiff)
-                        if (IsProblemStiff) then
-                            StiffTest = -1 
-                                if (StiffnessTest == 1) then
-                                status = FLINT_STIFF_PROBLEM
-                                LAST_STEP = .TRUE.
-                            end if
+                ! do we need stiffness detection?
+                if (StiffnessTest == 1 .OR. StiffnessTest == 2) then
+                    call CheckStiffness(IsProblemStiff)
+                    if (IsProblemStiff) then
+                        StiffTest = -1 
+                        if (StiffnessTest == 1) then
+                            status = FLINT_STIFF_PROBLEM
+                            LAST_STEP = .TRUE.
                         end if
                     end if
-                    
-                    ! Event Detection start here after a step is accepted
+                end if
+                
+                ! Event Detection start here after a step is accepted
 
 
-                    if (EventsOn) then
+                if (EventsOn) then
 
-                        EvalEvents = 1
-                        EventsDetected = .FALSE.
-                        EventX0 = X
-                        EventX1 = X + h
-                        EX0 = EventX0
-                        EX1 = EventX1
-                        nStepSzEvents = 1
-        
-                        ! First check for events sign change at the step boundaries
-                        EventNewY = Y2
-                        call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, EV1(1,:), EventDir)
-                        do EventId = 1,pDiffEqSys%m
-                            call DetectEvent(EventId, EV0(1,EventId), EV1(1,EventId), EventsDetected(EventId))
-                        end do
+                    EvalEvents = 1
+                    EventsDetected = .FALSE.
+                    EventX0 = X
+                    EventX1 = X + h
+                    EX0 = EventX0
+                    EX1 = EventX1
+                    nStepSzEvents = 1
+    
+                    ! First check for events sign change at the step boundaries
+                    EventNewY = Y1
+                    call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, EV1(1,:), EventDir)
+                    do EventId = 1,pDiffEqSys%m
+                        call DetectEvent(EventId, EV0(1,EventId), EV1(1,EventId), EventsDetected(EventId))
+                    end do
 
-                        ! Check do we need to check sign changes for any event at smaller intervals
-                        ! than the current step length
-                        StepSzEvents = 1
-                        where (me%EventStepSz == 0 .OR. me%EventStepSz > hSign*h)
-                            StepSzEvents = 0
-                        end where
+                    ! Check do we need to check sign changes for any event at smaller intervals
+                    ! than the current step length
+                    StepSzEvents = 1
+                    where (me%EventStepSz == 0 .OR. me%EventStepSz > hSign*h)
+                        StepSzEvents = 0
+                    end where
 
-                        if (any(StepSzEvents == 1)) then
+                    if (any(StepSzEvents == 1)) then
 
-                            ! For computing solution between the steps
-                            if (.NOT. BipComputed) then
-                                call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
-                                me%FCalls = me%FCalls + FCalls
-                                BipComputed = .TRUE.
-                            end if
-
-                            ! Check for sign changes one by one for these events
-                            do EventId = 1, pDiffEqSys%m
-                            block
-                                real(WP), dimension(pDiffEqSys%m) :: EventV0, EventV1, EventVh
-                                real(WP) :: Eventh
-                                logical :: EvStepSzDetected, LastStepSzEvent
-                            
-                                ! Skip the event if statically masked
-                                if ((EvMask(EventId)) .AND. &
-                                    (StepSzEvents(EventId)==1)) then
-
-                                    EvalEvents = 0
-                                    EvalEvents(EventId) = 1
-
-                                    Eventh = hSign*me%EventStepSz(EventId)
-                                    EventX1 = X + Eventh
-                                    EventV0 = EV0(1,:)
-                                    EventV1 = EV1(1,:)
-                                    
-                                    ! Save the original event values at X+h
-                                    EventVh(EventId) = EV1(1,EventId)
-
-                                    EventsDetected(EventId) = .FALSE.
-                                    LastStepSzEvent = .FALSE.
-
-                                    ! detect events inside the integrator's step
-                                    do while (EventX1 <= (X+h))
-                                        if (EventX1 /= (X+h)) then
-                                            ! interpolate solution
-                                            EventNewY = InterpY(pDiffEqSys%n, EventX1, X, h, me%pstar, Bip)
-                                            ! evaluate this specific event function
-                                            call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, &
-                                                                EventV1, EventDir)
-                                        else
-                                            EventV1(EventId) = EventVh(EventId)
-                                        end if
-                                        call DetectEvent(EventId, EventV0(EventId),EventV1(EventId),EvStepSzDetected)
-                                        if (EvStepSzDetected) then
-                                            ! store the this event details
-                                            EventsDetected(EventId) = .TRUE.
-                                            EX0(nStepSzEvents(EventId),EventId) = EventX0
-                                            EX1(nStepSzEvents(EventId),EventId) = EventX1
-                                            EV0(nStepSzEvents(EventId),EventId) = EventV0(EventId)
-                                            EV1(nStepSzEvents(EventId),EventId) = EventV1(EventId)
-                                            nStepSzEvents(EventId) = nStepSzEvents(EventId) + 1
-                                            if (nStepSzEvents(EventId) > MAXNUMSTEPSZEVENTS) then
-                                                ! max number of step size events has been detected
-                                                exit
-                                            end if
-                                        end if
-                                        ! prepare for the next step interval
-                                        if (LastStepSzEvent) exit
-                                        EventX0 = EventX1
-                                        EventX1 = EventX1 + Eventh
-                                        if (EventX1 > X+h) then
-                                            EventX1 = X + h
-                                            LastStepSzEvent = .TRUE.
-                                        end if
-                                        EventV0(EventId) = EventV1(EventId)                        
-                                    end do
-                                    ! nStepSzEvents always counts one more than actual no. of 
-                                    ! step size events, so we need to subtract 1
-                                    if (nStepSzEvents(EventId) > 1) nStepSzEvents(EventId) = nStepSzEvents(EventId) - 1
-                                end if
-                            end block
-                            end do
+                        ! For computing solution between the steps
+                        if (.NOT. BipComputed) then
+                            call me%InterpCoeff(X, Y, h, Y1, Bip, FCalls, params)
+                            me%FCalls = me%FCalls + FCalls
+                            BipComputed = .TRUE.
                         end if
 
-                        ! If any event is triggered?
-
-                        if (any(EventsDetected)) then
+                        ! Check for sign changes one by one for these events
+                        do EventId = 1, pDiffEqSys%m
                         block
-                            
-                            real(WP), dimension(MAXNUMSTEPSZEVENTS,pDiffEqSys%m) :: EXm
-                            real(WP), dimension(pDiffEqSys%n) :: EYm
-                            integer :: StepEvId, rootiter, rooterror, nEvents
-                            integer, dimension(1) :: MinEvXIndex
-
-                            ! Locate the events first
-                            
-                            do EventId = 1, pDiffEqSys%m
-                                do StepEvId = 1, nStepSzEvents(EventId)
-                                    if (EventsDetected(EventId)) then
-
-                                        select case (me%EventOptions(EventId))          
-                                        ! Left bounrday of the integrator step is the event location
-                                        case (FLINT_EVENTOPTION_STEPBEGIN)
-                                            EXm(StepEvId,EventId) = EX0(StepEvId,EventId)
-
-                                        ! Right bounrday of the integrator step is the event location
-                                        case (FLINT_EVENTOPTION_STEPEND)
-                                            EXm(StepEvId,EventId) = EX1(StepEvId,EventId)
-                                    
-                                        case default
-                                            ! root-finding is enabled, so locate the event exactly
-                                            if (.NOT. BipComputed) then
-                                                call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
-                                                me%FCalls = me%FCalls + FCalls
-                                                BipComputed = .TRUE.
-                                            end if
-
-                                            call Root(EX0(StepEvId,EventId), EX1(StepEvId, EventId), &
-                                                            EV0(StepEvId,EventId), EV1(StepEvId,EventId), &
-                                                            me%ETol(EventId), SingleEvent, &
-                                                            EXm(StepEvId,EventId), EV0(StepEvId,EventId), &
-                                                            rootiter, rooterror)
-                                            if (rooterror /= 0 .AND. rooterror /= 2) then
-                                                ! root finding failed, dont exit. Try to go as far as you can!
-                                                status = FLINT_ERROR_EVENTROOT
-                                            end if
-                                        end select
-
-                                    end if
-                                end do
-                            end do
-
-                            ! Handle the event action starting from the earliest event
-
-                            ! iterate until all events are handled
-                            do while (any(EventsDetected))
-                                
-                                ! Find the earliest event. Note that the events' location
-                                ! increases with the 1st index of EXm.
-                                MinEvXIndex = minloc(EXm(1,:), EventsDetected)
-
-                                ! solution at the event
-                                select case (me%EventOptions(MinEvXIndex(1)))
-                                case (FLINT_EVENTOPTION_STEPBEGIN)
-                                    EYm = Y1
-                                case (FLINT_EVENTOPTION_STEPEND)
-                                    EYm = Y2
-                                case default
-                                    EYm = InterpY(nInterpStates, EXm(1,MinEvXIndex(1)),&
-                                                            X, h, me%pstar, Bip)
-                                end select
-
-                                ! Call the event function with the located event info
+                            real(WP), dimension(pDiffEqSys%m) :: EventV0, EventV1, EventVh
+                            real(WP) :: Eventh
+                            logical :: EvStepSzDetected, LastStepSzEvent
+                        
+                            ! Skip the event if statically masked
+                            if ((EvMask(EventId)) .AND. &
+                                (StepSzEvents(EventId)==1)) then
 
                                 EvalEvents = 0
-                                EvalEvents(MinEvXIndex(1)) = 1
-                                EventNewY = EYm
-                                call pDiffEqSys%G(EXm(1,MinEvXIndex(1)), EventNewY, EvalEvents, &
-                                                    EV0(1,:), EventDir, MinEvXIndex(1), EventAction)
+                                EvalEvents(EventId) = 1
 
-                                ! save the event state
-                                ! Note that if an event action alters the solution Y, event data returned to
-                                ! the user still contains the original state corresponding to the event location
-                                EventData = [EventData, EXm(1,MinEvXIndex(1)), EYm, real(MinEvXIndex(1), WP)]
+                                Eventh = hSign*me%EventStepSz(EventId)
+                                EventX1 = X + Eventh
+                                EventV0 = EV0(1,:)
+                                EventV1 = EV1(1,:)
+                                
+                                ! Save the original event values at X+h
+                                EventVh(EventId) = EV1(1,EventId)
 
-                                ! Handle the event actions. Note that we must recompute interpolation
-                                ! coefficients in case we update the solution Y2 or h.
+                                EventsDetected(EventId) = .FALSE.
+                                LastStepSzEvent = .FALSE.
 
-                                ! Handle the event mask action
-                                if (btest(EventAction, 7)) then
-                                    EvMask(MinEvXIndex(1)) = .FALSE.
-                                end if
-
-                                ! The following actions are mutually exclusive
-                                select case (IAND(EventAction, b'01111111'))
-                                case (FLINT_EVENTACTION_TERMINATE)
-                                    ! Return the event solution as the last solution
-                                    h = EXm(1,MinEvXIndex(1)) - X
-                                    Y2 = EYm
-                                    LAST_STEP = .TRUE.
-                                    BipComputed = .FALSE.
-                                    status = FLINT_EVENT_TERM
-                                    exit
-                                case (FLINT_EVENTACTION_RESTARTINT)
-                                    ! Restart the integration from this point on
-                                    h = EXm(1,MinEvXIndex(1)) - X
-                                    Y2 = EYm
-                                    ! If it was already a last step, then reset it
-                                    LAST_STEP = .FALSE.
-                                    BipComputed = .FALSE.
-                                    exit
-                                case (FLINT_EVENTACTION_CHANGESOLY)
-                                    ! Change the solution Y and restart the integration
-                                    h = EXm(1,MinEvXIndex(1)) - X
-                                    Y2 = EYm
-                                    ! If it was already a last step, then reset it
-                                    LAST_STEP = .FALSE.
-                                    BipComputed = .FALSE.
-                                    exit
-                                end select
-
-                                ! This event has been handled, so remove it for the next event
-                                ! If the handled event is a step-size event then we need to 
-                                ! shift the contents of its columns to left
-                                if (StepSzEvents(MinEvXIndex(1)) == 1) then
-                                    nStepSzEvents(MinEvXIndex(1)) = nStepSzEvents(MinEvXIndex(1)) - 1
-                                    if (nStepSzEvents(MinEvXIndex(1)) == 0) then
-                                        EventsDetected(MinEvXIndex(1)) = .FALSE.
+                                ! detect events inside the integrator's step
+                                do while (EventX1 <= (X+h))
+                                    if (EventX1 /= (X+h)) then
+                                        ! interpolate solution
+                                        EventNewY = InterpY(pDiffEqSys%n, EventX1, X, h, me%pstar, Bip)
+                                        ! evaluate this specific event function
+                                        call pDiffEqSys%G(EventX1, EventNewY, EvalEvents, &
+                                                            EventV1, EventDir)
                                     else
-                                        EXm(1:nStepSzEvents(MinEvXIndex(1)), MinEvXIndex(1)) &
-                                        = EXm(2:(nStepSzEvents(MinEvXIndex(1))+1),MinEvXIndex(1))
+                                        EventV1(EventId) = EventVh(EventId)
                                     end if
-                                else
-                                    EventsDetected(MinEvXIndex(1)) = .FALSE.
+                                    call DetectEvent(EventId, EventV0(EventId),EventV1(EventId),EvStepSzDetected)
+                                    if (EvStepSzDetected) then
+                                        ! store the this event details
+                                        EventsDetected(EventId) = .TRUE.
+                                        EX0(nStepSzEvents(EventId),EventId) = EventX0
+                                        EX1(nStepSzEvents(EventId),EventId) = EventX1
+                                        EV0(nStepSzEvents(EventId),EventId) = EventV0(EventId)
+                                        EV1(nStepSzEvents(EventId),EventId) = EventV1(EventId)
+                                        nStepSzEvents(EventId) = nStepSzEvents(EventId) + 1
+                                        if (nStepSzEvents(EventId) > MAXNUMSTEPSZEVENTS) then
+                                            ! max number of step size events has been detected
+                                            exit
+                                        end if
+                                    end if
+                                    ! prepare for the next step interval
+                                    if (LastStepSzEvent) exit
+                                    EventX0 = EventX1
+                                    EventX1 = EventX1 + Eventh
+                                    if (EventX1 > X+h) then
+                                        EventX1 = X + h
+                                        LastStepSzEvent = .TRUE.
+                                    end if
+                                    EventV0(EventId) = EventV1(EventId)                        
+                                end do
+                                ! nStepSzEvents always counts one more than actual no. of 
+                                ! step size events, so we need to subtract 1
+                                if (nStepSzEvents(EventId) > 1) nStepSzEvents(EventId) = nStepSzEvents(EventId) - 1
+                            end if
+                        end block
+                        end do
+                    end if
+
+                    ! If any event is triggered?
+
+                    if (any(EventsDetected)) then
+                    block
+                        
+                        real(WP), dimension(MAXNUMSTEPSZEVENTS,pDiffEqSys%m) :: EXm
+                        real(WP), dimension(pDiffEqSys%n) :: EYm
+                        integer :: StepEvId, rootiter, rooterror, nEvents
+                        integer, dimension(1) :: MinEvXIndex
+
+                        ! Locate the events first
+                        
+                        do EventId = 1, pDiffEqSys%m
+                            do StepEvId = 1, nStepSzEvents(EventId)
+                                if (EventsDetected(EventId)) then
+
+                                    select case (me%EventOptions(EventId))          
+                                    ! Left bounrday of the integrator step is the event location
+                                    case (FLINT_EVENTOPTION_STEPBEGIN)
+                                        EXm(StepEvId,EventId) = EX0(StepEvId,EventId)
+
+                                    ! Right bounrday of the integrator step is the event location
+                                    case (FLINT_EVENTOPTION_STEPEND)
+                                        EXm(StepEvId,EventId) = EX1(StepEvId,EventId)
+                                
+                                    case default
+                                        ! root-finding is enabled, so locate the event exactly
+                                        if (.NOT. BipComputed) then
+                                            call me%InterpCoeff(X, Y, h, Y1, Bip, FCalls, params)
+                                            me%FCalls = me%FCalls + FCalls
+                                            BipComputed = .TRUE.
+                                        end if
+
+                                        call Root(EX0(StepEvId,EventId), EX1(StepEvId, EventId), &
+                                                        EV0(StepEvId,EventId), EV1(StepEvId,EventId), &
+                                                        me%ETol(EventId), SingleEvent, &
+                                                        EXm(StepEvId,EventId), EV0(StepEvId,EventId), &
+                                                        rootiter, rooterror)
+                                        if (rooterror /= 0 .AND. rooterror /= 2) then
+                                            ! root finding failed, dont exit. Try to go as far as you can!
+                                            status = FLINT_ERROR_EVENTROOT
+                                        end if
+                                    end select
+
                                 end if
                             end do
-                        end block
-                        end if
+                        end do
 
-                        ! save EV0 for the next integrator's step
-                        EV0 = EV1
+                        ! Handle the event action starting from the earliest event
 
+                        ! iterate until all events are handled
+                        do while (any(EventsDetected))
+                            
+                            ! Find the earliest event. Note that the events' location
+                            ! increases with the 1st index of EXm.
+                            MinEvXIndex = minloc(EXm(1,:), EventsDetected)
+
+                            ! solution at the event
+                            select case (me%EventOptions(MinEvXIndex(1)))
+                            case (FLINT_EVENTOPTION_STEPBEGIN)
+                                EYm = Y
+                            case (FLINT_EVENTOPTION_STEPEND)
+                                EYm = Y1
+                            case default
+                                EYm = InterpY(nInterpStates, EXm(1,MinEvXIndex(1)),&
+                                                        X, h, me%pstar, Bip)
+                            end select
+
+                            ! Call the event function with the located event info
+
+                            EvalEvents = 0
+                            EvalEvents(MinEvXIndex(1)) = 1
+                            EventNewY = EYm
+                            call pDiffEqSys%G(EXm(1,MinEvXIndex(1)), EventNewY, EvalEvents, &
+                                                EV0(1,:), EventDir, MinEvXIndex(1), EventAction)
+
+                            ! save the event state
+                            ! Note that if an event action alters the solution Y, event data returned to
+                            ! the user still contains the original state corresponding to the event location
+                            EventData = [EventData, EXm(1,MinEvXIndex(1)), EYm, real(MinEvXIndex(1), WP)]
+
+                            ! Handle the event actions. Note that we must recompute interpolation
+                            ! coefficients in case we update the solution Y1 or h.
+
+                            ! Handle the event mask action
+                            if (btest(EventAction, 7)) then
+                                EvMask(MinEvXIndex(1)) = .FALSE.
+                            end if
+
+                            ! The following actions are mutually exclusive
+                            select case (IAND(EventAction, b'01111111'))
+                            case (FLINT_EVENTACTION_TERMINATE)
+                                ! Return the event solution as the last solution
+                                h = EXm(1,MinEvXIndex(1)) - X
+                                Y1 = EYm
+                                LAST_STEP = .TRUE.
+                                BipComputed = .FALSE.
+                                status = FLINT_EVENT_TERM
+                                exit
+                            case (FLINT_EVENTACTION_RESTARTINT)
+                                ! Restart the integration from this point on
+                                h = EXm(1,MinEvXIndex(1)) - X
+                                Y1 = EYm
+                                ! If it was already a last step, then reset it
+                                LAST_STEP = .FALSE.
+                                BipComputed = .FALSE.
+                                exit
+                            case (FLINT_EVENTACTION_CHANGESOLY)
+                                ! Change the solution Y and restart the integration
+                                h = EXm(1,MinEvXIndex(1)) - X
+                                Y1 = EYm
+                                ! If it was already a last step, then reset it
+                                LAST_STEP = .FALSE.
+                                BipComputed = .FALSE.
+                                exit
+                            end select
+
+                            ! This event has been handled, so remove it for the next event
+                            ! If the handled event is a step-size event then we need to 
+                            ! shift the contents of its columns to left
+                            if (StepSzEvents(MinEvXIndex(1)) == 1) then
+                                nStepSzEvents(MinEvXIndex(1)) = nStepSzEvents(MinEvXIndex(1)) - 1
+                                if (nStepSzEvents(MinEvXIndex(1)) == 0) then
+                                    EventsDetected(MinEvXIndex(1)) = .FALSE.
+                                else
+                                    EXm(1:nStepSzEvents(MinEvXIndex(1)), MinEvXIndex(1)) &
+                                    = EXm(2:(nStepSzEvents(MinEvXIndex(1))+1),MinEvXIndex(1))
+                                end if
+                            else
+                                EventsDetected(MinEvXIndex(1)) = .FALSE.
+                            end if
+                        end do
+                    end block
                     end if
+
+                    ! save EV0 for the next integrator's step
+                    EV0 = EV1
+
                 end if
 
                 ! Do we need to store interpolation coefficients?
@@ -558,7 +556,7 @@ submodule (ERK) ERKIntegrate
                     ! If EventAction is performed to terminate, restart or change SolY
                     ! then we must compute interpolation coefficients again.
                     if (.NOT. BipComputed) then
-                        call me%InterpCoeff(X, Y1, h, Y2, Bip, FCalls, params)
+                        call me%InterpCoeff(X, Y, h, Y1, Bip, FCalls, params)
                         me%FCalls = me%FCalls + FCalls
                         BipComputed = .TRUE.
                     end if
@@ -567,19 +565,18 @@ submodule (ERK) ERKIntegrate
                     me%Bip(:,:,me%AcceptedSteps) = Bip
                 end if
 
-                
-                ! Restart the integration and update Y2 with the modified solution.
+                ! Restart the integration and update Y1 with the modified solution.
                 ! Note that the modified solution is returned back to the user in Yint.
                 ! The following code must be after the code for saving interpolation
                 ! coefficients as these coefficients need the original Y only.
                 if (EventsOn) then
                     select case (IAND(EventAction, b'01111111')) 
                     case(FLINT_EVENTACTION_RESTARTINT)
-                        me%k(:,1) = pDiffEqSys%F(X + h, Y2, params)
+                        me%k(:,1) = pDiffEqSys%F(X + h, Y1, params)
                         me%FCalls = me%FCalls + 1                
                     case(FLINT_EVENTACTION_CHANGESOLY)
-                        Y2 = EventNewY
-                        me%k(:,1) = pDiffEqSys%F(X + h, Y2, params)
+                        Y1 = EventNewY
+                        me%k(:,1) = pDiffEqSys%F(X + h, Y1, params)
                         me%FCalls = me%FCalls + 1                
                     end select
                 end if
@@ -587,12 +584,12 @@ submodule (ERK) ERKIntegrate
                 ! return the solution at integrator's natural step size
                 if (IntStepsNeeded) then
                     Xint(me%AcceptedSteps + 1) = X + h
-                    Yint(:,me%AcceptedSteps + 1) = Y2
+                    Yint(:,me%AcceptedSteps + 1) = Y1
                 end if
 
                 ! get ready for the next iteration
                 X = X + h
-                Y1 = Y2
+                Y = Y1
 
                 ! compute the new step size now
                 if (.NOT. ConstStepSz) then
@@ -610,7 +607,7 @@ submodule (ERK) ERKIntegrate
             else
 
                 ! step is rejected, now what
-                
+
                 ! increment the reject step counter, ignore the initial step rejections
                 if (me%AcceptedSteps >= 1) me%RejectedSteps = me%RejectedSteps + 1
                 
@@ -623,7 +620,7 @@ submodule (ERK) ERKIntegrate
                 
                 ! Retry again if this was the last step
                 LAST_STEP = .FALSE.
-                
+
             end if
             
             ! update the step size for next iteration
@@ -703,7 +700,7 @@ submodule (ERK) ERKIntegrate
         
         ! save the stats in any case
         Xf = X
-        Yf = Y1
+        Yf = Y
         if (.NOT. ConstStepSz) StepSz = h                
         me%Xf = Xf
         me%hf = StepSz
@@ -778,11 +775,14 @@ submodule (ERK) ERKIntegrate
         hLamb = 0.0_WP
         
         if (mod(me%AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
-            StiffN = norm2(me%k(:,1) - me%k(:,me%sint-1))
-            StiffD = norm2(Y2 - Yint12)
+            StiffN = norm2(me%k(:,me%sint) - me%k(:,me%sint-1))
+            StiffD = norm2(Y1 - Yint12)
 
             if (StiffD > 0.0_WP) hLamb = abs(h)*StiffN/StiffD
             
+            ! TBD: this threshold for hLamb can be set specific to each
+            ! integator method, check Hairer codes for DOP54 and DOP853 specific
+            ! values
             if (hLamb > 6.1_WP) then
                 NonStiffThreshold = 0
                 StiffThreshold = StiffThreshold + 1

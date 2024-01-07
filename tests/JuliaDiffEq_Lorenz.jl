@@ -24,11 +24,12 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol, DenseOn, Runs, p
 
     rtime = @elapsed for i in 1:Runs        
         # randomsize initial conditions
-        X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
-    
+        # X0new[1] = X0new[1] + 0.000000000000*X0new[1].*rand()
+        X0r = setindex(X0new, X0new[1] + 0.000000000001*X0new[1].*rand(), 1)
+
         # Define ODE problem
         # prob = ODEProblem(ODE, X0new, tspan, par);   
-        prob = remake(prob; u0 = X0new);                  
+        prob = remake(prob; u0 = X0r);                  
 
         #GC.gc()
         sol = solve(prob, OdeMethod,reltol=rtol,abstol=atol, dense=DenseOn)
@@ -47,7 +48,7 @@ function main_Lorenz()
     print("\n")
 
 
-    u0 = MVector{3,Float64}([1.0,0.0,0.0])
+    u0 = SVector{3,Float64}([1.0,0.0,0.0])
     p = SA_F64[10.0,28.0,8/3]
     tspan = (0.0,100.0)
     rtol = 1.0e-11::Float64
