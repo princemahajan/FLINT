@@ -24,8 +24,11 @@
 !> Module containing all the algorithms for step size computations    
 module StepSize
 
-    use FLINT_base, only: WP, DiffEqSys
+    use FLINT_base, only: DiffEqSys
+    use FLINTUtils, only: WP => FLINT_WP
     
+    private :: WP
+
     ! Default constants
     
     !> Safety factor

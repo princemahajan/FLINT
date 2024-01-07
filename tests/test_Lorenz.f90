@@ -24,7 +24,7 @@
 
 module LorenzDiffEq
 
-    use FLINT
+    use FLINT, WP => FLINT_WP
 
     use, intrinsic :: IEEE_ARITHMETIC
 

@@ -92,7 +92,7 @@
         if (present(MinStepSize)) then
             me%MinStepSize = abs(MinStepSize)
         else
-            me%MinStepSize = EPS
+            me%MinStepSize = FLINT_EPS
         end if
             
         ! Maximum-step size: A "0" value means that it will be set 

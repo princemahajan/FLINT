@@ -23,7 +23,7 @@
 
 module TwoBodyDynamics
 
-    use FLINT
+    use FLINT, WP => FLINT_WP
     !use ddeabm_module
 
     use, intrinsic :: IEEE_ARITHMETIC

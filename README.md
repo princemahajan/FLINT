@@ -24,7 +24,7 @@ are available at http://people.math.sfu.ca/~jverner/.
 
 ### Introduction
 
-FLINT is a modern object-oriented Fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and multiple event-detection support for each of the methods. The code is written such that any other ERK method can be implemented by including its coefficients with minimum changes required in the code. The DOP54 and DOP853 integrators  step implementation is hand-optimized and for other integrators, a generic routine for step integration is implemented. This generic routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in internal memory. Thereafter, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final conditions. Interpolation is much faster than integration, as the coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with many features such as event root-finding, event step-size, event actions. In a nutshell, the features are:
+FLINT is a modern object-oriented Fortran library that provides four adaptive step-size explicit Runge-Kutta (ERK) methods of order 5, 6, 8, and 9 along with dense-output and multiple event-detection support for each of the methods. The code is written such that any other ERK method can be implemented by including its coefficients with minimum changes required in the code. The DOP54 and DOP853 integrators step implementation is hand-optimized and for other integrators, a generic routine for step integration enables quick inclusion of new ERK methods. This generic step integration routine supports both FSAL and non-FSAL methods. Dense output is supported with delayed interpolation. When interpolation is enabled, FLINT computes the interpolation coefficients during the integration and stores them in internal memory. Thereafter, the interpolation method can be used any number of times to find the solution values at any user-specified grid within the initial and final conditions. Interpolation is performed much faster than integration as the coefficients are all precomputed during the integration. Multiple event detection is supported for each integrator along with many features such as event root-finding, event step-size, event actions. In a nutshell, the features are:
                   
 + Modern object-oriented, thread-safe, and optimized Fortran code
 + 4 Adaptive-step ERK integrators: DOP54, DOP853, Verner98R, Verner65E
@@ -36,7 +36,7 @@ FLINT is a modern object-oriented Fortran library that provides four adaptive st
 + Ability to restart the integration or change solution on the detection of events
 + Stiffness detection
 
-The following figure shows the multiple event detection capability of FLINT, in which the X-crossings in decreasing and Y-crossings in increasing direction of a three-body orbit are detected and reported to the user.
+The following figure shows the multiple event detection capability of FLINT, in which the X-crossings in decreasing and Y-crossings in increasing directions of a three-body orbit are detected by FLINT.
 
 
 ![FINT's event-detection](media/FLINT_Events.png)
@@ -44,7 +44,7 @@ The following figure shows the multiple event detection capability of FLINT, in 
 
 ### Performance Benchmarks
 
-The latest FLINT code (compiled using Intel Fortran compiler ifort) is tested against Julia's (ver 1.10.0) DifferentialEquations package ver 7.12.0 (https://diffeq.sciml.ai/stable/) for different problems with and without event detection. The Julia test code along with results are provided in tests folder in FLINT's GitHub repository https://github.com/princemahajan/FLINT. More benchmarks are provided in media folder.
+The latest FLINT code (compiled using Intel Fortran compiler ifort) is tested against Julia's (ver 1.10.0) DifferentialEquations package ver 7.12.0 (https://diffeq.sciml.ai/stable/) for different problems with and without event detection. The Julia test code along with results are provided in the tests folder in FLINT's GitHub repository https://github.com/princemahajan/FLINT. Benchmark charts are provided in the media folder.
 
 + Work-Precision Data for Three-Body problem (No events)
 
@@ -61,7 +61,21 @@ The latest FLINT code (compiled using Intel Fortran compiler ifort) is tested ag
 
 ### Installation
 
-FLINT is tested with ifort (2021.11.1) and gfortran (11.4.0) compilers. Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists and a FPM (https://github.com/fortran-lang/fpm) toml files are provided to generate build files on Windows and Linux. Additionally, it generates cmake config files to easily link FLINT using the find_package() command when cmake is used. The steps to link FLINT in cmake-based projects are:
+FLINT is tested with ifort (2021.11.1) and gfortran (11.4.0) compilers. Doxyfile is provided for generating extensive API documentation using Doxygen. FLINT has no dependency on any other library. The CMakeLists and a FPM (https://github.com/fortran-lang/fpm) toml files are provided to generate build and install files on Windows and Linux. An example to build the project along with the test programs with double precision using cmake is
+
+```
+cmake -B ./build -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR_PATH>
+cmake --build ./build
+```
+
+The option _REAL128=TRUE (as -D_REAL128=TRUE) can be provided to cmake to build the project with quad precision. For single precision, use _REAL32=TRUE. For FPM, use
+
+```
+ fpm build --flag -D_REAL128
+ fpm test --flag -D_REAL128
+```
+
+Additionally, FLINT generates cmake config files to easily link it using the find_package() command when cmake is used. The steps to link FLINT in cmake-based projects are:
 
 + In cmake GUI or command-line, set FLINT_INSTALL_LIB_DIR to the desired directory, where the compiled library, modules, and cmake config files will be installed.
 + In cmake GUI or command-line, set FLINT_INSTALL_BIN_DIR to the desired directory, where the compiled test executables of FLINT will be installed.
@@ -75,12 +89,12 @@ FLINT is tested with ifort (2021.11.1) and gfortran (11.4.0) compilers. Doxyfile
 
 ### How to Use
 
-See the test codes in [tests](https://github.com/princemahajan/FLINT/tree/master/tests) folder. Following are the steps in brief for a simpler problem:
+See the test codes in [tests](https://github.com/princemahajan/FLINT/tree/master/tests) folder. Following are the steps in brief for a demo problem:
 
 1. Create a differential equation system class by providing differential equation function, events function (if any), and parameters (if any).
 
 ```fortran
-    use FLINT
+    use FLINT, WP => FLINT_WP
     implicit none
 
     type, extends(DiffEqSys) :: TBSys

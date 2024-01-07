@@ -24,6 +24,7 @@
 
 module ERK
     
+    use FLINTUtils, only: WP => FLINT_WP
     use FLINT_base
     use ButcherTableaus
     use StepSize

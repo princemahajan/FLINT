@@ -58,8 +58,9 @@
     
 module ButcherTableaus
 
-use FLINT_base, only: WP
+use FLINTUtils, only: WP => FLINT_WP
 
+private :: WP
 
 !> Maximum number of stages for storage allocation
 

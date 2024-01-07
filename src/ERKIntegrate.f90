@@ -630,7 +630,7 @@ submodule (ERK) ERKIntegrate
             ! not the last step
             ! Reference: Hairer's DOP853 code but added the last step check
             if ((.NOT. ConstStepSz) .AND. (.NOT. LAST_STEP) &
-                                .AND. abs(h)*0.01_WP <= abs(X)*EPS) then
+                                .AND. abs(h)*0.01_WP <= abs(X)*FLINT_EPS) then
                 status = FLINT_ERROR_STEPSZ_TOOSMALL
             end if
 

@@ -29,16 +29,27 @@ module FLINTUtils
     use, intrinsic :: iso_fortran_env, only: real32, real64, real128
 
     !> By default, use 64-bit double precision (IEEE-754)
-    integer, parameter, public :: SP = real32   !> Single precision kind parameter
-    integer, parameter, public :: DP = real64   !> Double precision kind parameter
-    integer, parameter, public :: QP = real128  !> Quadruple precision kind parameter
-    integer, parameter, public :: WP = DP       !> choose the precision kind
+    integer, parameter, public :: FLINT_SP = real32   !> Single precision kind parameter
+    integer, parameter, public :: FLINT_DP = real64   !> Double precision kind parameter
+    integer, parameter, public :: FLINT_QP = real128  !> Quadruple precision kind parameter
+    
+    ! conditional compilation for choosing precision (default 64 bits)
+#ifdef _REAL32
+    integer, parameter, public :: FLINT_WP = FLINT_SP
+#elif _REAL128
+    integer, parameter, public :: FLINT_WP = FLINT_QP
+#else
+    integer, parameter, public :: FLINT_WP = FLINT_DP
+#endif
+
+    ! This is for use only in this module
+    integer, parameter, private :: WP = FLINT_WP       !> choose the precision kind
 
     !> Smallest positive real satisfying 1.0_WP + eps > 1.0_WP
-    real(WP), parameter, public :: EPS = epsilon(1.0_WP)
+    real(WP), parameter, public :: FLINT_EPS = epsilon(1.0_WP)
     
     !> Max iterations for the root-finding
-    integer, parameter :: MAX_ITERATIONS = 50
+    integer, parameter :: FLINT_ROOTFIND_MAXITR = 50
     
     !> Interface of the function whose root needs to be computed
     abstract interface
@@ -113,7 +124,7 @@ module FLINTUtils
         fc = fb
         done = .FALSE.
         itr = 0
-        do while (done .EQV. .FALSE. .AND. itr < MAX_ITERATIONS)
+        do while (done .EQV. .FALSE. .AND. itr < FLINT_ROOTFIND_MAXITR)
             
             ! if root is NOT bracketed between C and B, then C = A
             if ((fc>0.0_WP .AND. fb>0.0_WP) .OR. (fc<0.0_WP .AND. fb<0.0_WP)) then
@@ -132,7 +143,7 @@ module FLINTUtils
                 fc = fa
             end if
             ! tolerance on the independent variable
-            tolx = 2.0_WP*EPS*abs(bb) + 0.5_WP*tol
+            tolx = 2.0_WP*FLINT_EPS*abs(bb) + 0.5_WP*tol
             ! middle point
             xm = 0.5_WP*(cc - bb)
             
@@ -190,7 +201,7 @@ module FLINTUtils
             end if
         end do
         
-        if (itr >= MAX_ITERATIONS) error = 2
+        if (itr >= FLINT_ROOTFIND_MAXITR) error = 2
         niter = itr
 
     end subroutine Root

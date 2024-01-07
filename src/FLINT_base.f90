@@ -28,9 +28,11 @@
 module FLINT_base
     
     ! All the basic definitions
-    use FLINTUtils
+    use FLINTUtils, WP => FLINT_WP
 
     implicit none
+
+    private :: WP
 
     public
     

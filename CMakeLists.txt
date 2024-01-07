@@ -41,6 +41,13 @@ endforeach()
 # Lib dir should contain all the .mod files 
 set(CMAKE_Fortran_MODULE_DIRECTORY ${FLINT_INSTALL_LIB_DIR})
 
+# compile time constants (provide -D<VAR>=TRUE to cmake)
+if (_REAL32)
+  add_compile_definitions(_REAL32)
+elseif (_REAL128)
+  add_compile_definitions(_REAL128)
+endif()
+
 ###############
 # FLINT Targets
 ###############
@@ -48,7 +55,7 @@ set(CMAKE_Fortran_MODULE_DIRECTORY ${FLINT_INSTALL_LIB_DIR})
 set(FLINTBIN FLINT)
 
 # Define the static library target
-file(GLOB FLINT_SRC src/*.f90)
+file(GLOB FLINT_SRC src/*.f90 src/*.F90)
 add_library(${FLINTBIN} STATIC ${FLINT_SRC})
 target_include_directories(${FLINTBIN} INTERFACE ${FLINT_INSTALL_LIB_DIR})
 
