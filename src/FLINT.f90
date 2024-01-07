@@ -4,7 +4,7 @@
 !!              and multiple event-detection support. Currently, it provides four
 !!              Explicit Runge-Kutta methods: DOP54, DOP853, Verner65E, and Verner98R.
 !! \author      Bharat Mahajan
-!! \version     0.9.8
+!! \version     0.9.9
 !! \date        Created: 01/25/2019    
 !! \copyright   Copyright 2024 Bharat Mahajan <br><br>
 !!              The initial code was written by Bharat Mahajan at Odyssey Space Research LLC, Houston, TX

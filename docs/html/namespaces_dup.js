@@ -38,6 +38,7 @@ var namespaces_dup =
       [ "erk_max_a", "namespacebutchertableaus.html#af6e8fd7d86ca15f621014786f64ef745", null ],
       [ "erk_maxipdegree", "namespacebutchertableaus.html#a3cdd77195db57710837bf1712759f7bb", null ],
       [ "erk_maxstages", "namespacebutchertableaus.html#a0065d7dade5524725ea5fd60a8eebf48", null ],
+      [ "i", "namespacebutchertableaus.html#aa449889b2b2bfab480f81d226f258591", null ],
       [ "verner65e_a", "namespacebutchertableaus.html#a382c2277a5282d698869ef86cff74d67", null ],
       [ "verner65e_b", "namespacebutchertableaus.html#a36936c8da2ff8e3dc3dd98444734e748", null ],
       [ "verner65e_bh", "namespacebutchertableaus.html#ae9e7dfe7a73452c980b376b2889ef7ed", null ],
@@ -72,8 +73,8 @@ var namespaces_dup =
     [ "flint_base", "namespaceflint__base.html", "namespaceflint__base" ],
     [ "flintutils", "namespaceflintutils.html", "namespaceflintutils" ],
     [ "stepsize", "namespacestepsize.html", [
-      [ "stepsz0hairer", "namespacestepsize.html#a7a7d29b0b69f0c4d0015684e9b3b869c", null ],
-      [ "stepszhairer", "namespacestepsize.html#ace8f8885fde54644bdab9ece497a6003", null ],
+      [ "stepsz0hairer", "namespacestepsize.html#ac53cb13a863bc78dde608efa5cf2492e", null ],
+      [ "stepszhairer", "namespacestepsize.html#a5d9f894b9fda729f589cee137e272f83", null ],
       [ "hbyhoptold", "namespacestepsize.html#a2e568931184615ceeb08a8bb65d90d81", null ],
       [ "sf", "namespacestepsize.html#a98f437ebfe99a2602b64cc6d2e9c5991", null ],
       [ "sfmax", "namespacestepsize.html#a31c7482db403647b0e8818e25e9ba85c", null ],

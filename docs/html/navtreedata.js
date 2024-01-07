@@ -25,10 +25,7 @@
 var NAVTREE =
 [
   [ "FLINT", "index.html", [
-    [ "FLINT: Fortran Library for numerical INTegrators of differential equations", "index.html", [
-      [ "Introduction", "index.html#sec", null ],
-      [ "Performance benchmark against Julia's Differential Equation package", "index.html#compsec", null ]
-    ] ],
+    [ "FLINT: Fortran Library for numerical INTegrators of differential equations", "index.html", "index" ],
     [ "Modules", "namespaces.html", [
       [ "Modules List", "namespaces.html", "namespaces_dup" ],
       [ "Module Members", "namespacemembers.html", [
@@ -38,9 +35,9 @@ var NAVTREE =
         [ "Enumerator", "namespacemembers_eval.html", null ]
       ] ]
     ] ],
-    [ "Data Types List", "annotated.html", [
+    [ "Data Types", "annotated.html", [
       [ "Data Types List", "annotated.html", "annotated_dup" ],
-      [ "Data Types", "classes.html", null ],
+      [ "Data Type Index", "classes.html", null ],
       [ "Class Hierarchy", "hierarchy.html", "hierarchy" ],
       [ "Data Fields", "functions.html", [
         [ "All", "functions.html", null ],
@@ -57,7 +54,7 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "_butcher_tableaus_8f90.html",
-"namespacestepsize.html"
+"structerk_1_1erk__class.html#a160dc04f5ef7e46ee27aa1f52109b1ff"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

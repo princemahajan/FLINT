@@ -1,10 +1,10 @@
 var structerk_1_1erk__class =
 [
-    [ "erk_destroy", "structerk_1_1erk__class.html#afbacb4804518decfceaee81659e7a343", null ],
-    [ "info", "structerk_1_1erk__class.html#a63eac89544e47e598205eb76a7f2246d", null ],
-    [ "init", "structerk_1_1erk__class.html#ad53547d468bc0c78d4360550ebc60c5b", null ],
-    [ "integrate", "structerk_1_1erk__class.html#a1eba3889a1fa9fae257157f9681e3ae0", null ],
-    [ "interpolate", "structerk_1_1erk__class.html#a9d0c1db88b6dea53d4bb1c4130694af2", null ],
+    [ "erk_destroy", "structerk_1_1erk__class.html#a96570a00986d0036eb1c62ad80d71546", null ],
+    [ "info", "structerk_1_1erk__class.html#aa1a148004bf5f604039466a993f61765", null ],
+    [ "init", "structerk_1_1erk__class.html#a0a77beb46258f13212b6568605155350", null ],
+    [ "integrate", "structerk_1_1erk__class.html#adde9f75a1f2b41b637e41b4a10be6946", null ],
+    [ "interpolate", "structerk_1_1erk__class.html#a160dc04f5ef7e46ee27aa1f52109b1ff", null ],
     [ "d", "structerk_1_1erk__class.html#a1981ddeda7db4d8124f7d4db7ec867ef", null ],
     [ "dinz", "structerk_1_1erk__class.html#aa98ece20b791abf8fe086d5ac1110bde", null ],
     [ "isfsalmethod", "structerk_1_1erk__class.html#ac8a5724e900b0a4788a558a92817a69c", null ],

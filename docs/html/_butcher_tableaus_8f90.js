@@ -37,6 +37,7 @@ var _butcher_tableaus_8f90 =
     [ "erk_max_a", "_butcher_tableaus_8f90.html#af6e8fd7d86ca15f621014786f64ef745", null ],
     [ "erk_maxipdegree", "_butcher_tableaus_8f90.html#a3cdd77195db57710837bf1712759f7bb", null ],
     [ "erk_maxstages", "_butcher_tableaus_8f90.html#a0065d7dade5524725ea5fd60a8eebf48", null ],
+    [ "i", "_butcher_tableaus_8f90.html#aa449889b2b2bfab480f81d226f258591", null ],
     [ "verner65e_a", "_butcher_tableaus_8f90.html#a382c2277a5282d698869ef86cff74d67", null ],
     [ "verner65e_b", "_butcher_tableaus_8f90.html#a36936c8da2ff8e3dc3dd98444734e748", null ],
     [ "verner65e_bh", "_butcher_tableaus_8f90.html#ae9e7dfe7a73452c980b376b2889ef7ed", null ],
