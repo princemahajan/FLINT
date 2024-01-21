@@ -127,6 +127,7 @@ end module MyDiffEq
 
 program TestFLINT_WP
 
+    use, intrinsic :: ieee_arithmetic, only: IEEE_Value, IEEE_QUIET_NAN
     use iso_fortran_env, only: output_unit
     use FLINT
     use MyDiffEq
@@ -148,7 +149,7 @@ program TestFLINT_WP
     integer, parameter :: tloops = 100
 
     ! max no. of steps
-    integer, parameter :: MAX_STEPS = 30000
+    integer, parameter :: MAX_STEPS = 99000
 
     real(WP), parameter :: stepsz00 = 0.0_WP
     integer :: stifftest = 1
@@ -181,7 +182,6 @@ program TestFLINT_WP
     type(CR3BPSys) :: eom
 
     eom%n = 6
-    t = eom%Period
     IOM0 = eom%IOM(eom%mu, eom%Y0)
               
     tip = [(eom%Period/(nsteps-1)*i, i = 0, nsteps-1)]
@@ -203,56 +203,75 @@ program TestFLINT_WP
         method = ERK_Verner98R
     end select            
 
-    
     do ctr = 1, size(rtol)
 
         ! integrate sparse
         call erk%Init(eom, MAX_STEPS, Method=method, InterpOn=.FALSE., &
                                     RTol=[rtol(ctr)], ATol=[atol])
  
-        call cpu_time(ts0)
-        do itr = 1, tloops
-            stiffstatus = stifftest            
-            stepsz0 = stepsz00    
-            call erk%Integrate(0.0_WP, eom%Y0, t, Y, IntStepsOn=.TRUE., &
-                Xint=tin, Yint=Yin, StepSz=stepsz0, StiffTest=stiffstatus) 
-        end do
-        call cpu_time(ts1)
- 
         if (erk%status /= FLINT_SUCCESS) then
             call erk%Info(stiffstatus, errstr)
-            print *, rtol(ctr), mname//': Sparse int failed: '//errstr
-        end if
+            print *, rtol(ctr), mname//': Sparse Init failed: '//errstr
+        else                            
+            call cpu_time(ts0)
+            do itr = 1, tloops
+                stiffstatus = stifftest            
+                stepsz0 = stepsz00
+                t = eom%Period
+                call erk%Integrate(0.0_WP, eom%Y0, t, Y, IntStepsOn=.TRUE., &
+                    Xint=tin, Yint=Yin, StepSz=stepsz0, StiffTest=stiffstatus) 
+            end do
+            call cpu_time(ts1)
+    
+            if (erk%status /= FLINT_SUCCESS) then
+                IOMerr(ctr) = IEEE_VALUE (IOMerr(ctr), IEEE_QUIET_NAN)
+                fcalls(ctr) = 0
+                call erk%Info(stiffstatus, errstr)
+                print *, rtol(ctr), mname//': Sparse int failed: '//errstr
+            else
+                if (.NOT. allocated(IOMin)) allocate(IOMin(size(tin)))  
+                do i = 1, size(tin)
+                    IOMin(i) = eom%IOM(eom%mu, Yin(:,i))
+                end do
+                IOMerr(ctr) = maxval(abs(IOMin-IOM0))
+            end if
 
-        time_s(ctr) = ts1 - ts0
+            time_s(ctr) = ts1 - ts0
+        end if
 
         ! integrate dense
         call erk%Init(eom, MAX_STEPS, Method=method, InterpOn=.TRUE., &
                                     RTol=[rtol(ctr)], ATol=[atol])
- 
-        call cpu_time(td0)
-        do itr = 1, tloops
-            stepsz0 = stepsz00
-            stiffstatus = stifftest            
-            call erk%Integrate(0.0_WP, eom%Y0, t, Y, &
-                StepSz=stepsz0, StiffTest=stiffstatus) 
-        end do
-        call cpu_time(td1)
- 
+
         if (erk%status /= FLINT_SUCCESS) then
             call erk%Info(stiffstatus, errstr)
-            print *, rtol(ctr), mname//': Dense int failed: '//errstr
-        end if
+            print *, rtol(ctr), mname//': Dense Init failed: '//errstr
+        else                                                                
+            call cpu_time(td0)
+            do itr = 1, tloops
+                stepsz0 = stepsz00
+                stiffstatus = stifftest
+                t = eom%Period            
+                call erk%Integrate(0.0_WP, eom%Y0, t, Y, &
+                    StepSz=stepsz0, StiffTest=stiffstatus) 
+            end do
+            call cpu_time(td1)
+    
+            if (erk%status /= FLINT_SUCCESS) then
+                IOMerr_d(ctr) = IEEE_VALUE (IOMerr_d(ctr), IEEE_QUIET_NAN)
+                fcalls(ctr) = 0
+                call erk%Info(stiffstatus, errstr)
+                print *, rtol(ctr), mname//': Dense int failed: '//errstr
+            end if
 
-        time_d(ctr) = td1 - td0
+            time_d(ctr) = td1 - td0
+        end if
 
         if (erk%status == FLINT_SUCCESS) then
 
-            if (.NOT. allocated(IOMin)) allocate(IOMin(size(tin)))            
-
             ! interpolate       
             call erk%Interpolate(tip, Yip,.FALSE.)       
-        
+
             ! compute stats
             call erk%Info(stiffstatus, errstr, nFCalls=fc)
 
@@ -261,12 +280,10 @@ program TestFLINT_WP
                 do i = 1, nsteps
                     IOMip(i) = eom%IOM(eom%mu, Yip(:,i))
                 end do
-                do i = 1, size(tin)
-                    IOMin(i) = eom%IOM(eom%mu, Yin(:,i))
-                end do
-                IOMerr(ctr) = maxval(abs(IOMin-IOM0))
                 IOMerr_d(ctr) = maxval(abs(IOMip-IOM0))
             else
+                IOMerr_d(ctr) = IEEE_VALUE (IOMerr_d(ctr), IEEE_QUIET_NAN)
+                fcalls(ctr) = 0
                 print *, mname//': Interpolation failed: ', erk%status, ',', errstr
             end if
         end if

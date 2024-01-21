@@ -60,6 +60,7 @@ struct ODETestResult
     IOMErr
     MeanTime
     Solver
+    FunCalls
 end
 
 # Integrate ODE
@@ -90,8 +91,10 @@ function FireODEIntTest(X0, ODE, tspan, OdeMethod,  atol, rtol,
     # compute IOM variations
     IOMsol = IOMFunc(sol, par)
     ierr = maximum(abs.(IOMsol .- IOM))
+
+    fcalls = sol.destats.nf
     
-    ODETestResult(serr, ierr, rtime, OdeMethod.name)
+    ODETestResult(serr, ierr, rtime, OdeMethod.name, fcalls)
 end
 
 ##
@@ -296,6 +299,31 @@ function main_wp_diffeq()
     title!("Dense Output Work-Precision")
 
 
+    # Sparse fcalls - rtol plots
+    plt5 = plot(FLINT_data[1][:,1], FLINT_data[1][:,2], xaxis=:log10, yaxis=:log10, 
+                label=string("FLINT ",FLINT_solvers[1]), ls = ls1, legend=:top,
+                lw=lw, ms=ms,markershape = :auto, minorgrid=true)
+
+    for ctr = 2:size(FLINT_data)[1]
+        plot!(FLINT_data[ctr][:,1], FLINT_data[ctr][:,2], 
+                    label=string("FLINT ",FLINT_solvers[ctr]), ls=ls1,
+                    ms=ms, markershape = :auto, lw=lw, legend=:top,)
+    end
+
+    # Julia DiffEq results
+    for ctr in 1:nsol
+        tsdata = Float64.([SpRes[ctr,i].MeanTime for i =1:ntol])
+        nfdata = Int32.([SpRes[ctr,i].FunCalls for i =1:ntol])
+        plot!(rtol, nfdata, label=string("Julia ", SpRes[ctr,1].Solver), 
+                    ls=ls2,ms=ms, markershape = :auto, lw=lw,legend=:top)
+    end
+   
+    xlabel!("Rel Tol");
+    ylabel!("Func Calls");
+    title!("Sparse Output Work-Precision")
+
+
+
     # for fdata in FLINT_data
     #     sctime = SpRes[ctr,end].MeanTime/FLINT_res[ctr]
     #     @Printf.printf("%7s: %.3e [%.1f], \t\t %.3e (FLINT %7s)\n",
@@ -303,7 +331,7 @@ function main_wp_diffeq()
     #     FLINT_alg[ctr])
     # end
 
-    return (plt1, plt2, plt3, plt4)
+    return (plt1, plt2, plt3, plt4, plt5)
 
 
 

@@ -48,7 +48,7 @@ The latest FLINT code (compiled using Intel Fortran compiler ifort) is tested ag
 
 + Work-Precision Data for Three-Body problem (No events)
 
-<img src="media/wp_sp_tr.jpg" alt="WP-data" width="800"/>
+<img src="media/wp_sp_fr.png" alt="WP-data" width="800"/>
 
 + Three-Body problem propagation (w/ events)
 
