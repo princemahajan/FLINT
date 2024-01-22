@@ -87,7 +87,7 @@ end module LorenzDiffEq
     logical, parameter :: CONST_STEPSZ = .FALSE.
     
     ! random dispersion of IC: this multiplies the random number
-    real(WP), parameter :: randon = 0.000000000000_WP
+    real(WP), parameter :: randon = 0.000000000001_WP
 
     ! Interpolation points
     integer, parameter :: nIp = int(1000.0)

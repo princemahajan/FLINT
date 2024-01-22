@@ -57,7 +57,7 @@ submodule (ERK) ERKIntegrate
         real(WP), dimension(6) :: StepSzParams        
 
         real(WP) :: h, hSign, hnew, hmax, X, Err, LastStepSzFac
-        real(WP), dimension(me%pDiffEqSys%n) :: Y, Y1, F0, Sc0, Yint12
+        real(WP), dimension(me%pDiffEqSys%n) :: Y, Y1, F0, Sc0, Ysint_pre, Ysint
 
         integer :: FCalls, nInterpStates
         integer :: StiffnessTest, StiffThreshold, NonStiffThreshold, StiffTestSteps
@@ -271,7 +271,7 @@ submodule (ERK) ERKIntegrate
             end if
 
             ! Advance one step using the chosen method
-            call me%StepInt(X, Y, F0, h, Y1, Yint12, FCalls, (.NOT. ConstStepSz), Err, params)
+            call me%StepInt(X, Y, F0, h, Y1, Ysint_pre, Ysint, FCalls, (.NOT. ConstStepSz), Err, params)
 
             ! update steps taken and function calls made
             me%TotalSteps = me%TotalSteps + 1                
@@ -776,7 +776,7 @@ submodule (ERK) ERKIntegrate
         
         if (mod(me%AcceptedSteps, StiffTestSteps) == 0 .OR. StiffThreshold > 0) then
             StiffN = norm2(me%k(:,me%sint) - me%k(:,me%sint-1))
-            StiffD = norm2(Y1 - Yint12)
+            StiffD = norm2(Ysint - Ysint_pre)
 
             if (StiffD > 0.0_WP) hLamb = abs(h)*StiffN/StiffD
             

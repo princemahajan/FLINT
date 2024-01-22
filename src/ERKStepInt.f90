@@ -25,14 +25,14 @@ submodule (ERK) ERKStepInt
 
     contains    
 
-    module subroutine erk_stepint(me, X0, Y0, F0, h, Y1, Yint12, FCalls, &
-                                        EstimateErr, Err, params)
+    module subroutine erk_stepint(me, X0, Y0, F0, h, Y1, Ysint_pre, Ysint, &
+                        FCalls, EstimateErr, Err, params)
         class(ERK_class), intent(inout) :: me
         real(WP), intent(in) :: X0
         real(WP), dimension(me%pDiffEqSys%n), intent(in) :: Y0
         real(WP), dimension(me%pDiffEqSys%n), intent(inout) :: F0
         real(WP), intent(in) :: h
-        real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
+        real(WP), dimension(size(Y0)), intent(out) :: Y1, Ysint_pre, Ysint
         integer, intent(out) :: FCalls
         logical, intent(in) :: EstimateErr
         real(WP), intent(out) :: Err
@@ -41,38 +41,38 @@ submodule (ERK) ERKStepInt
         select case (me%method)
         case (ERK_DOP853)
             if (EstimateErr) then
-                call DOP853_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Yint12, FCalls, Err, &
-                    me%IsScalarTol, me%RTol, me%ATol, params)
+                call DOP853_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Ysint_pre, Ysint, &
+                        FCalls, Err, me%IsScalarTol, me%RTol, me%ATol, params)
             else
-                call DOP853_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Yint12, FCalls, Err, &
-                    params=params)
+                call DOP853_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Ysint_pre, Ysint, &
+                        FCalls, Err, params=params)
             end if
         case (ERK_DOP54)
             if (EstimateErr) then
-                call DOP54_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Yint12, FCalls, Err, &
-                    me%IsScalarTol, me%RTol, me%ATol, params)
+                call DOP54_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Ysint_pre, Ysint, &
+                        FCalls, Err, me%IsScalarTol, me%RTol, me%ATol, params)
             else
-                call DOP54_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Yint12, FCalls, Err, &
-                    params=params)
+                call DOP54_stepint(me%pDiffEqSys, X0, Y0, F0, h, me%k, Y1, Ysint_pre, Ysint, &
+                        FCalls, Err, params=params)
             end if
         case (ERK_VERNER65E)
             if (EstimateErr) then
                 call stepint(me%pDiffEqSys, X0, Y0, F0, h, Verner65E_FSAL, Verner65E_sint, me%k, &
-                        Verner65E_a, Verner65E_b, Verner65E_c, Y1, Yint12, FCalls, &
+                        Verner65E_a, Verner65E_b, Verner65E_c, Y1, Ysint_pre, Ysint, FCalls, &
                         Err, me%IsScalarTol, me%RTol, me%ATol, Verner65E_e, params)        
             else
                 call stepint(me%pDiffEqSys, X0, Y0, F0, h, Verner65E_FSAL, Verner65E_sint, me%k, &
-                        Verner65E_a, Verner65E_b, Verner65E_c, Y1, Yint12, FCalls, &
+                        Verner65E_a, Verner65E_b, Verner65E_c, Y1, Ysint_pre, Ysint, FCalls, &
                         Err, params=params)        
             end if
         case (ERK_VERNER98R)
             if (EstimateErr) then
                 call stepint(me%pDiffEqSys, X0, Y0, F0, h, Verner98R_FSAL, Verner98R_sint, me%k, &
-                        Verner98R_a, Verner98R_b, Verner98R_c, Y1, Yint12, FCalls, &
+                        Verner98R_a, Verner98R_b, Verner98R_c, Y1, Ysint_pre, Ysint, FCalls, &
                         Err, me%IsScalarTol, me%RTol, me%ATol, Verner98R_e, params)        
             else
                 call stepint(me%pDiffEqSys, X0, Y0, F0, h, Verner98R_FSAL, Verner98R_sint, me%k, &
-                        Verner98R_a, Verner98R_b, Verner98R_c, Y1, Yint12, FCalls, &
+                        Verner98R_a, Verner98R_b, Verner98R_c, Y1, Ysint_pre, Ysint, FCalls, &
                         Err, params=params)        
             end if
         case default
@@ -118,7 +118,7 @@ submodule (ERK) ERKStepInt
     
     !> It advances integrator by 1 step by computing intermediate stages
     subroutine stepint(pDiffEqSys, X0, Y0, F0, h, IsFSALMethod, sint, k, a, b, c, Y1, &
-                        Yint12, FCalls, Err, IsScalarTol, RTol, ATol, e, params)
+                    Ysint_pre, Ysint, FCalls, Err, IsScalarTol, RTol, ATol, e, params)
         class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
@@ -130,7 +130,7 @@ submodule (ERK) ERKStepInt
         real(WP), dimension(:), contiguous, intent(in) :: a
         real(WP), dimension(1:sint), intent(in) :: b
         real(WP), dimension(2:sint), intent(in) :: c
-        real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
+        real(WP), dimension(size(Y0)), intent(out) :: Y1, Ysint_pre, Ysint
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
@@ -153,7 +153,7 @@ submodule (ERK) ERKStepInt
         
         ! compute rest of the stages
         ! This compact and beautiful code is slower than ugly hardcoded one!
-        do i = 2,sint
+        do i = 2, (sint-1)
             block
             integer :: astart, j
             real(WP), dimension(n) :: aijkj
@@ -170,28 +170,32 @@ submodule (ERK) ERKStepInt
                 aijkj = aijkj + k(:,j)*a(astart + j)
             end do
             
-            Yint = Y0 + h*aijkj
-            k(:,i) = pDiffEqSys%F(X0 + h*c(i), Yint, params)
-            
-            ! Yint for the last non-FSAL stage is needed for stiffness detection
-            ! This is from Hairer's DOP853, so not sure its correct for other solvers
-            ! TBD: I dont like this, need a way to avoid this condition in this loop
-            if (i == (sint-1)) Yint12 = Yint 
+            Ysint_pre = Y0 + h*aijkj
+            k(:,i) = pDiffEqSys%F(X0 + h*c(i), Ysint_pre, params)            
             end block
         end do
         
+        ! Yint for the second last stage is needed for stiffness detection
+        ! TBD: Confirm this is correct method for stiffness detection for non-FSAL methods
+
+        ! the last stage
+        block
+        integer :: astart, j
+        real(WP), dimension(n) :: aijkj
+        astart = int((sint-1)/2.0*(sint-2))
+        aijkj = 0.0_WP
+        do j = 1,(sint-1)
+            aijkj = aijkj + k(:,j)*a(astart + j)
+        end do        
+        Yint = Y0 + h*aijkj
+        k(:,sint) = pDiffEqSys%F(X0 + h*c(sint), Yint, params)
+        end block
+
         ! propagate the solution to the next step for error computation
         ! For FSAL methods, Yint already has the new solution
         
         ! For non-FSAL methods, compute the solution at the next step
-        if (IsFSALMethod .EQV. .FALSE.) then
-            ! for stiffness detection, we need last non-FSAL stage solution
-            ! TBD: this needs correction for stifness detection in case of 
-            ! non-FSAL methods as stiffness test needs Yint12 and F(Yint12)
-            ! and we replaced Yint12 with Yint but still have old F(Yint12)
-            Yint12 = Yint
-            Yint = Y0 + h*matmul(k(:,1:sint), b(1:sint))
-        end if
+        if (IsFSALMethod .EQV. .FALSE.) Yint = Y0 + h*matmul(k(:,1:sint), b(1:sint))
 
         if (EstimateErr) then
             ! Estimate the error. We assume that the error coeffcients are precomputed,
@@ -223,6 +227,7 @@ submodule (ERK) ERKStepInt
                 ! Evaluate F0 for the next step
                 F0 = pDiffEqSys%F(X0 + h, Y1, params)
                 ! Number of function calls made so far
+                Ysint = Yint ! for stiffness detection
                 FCalls = sint            
             else
                 ! In FSAL methods, the integration last stage is F0 for the next step
@@ -319,15 +324,15 @@ submodule (ERK) ERKStepInt
 
 
     !> It advances integrator by 1 step by computing stages
-    subroutine DOP853_stepint(pDiffEqSys, X0, Y0, F0, h, k, Y1, Yint12, FCalls, Err, &
-                                    IsScalarTol, RTol, ATol, params)
+    subroutine DOP853_stepint(pDiffEqSys, X0, Y0, F0, h, k, Y1, Ysint_pre, Ysint, &
+                    FCalls, Err, IsScalarTol, RTol, ATol, params)
         class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), dimension(pDiffEqSys%n), intent(inout) :: F0
         real(WP), intent(in) :: h
         real(WP), dimension(size(Y0),1:DOP853_sint), intent(inout) :: k
-        real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
+        real(WP), dimension(size(Y0)), intent(out) :: Y1, Ysint_pre, Ysint
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
@@ -408,9 +413,9 @@ submodule (ERK) ERKStepInt
         aijkj = k(:,1)*DOP853_a(56)  + k(:,4)*DOP853_a(59) &
                 + k(:,5)*DOP853_a(60) + k(:,6)*DOP853_a(61) +  k(:,7)*DOP853_a(62) +  k(:,8)*DOP853_a(63) &
                 + k(:,9)*DOP853_a(64) +  k(:,10)*DOP853_a(65) +  k(:,11)*DOP853_a(66)
-        Yint12 = Y0 + h*aijkj        
-        k(:,12) = pDiffEqSys%F(X0 + h*DOP853_c(12), Yint12, params)
-        
+        Ysint_pre = Y0 + h*aijkj        
+        k(:,12) = pDiffEqSys%F(X0 + h*DOP853_c(12), Ysint_pre, params)
+
         ! 13th stage
         aijkj = k(:,1)*DOP853_a(67)  &
                 + k(:,6)*DOP853_a(72) +  k(:,7)*DOP853_a(73) +  k(:,8)*DOP853_a(74) &
@@ -453,6 +458,8 @@ submodule (ERK) ERKStepInt
             ! In FSAL methods, the intgeration last stage is F0 for the next step
             k(:,13) = pDiffEqSys%F(X0 + h, Yint, params)
             F0 = k(:,13)
+            ! this for stiffness detection
+            Ysint = Yint
             ! Function calls made if the step is accepted
             FCalls = DOP853_sint - 1    
         else
@@ -558,15 +565,15 @@ submodule (ERK) ERKStepInt
 
 
     !> It advances integrator by 1 step by computing stages
-    subroutine DOP54_stepint(pDiffEqSys, X0, Y0, F0, h, k, Y1, Yint12, FCalls, Err, &
-                                    IsScalarTol, RTol, ATol, params) 
+    subroutine DOP54_stepint(pDiffEqSys, X0, Y0, F0, h, k, Y1, Ysint_pre, Ysint, &
+                    FCalls, Err, IsScalarTol, RTol, ATol, params) 
         class(DiffEqSys), intent(inout)  :: pDiffEqSys
         real(WP), intent(in) :: X0
         real(WP), dimension(pDiffEqSys%n), intent(in) :: Y0
         real(WP), dimension(pDiffEqSys%n), intent(inout) :: F0
         real(WP), intent(in) :: h
         real(WP), dimension(size(Y0),1:DOP54_sint), intent(inout) :: k
-        real(WP), dimension(size(Y0)), intent(out) :: Y1, Yint12
+        real(WP), dimension(size(Y0)), intent(out) :: Y1, Ysint_pre, Ysint
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
@@ -600,13 +607,13 @@ submodule (ERK) ERKStepInt
         k(:,5) = pDiffEqSys%F(X0 + h*DOP54_c(5), Yint, params)
         
         ! 6th stage
-        Yint12 = Y0 + h*(k(:,1)*DOP54_a(11) + k(:,2)*DOP54_a(12) + k(:,3)*DOP54_a(13) &
-        +  k(:,4)*DOP54_a(14) + k(:,5)*DOP54_a(15))                
-        k(:,6) = pDiffEqSys%F(X0 + h*DOP54_c(6), Yint12, params)
+        Ysint_pre = Y0 + h*(k(:,1)*DOP54_a(11) + k(:,2)*DOP54_a(12) + k(:,3)*DOP54_a(13) &
+                        +  k(:,4)*DOP54_a(14) + k(:,5)*DOP54_a(15))                
+        k(:,6) = pDiffEqSys%F(X0 + h*DOP54_c(6), Ysint_pre, params)
         
         ! 7th stage
         Yint = Y0 + h*(k(:,1)*DOP54_a(16) + k(:,2)*DOP54_a(17) + k(:,3)*DOP54_a(18) &
-        + k(:,4)*DOP54_a(19) + k(:,5)*DOP54_a(20) + k(:,6)*DOP54_a(21))  
+                    + k(:,4)*DOP54_a(19) + k(:,5)*DOP54_a(20) + k(:,6)*DOP54_a(21))  
         k(:,7) = pDiffEqSys%F(X0 + h, Yint, params)
         
         ! propagate the solution to the next step for error computation
@@ -637,6 +644,8 @@ submodule (ERK) ERKStepInt
             Y1 = Yint
             ! In FSAL methods, the intgeration first stage is same as the last stage
             F0 = k(:,7)
+            ! this for stiffness detection
+            Ysint = Yint
             ! Function calls made if the step is accepted
             FCalls = DOP54_sint - 1    
         else
