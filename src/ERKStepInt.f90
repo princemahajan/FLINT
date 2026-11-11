@@ -134,7 +134,7 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
-        real(WP), dimension(size(Y0)), intent(in), optional :: RTol, ATol
+        real(WP), dimension(:), intent(in), optional :: RTol, ATol
         real(WP), dimension(1:sint), intent(in), optional :: e
         real(WP), dimension(:), intent(in), optional :: params
         
@@ -336,7 +336,7 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
-        real(WP), dimension(size(Y0)), intent(in), optional :: RTol, ATol
+        real(WP), dimension(:), intent(in), optional :: RTol, ATol
         real(WP), dimension(:), intent(in), optional :: params
                 
         real(WP), dimension(size(Y0)) :: Yint, aijkj, Sc
@@ -577,7 +577,7 @@ submodule (ERK) ERKStepInt
         integer, intent(out) :: FCalls
         real(WP), intent(out) :: Err
         logical, intent(in), optional :: IsScalarTol
-        real(WP), dimension(size(Y0)), intent(in), optional :: RTol, ATol
+        real(WP), dimension(:), intent(in), optional :: RTol, ATol
         real(WP), dimension(:), intent(in), optional :: params
 
         real(WP), dimension(size(Y0)) :: Yint, Sc
